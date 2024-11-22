@@ -1,5 +1,13 @@
-node_modules/
-dist/
-public/
-.vite/
+build
+coverage
+dist
+node_modules
+.next
+.cache
+.vscode
+.idea
+
+
 *.lock
+*.yaml
+*.yml
