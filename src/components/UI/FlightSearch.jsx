@@ -3,7 +3,7 @@ import { Plane, Calendar, Users, ArrowLeftRight } from 'lucide-react';
 
 const FlightSearch = () => {
   return (
-    <div className="relative z-20 max-w-6xl mx-auto pt-12 px-4">
+    <div className="relative z-20 max-w-5xl mx-auto pt-12 px-4">
       <div className="bg-white rounded-xl shadow-lg">
         <div className="p-6">
           <h2 className="text-xl font-bold mb-6">
