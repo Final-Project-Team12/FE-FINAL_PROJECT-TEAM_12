@@ -1,38 +1,39 @@
+import React from 'react';
 import { Timer } from 'lucide-react';
 import { FaArrowRightLong } from 'react-icons/fa6';
 
-const TravelCard = ({ from, to, airline, date, price, image, badge }) => {
+const TravelCard = ({ travel }) => {
   return (
-    <div className="max-w-sm rounded-lg overflow-hidden shadow-lg bg-white">
-      <div className="relative p-4 pt-4 pb-0">
-        <div className="rounded-t-lg overflow-hidden relative">
-          <img
-            src={image}
-            alt={`${from} to ${to}`}
-            className="w-full h-48 object-cover"
-          />
-          <div className="absolute top-0 right-0 bg-purple-500 text-white px-4 py-1 rounded-l-lg">
-            {badge}
-          </div>
+    <div className="bg-white rounded-lg shadow-lg overflow-hidden p-4 flex flex-col">
+      <div className="relative">
+        <img
+          src={travel.image}
+          alt={`${travel.from} to ${travel.to}`}
+          className="w-full h-48 object-cover rounded-lg"
+        />
+
+        <div className="absolute top-0 right-0 px-3 py-1 rounded-e-none rounded-s-lg text-sm font-bold text-white bg-purple-500">
+          {travel.badge}
         </div>
       </div>
 
-      <div className="p-4">
-        <div className="flex items-center gap-2 text-xl font-semibold mb-2">
-          <span>{from}</span>
+      <div className="mt-4 flex flex-col justify-between flex-1">
+        <div className="flex items-center gap-2 text-lg font-semibold mb-2">
+          <span>{travel.from}</span>
           <FaArrowRightLong size={16} />
-          <span>{to}</span>
+          <span>{travel.to}</span>
         </div>
 
-        <div className="text-purple-600 font-medium mb-2">{airline}</div>
+        <div className="text-purple-600 font-medium mb-2">{travel.airline}</div>
 
-        <div className="flex items-center gap-2 text-gray-600 mb-3">
+        <div className="flex items-center gap-2 text-gray-600 mb-4">
           <Timer size={16} />
-          <span>{date}</span>
+          <span>{travel.date}</span>
         </div>
 
         <div className="text-lg">
-          Mulai dari <span className="text-red-500 font-bold">IDR {price}</span>
+          Mulai dari{' '}
+          <span className="text-red-500 font-bold">IDR {travel.price}</span>
         </div>
       </div>
     </div>
