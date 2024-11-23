@@ -1,8 +1,9 @@
 import React from 'react';
-import TravelCard from './UI/TravelCard';
-import ImageDestination from '../../public/images/destination.jpeg';
 import Navbar from './UI/Navbar';
 import FlightSearch from './UI/FlightSearch';
+import Banner from './Elements/Banner/Banner';
+import DestinationFilter from './UI/DestinationFilter';
+import ImageDestination from '../../public/images/destination.jpeg';
 
 const travelData = [
   {
@@ -59,26 +60,16 @@ const travelData = [
 
 const Home = () => {
   return (
-    <>
-      <div className="container mx-auto p-4">
-        <Navbar />
-        <FlightSearch />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {travelData.map((travel) => (
-            <TravelCard
-              key={travel.id}
-              from={travel.from}
-              to={travel.to}
-              airline={travel.airline}
-              date={travel.date}
-              price={travel.price}
-              image={travel.image}
-              badge={travel.badge}
-            />
-          ))}
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      <main className="container mx-auto px-4 lg:px-6 py-4">
+        <div className="relative">
+          <Banner />
+          <FlightSearch />
+          <DestinationFilter travelData={travelData} />
         </div>
-      </div>
-    </>
+      </main>
+    </div>
   );
 };
 
