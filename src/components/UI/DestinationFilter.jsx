@@ -17,7 +17,7 @@ const DestinationFilter = ({ travelData }) => {
   const [activeContinent, setActiveContinent] = useState('all');
 
   return (
-    <div className="mt-8 px-4 max-w-6xl mx-auto">
+    <div className="mt-8 max-w-6xl mx-auto overflow-x-hidden">
       <h2 className="text-2xl font-bold mb-4">Destinasi Favorit</h2>
 
       <div className="flex flex-wrap gap-3">
