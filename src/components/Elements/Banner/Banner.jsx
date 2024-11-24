@@ -19,7 +19,7 @@ const Banner = () => {
             className="w-full h-full object-cover"
           />
           <div className="absolute top-0 left-0 w-full h-full z-10">
-            <div className="h-full flex items-center px-4 md:px-8">
+            <div className="h-full flex items-start py-4 md:items-center md:py-0 px-4 md:px-8">
               <div className="max-w-md md:max-w-2xl">
                 <h1 className="text-3xl md:text-5xl font-bold italic mb-2 md:mb-4">
                   Diskon Hari ini
