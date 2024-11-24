@@ -1,77 +1,64 @@
 import React, { useState } from 'react';
-import { ArrowLeftRight, Search, X } from 'lucide-react';
+import { ArrowLeftRight } from 'lucide-react';
 import {
   MdFlightTakeoff,
   MdDateRange,
   MdOutlineAirlineSeatReclineNormal,
 } from 'react-icons/md';
-
-const CitySelectionModal = ({ isOpen, onClose, onSelect, title }) => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const recentCities = ['Jakarta', 'Bandung', 'Surabaya'];
-
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div
-        className="absolute inset-0 bg-black bg-opacity-50"
-        onClick={onClose}
-      />
-      <div
-        className="bg-white w-full max-w-xl rounded-2xl overflow-hidden relative transform transition-all duration-300 ease-out"
-        style={{
-          animation: 'slideUp 0.3s ease-out',
-        }}
-      >
-        <div className="p-4">
-          <div className="flex items-center border rounded-lg p-2 mb-6">
-            <Search className="text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Masukkan Kota atau Negara"
-              className="ml-2 flex-1 outline-none text-sm"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <button onClick={onClose}>
-              <X className="w-5 h-5 text-gray-400" />
-            </button>
-          </div>
-
-          <div>
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-semibold text-lg">Pencarian terkini</h3>
-              <button className="text-red-500 text-sm">Hapus</button>
-            </div>
-
-            <div className="space-y-4">
-              {recentCities.map((city) => (
-                <div
-                  key={city}
-                  className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg cursor-pointer"
-                  onClick={() => {
-                    onSelect(city);
-                    onClose();
-                  }}
-                >
-                  <span>{city}</span>
-                  <X className="w-4 h-4 text-gray-400" />
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
+import CitySelectionModal from '../Elements/Modal/CitySelectionModal';
+import DatePickerModal from '../Elements/Modal/DatePickerModal';
+import PassengerSelector from '../Elements/Modal/PassengerSelector';
+import SeatClassModal from '../Elements/Modal/SeatClassModal';
 
 const FlightSearch = () => {
   const [fromCity, setFromCity] = useState('Jakarta (JKTA)');
   const [toCity, setToCity] = useState('Melbourne (MLB)');
+  const [departureDate, setDepartureDate] = useState(new Date('2023-03-01'));
+  const [returnDate, setReturnDate] = useState(null);
   const [isFromModalOpen, setIsFromModalOpen] = useState(false);
   const [isToModalOpen, setIsToModalOpen] = useState(false);
+  const [isDepartureDateModalOpen, setIsDepartureDateModalOpen] =
+    useState(false);
+  const [isReturnDateModalOpen, setIsReturnDateModalOpen] = useState(false);
+  const [isPassengerSelectorOpen, setIsPassengerSelectorOpen] = useState(false);
+  const [passengerCounts, setPassengerCounts] = useState({
+    adult: 2,
+    child: 0,
+    infant: 1,
+  });
+  const [isSeatClassModalOpen, setIsSeatClassModalOpen] = useState(false);
+  const [selectedSeatClass, setSelectedSeatClass] = useState('Business');
+
+  const formatDate = (date) => {
+    if (!date) return '';
+    const months = [
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
+    ];
+    return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+  };
+
+  const handleSwapCities = () => {
+    const tempFrom = fromCity;
+    setFromCity(toCity);
+    setToCity(tempFrom);
+  };
+
+  const getTotalPassengers = () => {
+    const total =
+      passengerCounts.adult + passengerCounts.child + passengerCounts.infant;
+    return `${total} Penumpang`;
+  };
 
   return (
     <>
@@ -84,7 +71,9 @@ const FlightSearch = () => {
             </h2>
 
             <div className="space-y-4 md:space-y-6">
+              {/* City Selection Section */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 items-center relative">
+                {/* From City */}
                 <div>
                   <div className="text-gray-500 text-xs mb-1">From</div>
                   <div
@@ -103,12 +92,17 @@ const FlightSearch = () => {
                   </div>
                 </div>
 
+                {/* Swap Button */}
                 <div className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-                  <div className="bg-black rounded-full p-1.5 mx-4">
+                  <button
+                    onClick={handleSwapCities}
+                    className="bg-black rounded-full p-1.5 mx-4 hover:bg-gray-800 transition-colors"
+                  >
                     <ArrowLeftRight size={16} className="text-white" />
-                  </div>
+                  </button>
                 </div>
 
+                {/* To City */}
                 <div>
                   <div className="text-gray-500 text-xs mb-1">To</div>
                   <div
@@ -131,37 +125,49 @@ const FlightSearch = () => {
               {/* Date and Passengers Section */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Departure Date */}
                   <div>
                     <div className="text-gray-500 text-xs mb-1">Departure</div>
-                    <div className="relative flex items-center">
+                    <div
+                      className="relative flex items-center cursor-pointer"
+                      onClick={() => setIsDepartureDateModalOpen(true)}
+                    >
                       <div className="flex items-center px-3">
                         <MdDateRange size={20} className="text-gray-400" />
                       </div>
                       <input
                         type="text"
-                        value="1 Maret 2023"
-                        className="flex-1 py-2 text-sm md:text-base focus:outline-none focus:border-purple-600 border-b"
+                        value={formatDate(departureDate)}
+                        className="flex-1 py-2 text-sm md:text-base focus:outline-none focus:border-purple-600 border-b cursor-pointer"
                         readOnly
                       />
                     </div>
                   </div>
 
+                  {/* Return Date */}
                   <div>
                     <div className="text-gray-500 text-xs mb-1">Return</div>
-                    <div className="relative flex items-center">
+                    <div
+                      className="relative flex items-center cursor-pointer"
+                      onClick={() => setIsReturnDateModalOpen(true)}
+                    >
                       <div className="flex items-center px-3">
                         <MdDateRange size={20} className="text-gray-400" />
                       </div>
                       <input
                         type="text"
+                        value={formatDate(returnDate)}
                         placeholder="Pilih Tanggal"
-                        className="flex-1 py-2 text-sm md:text-base focus:outline-none focus:border-purple-600 border-b placeholder-purple-600"
+                        className="flex-1 py-2 text-sm md:text-base focus:outline-none focus:border-purple-600 border-b placeholder-purple-600 cursor-pointer"
+                        readOnly
                       />
                     </div>
                   </div>
                 </div>
 
+                {/* Passengers and Seat Class */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Passengers */}
                   <div>
                     <div className="text-gray-500 text-xs mb-1">Passengers</div>
                     <div className="relative flex items-center">
@@ -173,20 +179,31 @@ const FlightSearch = () => {
                       </div>
                       <input
                         type="text"
-                        value="2 Penumpang"
-                        className="flex-1 py-2 text-sm md:text-base focus:outline-none focus:border-purple-600 border-b"
+                        value={getTotalPassengers()}
+                        className="flex-1 py-2 text-sm md:text-base focus:outline-none focus:border-purple-600 border-b cursor-pointer"
                         readOnly
+                        onClick={() =>
+                          setIsPassengerSelectorOpen(!isPassengerSelectorOpen)
+                        }
+                      />
+                      <PassengerSelector
+                        isOpen={isPassengerSelectorOpen}
+                        onClose={() => setIsPassengerSelectorOpen(false)}
+                        passengerCounts={passengerCounts}
+                        onUpdatePassengers={setPassengerCounts}
                       />
                     </div>
                   </div>
 
+                  {/* Seat Class */}
                   <div>
                     <div className="text-gray-500 text-xs mb-1">Seat Class</div>
                     <input
                       type="text"
-                      value="Business"
+                      value={selectedSeatClass}
                       className="w-full py-2 border-b text-sm md:text-base focus:outline-none focus:border-purple-600"
                       readOnly
+                      onClick={() => setIsSeatClassModalOpen(true)}
                     />
                   </div>
                 </div>
@@ -200,6 +217,7 @@ const FlightSearch = () => {
         </div>
       </div>
 
+      {/* Modals */}
       <CitySelectionModal
         isOpen={isFromModalOpen}
         onClose={() => setIsFromModalOpen(false)}
@@ -216,6 +234,35 @@ const FlightSearch = () => {
           setToCity(`${city} (${city.substring(0, 4).toUpperCase()})`)
         }
         title="To"
+      />
+
+      <DatePickerModal
+        isOpen={isDepartureDateModalOpen}
+        onClose={() => setIsDepartureDateModalOpen(false)}
+        onSelect={(date) => {
+          setDepartureDate(date);
+          setIsDepartureDateModalOpen(false);
+        }}
+        selectedDate={departureDate}
+        title="Select Departure Date"
+      />
+
+      <DatePickerModal
+        isOpen={isReturnDateModalOpen}
+        onClose={() => setIsReturnDateModalOpen(false)}
+        onSelect={(date) => {
+          setReturnDate(date);
+          setIsReturnDateModalOpen(false);
+        }}
+        selectedDate={returnDate}
+        title="Select Return Date"
+      />
+
+      <SeatClassModal
+        isOpen={isSeatClassModalOpen}
+        onClose={() => setIsSeatClassModalOpen(false)}
+        onSelect={setSelectedSeatClass}
+        selectedClass={selectedSeatClass}
       />
 
       <style jsx global>{`
