@@ -1,6 +1,8 @@
 import React from 'react';
 import { X } from 'lucide-react';
-import { User, Users, Baby } from 'lucide-react';
+import ChildIcon from '../../../../public/icons/Child-Icon.svg';
+import AdultIcon from '../../../../public/icons/Adult-icon.svg';
+import BabyIcon from '../../../../public/icons/Baby-icon.svg';
 
 const PassengerSelector = ({
   isOpen,
@@ -43,7 +45,7 @@ const PassengerSelector = ({
           <div className="space-y-8">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <User size={24} className="text-gray-600" />
+                <img src={AdultIcon} alt="Adult Icon" className="w-8 h-8" />
                 <div>
                   <h3 className="text-lg font-semibold">Dewasa</h3>
                   <p className="text-sm text-gray-400">(12 tahun keatas)</p>
@@ -70,7 +72,7 @@ const PassengerSelector = ({
 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <Users size={24} className="text-gray-600" />
+                <img src={ChildIcon} alt="Child Icon" className="w-8 h-8" />
                 <div>
                   <h3 className="text-lg font-semibold">Anak</h3>
                   <p className="text-sm text-gray-400">(2 - 11 tahun)</p>
@@ -97,7 +99,7 @@ const PassengerSelector = ({
 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <Baby size={24} className="text-gray-600" />
+                <img src={BabyIcon} alt="Baby Icon" className="w-8 h-8" />
                 <div>
                   <h3 className="text-lg font-semibold">Bayi</h3>
                   <p className="text-sm text-gray-400">(Dibawah 2 tahun)</p>
