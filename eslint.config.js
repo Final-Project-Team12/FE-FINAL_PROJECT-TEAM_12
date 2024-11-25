@@ -33,7 +33,7 @@ export default [
       'react/prop-types': 'off',
       'react/react-in-jsx-scope': 'off',
       'react-hooks/rules-of-hooks': 'error',
-      'react-hooks/exhaustive-deps': 'warn',
+      'react-hooks/exhaustive-deps': 'off',
       'react/require-default-props': 'off',
       'react/jsx-props-no-spreading': 'off',
       'react/jsx-no-undef': 'off',
