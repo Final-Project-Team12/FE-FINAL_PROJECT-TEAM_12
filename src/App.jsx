@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import NotFoundPage from './pages/NotFoundPage';
 import Homepage from './pages/Homepage';
-import FlightTicket from './pages/FligthTicket';
+import FlightTicketPage from './pages/FligthTicketPage';
 import PaymentPage from './pages/PaymentPage';
 
 function App() {
@@ -10,7 +10,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Homepage />} />
-          <Route path="/fligth-ticket" element={<FlightTicket />} />
+          <Route path="/fligth-ticket" element={<FlightTicketPage />} />
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
