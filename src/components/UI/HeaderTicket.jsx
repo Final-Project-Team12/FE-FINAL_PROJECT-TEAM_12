@@ -46,9 +46,11 @@ const HeaderTicket = () => {
             <img
               src="../../public/icons/fi_arrow-left.svg"
               alt=""
-              className="w-6 h-6 ml-4 hover:scale-125 hover: transition-all duration-100"
+              className="w-6 h-6 ml-4 hover:scale-125 hover: transition-all duration-10 text-white"
             />
-            ini data dinamisnya
+            <div className="ml-3 text-white">
+              Ini data dinamisnya
+            </div>
           </div>
           <button className="w-[220px] h-[50px] rounded-[12px] bg-[#73CA5C] font-bold text-white">
             Ubah Pencarian

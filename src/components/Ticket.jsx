@@ -1,13 +1,13 @@
 import Navbar from './UI/Navbar';
 import HeaderTicket from './UI/HeaderTicket';
-import FilterSidebar from './UI/FilterSidebar';
+import LeftFilterTicket from "./UI/LeftFilterTicket";
 
 const Ticket = () => {
   return (
     <>
       <Navbar />
       <HeaderTicket />
-      <FilterSidebar />
+      <LeftFilterTicket/>
     </>
   );
 };
