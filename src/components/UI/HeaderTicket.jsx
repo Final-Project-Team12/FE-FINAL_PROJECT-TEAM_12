@@ -35,7 +35,7 @@ const HeaderTicket = () => {
   const [activeIndex, setActiveIndex] = useState(null);
 
   return (
-    <div className="border-b shadow-[0px_2px_10px_rgba(0,0,0,0.1)]">
+    <div className="border-b shadow-[0px_4px_10px_rgba(0,0,0,0.1)]">
       <div className="ml-[260px] mr-[212px] mt-[47px]">
         <h2 className="text-xl font-bold mb-[24px]">Pilih Penerbangan</h2>
         <div className="flex gap-3 mx-4">
