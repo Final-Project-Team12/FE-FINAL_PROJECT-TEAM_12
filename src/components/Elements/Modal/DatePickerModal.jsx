@@ -1,5 +1,4 @@
-// DatePickerModal.js
-import React from 'react';
+import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const DatePickerModal = ({
@@ -9,8 +8,8 @@ const DatePickerModal = ({
   selectedDate,
   title,
 }) => {
-  const [currentDate, setCurrentDate] = React.useState(new Date());
-  const [nextMonthDate, setNextMonthDate] = React.useState(
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [nextMonthDate, setNextMonthDate] = useState(
     new Date(new Date().setMonth(currentDate.getMonth() + 1))
   );
 
