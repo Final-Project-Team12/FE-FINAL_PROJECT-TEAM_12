@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 
 const LeftFilterTicket = () => {
   const [filters, setFilters] = useState({
@@ -7,9 +7,9 @@ const LeftFilterTicket = () => {
     harga: false,
   });
 
-  const [isModalOpen, setModalOpen] = useState(false); 
-  const [priceRange, setPriceRange] = useState({ min: "", max: "" }); 
-  const [appliedPriceRange, setAppliedPriceRange] = useState(null); 
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [priceRange, setPriceRange] = useState({ min: '', max: '' });
+  const [appliedPriceRange, setAppliedPriceRange] = useState(null);
 
   const toggleFilter = (key) => {
     setFilters((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -21,11 +21,15 @@ const LeftFilterTicket = () => {
   };
 
   const applyPriceFilter = () => {
-    if (priceRange.min && priceRange.max && Number(priceRange.min) <= Number(priceRange.max)) {
-      setAppliedPriceRange({ ...priceRange }); 
-      setModalOpen(false); 
+    if (
+      priceRange.min &&
+      priceRange.max &&
+      Number(priceRange.min) <= Number(priceRange.max)
+    ) {
+      setAppliedPriceRange({ ...priceRange });
+      setModalOpen(false);
     } else {
-      alert("Masukkan rentang harga yang valid!");
+      alert('Masukkan rentang harga yang valid!');
     }
   };
 
@@ -41,7 +45,9 @@ const LeftFilterTicket = () => {
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
-        d={isOpen ? "M19.5 8.25l-7.5 7.5-7.5-7.5" : "M8.25 19.5l7.5-7.5-7.5-7.5"}
+        d={
+          isOpen ? 'M19.5 8.25l-7.5 7.5-7.5-7.5' : 'M8.25 19.5l7.5-7.5-7.5-7.5'
+        }
       />
     </svg>
   );
@@ -56,7 +62,7 @@ const LeftFilterTicket = () => {
           <div>
             <div
               className="flex items-center justify-between cursor-pointer"
-              onClick={() => toggleFilter("transit")}
+              onClick={() => toggleFilter('transit')}
               aria-expanded={filters.transit}
             >
               <span className="font-medium">Transit</span>
@@ -93,7 +99,7 @@ const LeftFilterTicket = () => {
           <div>
             <div
               className="flex items-center justify-between cursor-pointer"
-              onClick={() => toggleFilter("fasilitas")}
+              onClick={() => toggleFilter('fasilitas')}
               aria-expanded={filters.fasilitas}
             >
               <span className="font-medium">Fasilitas</span>
@@ -146,11 +152,13 @@ const LeftFilterTicket = () => {
           <div className="bg-white w-[400px] rounded-lg shadow-lg p-6 relative">
             <button
               className="absolute top-2 right-2 text-gray-500"
-              onClick={() => setModalOpen(false)} 
+              onClick={() => setModalOpen(false)}
             >
               &times;
             </button>
-            <h4 className="text-lg font-semibold text-purple-600 mb-4">Masukkan Rentang Harga</h4>
+            <h4 className="text-lg font-semibold text-purple-600 mb-4">
+              Masukkan Rentang Harga
+            </h4>
             <div className="flex flex-col gap-4">
               <div>
                 <label htmlFor="min-price" className="text-sm text-gray-700">

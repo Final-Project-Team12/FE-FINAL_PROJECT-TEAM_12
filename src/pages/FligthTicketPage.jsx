@@ -1,7 +1,7 @@
 import Ticket from '../components/Ticket';
 
-const FlightTicket = () => {
+const FlightTicketPage = () => {
   return <Ticket />;
 };
 
-export default FlightTicket;
+export default FlightTicketPage;
