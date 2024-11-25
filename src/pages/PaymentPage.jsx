@@ -3,6 +3,7 @@ import { Clock } from 'lucide-react';
 import Navbar from '../components/UI/Navbar';
 import Stepper from '../components/UI/Stepper';
 import OrderForm from '../components/UI/OrderForm';
+import FlightDetails from '../components/UI/FlightDetail';
 
 const PaymentPage = () => {
   const [timeLeft, setTimeLeft] = useState(900); // 15 minutes in seconds
@@ -24,7 +25,9 @@ const PaymentPage = () => {
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
-    return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+    return `${String(minutes).padStart(2, '0')}:${String(
+      remainingSeconds
+    ).padStart(2, '0')}`;
   };
 
   return (
@@ -43,8 +46,12 @@ const PaymentPage = () => {
           </div>
         </div>
       </div>
-      <div className="max-w-6xl mx-auto px-4">
+      <div className="max-w-6xl mx-auto px-4 flex space-x-6 mt-8 justify-center">
         <OrderForm />
+
+        <div className="w-[450px] mt-4">
+          <FlightDetails />
+        </div>
       </div>
     </div>
   );
