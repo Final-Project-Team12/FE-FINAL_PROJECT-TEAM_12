@@ -115,12 +115,6 @@ const LeftFilterTicket = () => {
                     Makanan
                   </label>
                 </li>
-                <li>
-                  <input type="checkbox" id="recline" />
-                  <label htmlFor="recline" className="ml-2">
-                    Kursi Bisa Direbahkan
-                  </label>
-                </li>
               </ul>
             )}
           </div>
