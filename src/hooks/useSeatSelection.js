@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getSeatLayout } from '../services/ticket.service';
 
-export const useSeatSelection = (maxSeats) => {
-  const [selectedSeats, setSelectedSeats] = useState([]);
+export const useSeatSelection = () => {
   const [seatLayout, setSeatLayout] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -27,23 +26,9 @@ export const useSeatSelection = (maxSeats) => {
     fetchSeatLayout();
   }, []);
 
-  const handleSeatSelect = (seatId) => {
-    setSelectedSeats((prev) => {
-      if (prev.includes(seatId)) {
-        return prev.filter((id) => id !== seatId);
-      }
-      if (prev.length < maxSeats) {
-        return [...prev, seatId];
-      }
-      return prev;
-    });
-  };
-
   return {
-    selectedSeats,
     seatLayout,
     loading,
     error,
-    handleSeatSelect,
   };
 };
