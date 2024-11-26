@@ -19,6 +19,32 @@ export const getAllDestinations = async (page, limit) => {
   }
 };
 
+export const getSeatLayout = async () => {
+  try {
+    const seatLayout = {
+      totalRows: 12,
+      totalSeats: 72,
+      availableSeats: 64,
+      leftColumns: ['A', 'B', 'C'],
+      rightColumns: ['D', 'E', 'F'],
+      specialSeats: {
+        D3: 'P1',
+        E3: 'P2',
+      },
+    };
+
+    return {
+      isSuccess: true,
+      data: seatLayout,
+    };
+  } catch (error) {
+    return {
+      isSuccess: false,
+      message: error.message,
+    };
+  }
+};
+
 export const getDestinationById = async (id, callback) => {
   try {
     const response = await axiosInstance(`/destinations/${id}`);

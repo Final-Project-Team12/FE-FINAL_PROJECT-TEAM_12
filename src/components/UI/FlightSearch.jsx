@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import { ArrowLeftRight } from 'lucide-react';
 import {
   MdFlightTakeoff,
@@ -9,56 +8,41 @@ import CitySelectionModal from '../Elements/Modal/CitySelectionModal';
 import DatePickerModal from '../Elements/Modal/DatePickerModal';
 import PassengerSelector from '../Elements/Modal/PassengerSelector';
 import SeatClassModal from '../Elements/Modal/SeatClassModal';
+import { useFlightSearch } from '../../hooks/useFlightSearch';
+import { Switch } from '@headlessui/react';
 
 const FlightSearch = () => {
-  const [fromCity, setFromCity] = useState('Jakarta (JKTA)');
-  const [toCity, setToCity] = useState('Melbourne (MLB)');
-  const [departureDate, setDepartureDate] = useState(new Date('2023-03-01'));
-  const [returnDate, setReturnDate] = useState(null);
-  const [isFromModalOpen, setIsFromModalOpen] = useState(false);
-  const [isToModalOpen, setIsToModalOpen] = useState(false);
-  const [isDepartureDateModalOpen, setIsDepartureDateModalOpen] =
-    useState(false);
-  const [isReturnDateModalOpen, setIsReturnDateModalOpen] = useState(false);
-  const [isPassengerSelectorOpen, setIsPassengerSelectorOpen] = useState(false);
-  const [passengerCounts, setPassengerCounts] = useState({
-    adult: 2,
-    child: 0,
-    infant: 1,
-  });
-  const [isSeatClassModalOpen, setIsSeatClassModalOpen] = useState(false);
-  const [selectedSeatClass, setSelectedSeatClass] = useState('Business');
-
-  const formatDate = (date) => {
-    if (!date) return '';
-    const months = [
-      'Januari',
-      'Februari',
-      'Maret',
-      'April',
-      'Mei',
-      'Juni',
-      'Juli',
-      'Agustus',
-      'September',
-      'Oktober',
-      'November',
-      'Desember',
-    ];
-    return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
-  };
-
-  const handleSwapCities = () => {
-    const tempFrom = fromCity;
-    setFromCity(toCity);
-    setToCity(tempFrom);
-  };
-
-  const getTotalPassengers = () => {
-    const total =
-      passengerCounts.adult + passengerCounts.child + passengerCounts.infant;
-    return `${total} Penumpang`;
-  };
+  const {
+    fromCity,
+    toCity,
+    departureDate,
+    returnDate,
+    passengerCounts,
+    selectedSeatClass,
+    isRoundTrip,
+    isFromModalOpen,
+    isToModalOpen,
+    isDepartureDateModalOpen,
+    isReturnDateModalOpen,
+    isPassengerSelectorOpen,
+    isSeatClassModalOpen,
+    setFromCity,
+    setToCity,
+    setDepartureDate,
+    setReturnDate,
+    setPassengerCounts,
+    setSelectedSeatClass,
+    setIsRoundTrip,
+    setIsFromModalOpen,
+    setIsToModalOpen,
+    setIsDepartureDateModalOpen,
+    setIsReturnDateModalOpen,
+    setIsPassengerSelectorOpen,
+    setIsSeatClassModalOpen,
+    formatDate,
+    handleSwapCities,
+    getTotalPassengers,
+  } = useFlightSearch();
 
   return (
     <>
@@ -71,9 +55,8 @@ const FlightSearch = () => {
             </h2>
 
             <div className="space-y-4 md:space-y-6">
-              {/* City Selection Section */}
+              {/* From and To Section */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 items-center relative">
-                {/* From City */}
                 <div>
                   <div className="text-gray-500 text-xs mb-1">From</div>
                   <div
@@ -86,13 +69,13 @@ const FlightSearch = () => {
                     <input
                       type="text"
                       value={fromCity}
+                      placeholder="Jakarta (JKTA)"
                       className="flex-1 py-2 text-sm md:text-base focus:outline-none focus:border-purple-600 border-b cursor-pointer"
                       readOnly
                     />
                   </div>
                 </div>
 
-                {/* Swap Button */}
                 <div className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
                   <button
                     onClick={handleSwapCities}
@@ -102,7 +85,6 @@ const FlightSearch = () => {
                   </button>
                 </div>
 
-                {/* To City */}
                 <div>
                   <div className="text-gray-500 text-xs mb-1">To</div>
                   <div
@@ -115,6 +97,7 @@ const FlightSearch = () => {
                     <input
                       type="text"
                       value={toCity}
+                      placeholder="Bandung (BDG)"
                       className="flex-1 py-2 text-sm md:text-base focus:outline-none focus:border-purple-600 border-b cursor-pointer"
                       readOnly
                     />
@@ -144,22 +127,43 @@ const FlightSearch = () => {
                     </div>
                   </div>
 
-                  {/* Return Date */}
+                  {/* Return Date with Toggle */}
                   <div>
-                    <div className="text-gray-500 text-xs mb-1">Return</div>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-gray-500 text-xs">Return</span>
+                      <Switch
+                        checked={isRoundTrip}
+                        onChange={setIsRoundTrip}
+                        className={`${
+                          isRoundTrip ? 'bg-purple-600' : 'bg-gray-200'
+                        } relative inline-flex h-5 w-10 items-center rounded-full transition-colors focus:outline-none`}
+                      >
+                        <span
+                          className={`${
+                            isRoundTrip ? 'translate-x-6' : 'translate-x-1'
+                          } inline-block h-3 w-3 transform rounded-full bg-white transition-transform`}
+                        />
+                      </Switch>
+                    </div>
                     <div
-                      className="relative flex items-center cursor-pointer"
-                      onClick={() => setIsReturnDateModalOpen(true)}
+                      className={`relative flex items-center cursor-pointer ${
+                        !isRoundTrip && 'opacity-50'
+                      }`}
+                      onClick={() =>
+                        isRoundTrip && setIsReturnDateModalOpen(true)
+                      }
                     >
                       <div className="flex items-center px-3">
                         <MdDateRange size={20} className="text-gray-400" />
                       </div>
                       <input
                         type="text"
-                        value={formatDate(returnDate)}
-                        placeholder="Pilih Tanggal"
-                        className="flex-1 py-2 text-sm md:text-base focus:outline-none focus:border-purple-600 border-b placeholder-purple-600 cursor-pointer"
+                        value={
+                          isRoundTrip ? formatDate(returnDate) : 'Pilih Tanggal'
+                        }
+                        className="flex-1 py-2 text-sm md:text-base focus:outline-none focus:border-purple-600 border-b cursor-pointer"
                         readOnly
+                        disabled={!isRoundTrip}
                       />
                     </div>
                   </div>
@@ -167,7 +171,6 @@ const FlightSearch = () => {
 
                 {/* Passengers and Seat Class */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Passengers */}
                   <div>
                     <div className="text-gray-500 text-xs mb-1">Passengers</div>
                     <div className="relative flex items-center">
@@ -182,26 +185,17 @@ const FlightSearch = () => {
                         value={getTotalPassengers()}
                         className="flex-1 py-2 text-sm md:text-base focus:outline-none focus:border-purple-600 border-b cursor-pointer"
                         readOnly
-                        onClick={() =>
-                          setIsPassengerSelectorOpen(!isPassengerSelectorOpen)
-                        }
-                      />
-                      <PassengerSelector
-                        isOpen={isPassengerSelectorOpen}
-                        onClose={() => setIsPassengerSelectorOpen(false)}
-                        passengerCounts={passengerCounts}
-                        onUpdatePassengers={setPassengerCounts}
+                        onClick={() => setIsPassengerSelectorOpen(true)}
                       />
                     </div>
                   </div>
 
-                  {/* Seat Class */}
                   <div>
                     <div className="text-gray-500 text-xs mb-1">Seat Class</div>
                     <input
                       type="text"
                       value={selectedSeatClass}
-                      className="w-full py-2 border-b text-sm md:text-base focus:outline-none focus:border-purple-600"
+                      className="w-full py-2 border-b text-sm md:text-base focus:outline-none focus:border-purple-600 cursor-pointer"
                       readOnly
                       onClick={() => setIsSeatClassModalOpen(true)}
                     />
@@ -263,6 +257,13 @@ const FlightSearch = () => {
         onClose={() => setIsSeatClassModalOpen(false)}
         onSelect={setSelectedSeatClass}
         selectedClass={selectedSeatClass}
+      />
+
+      <PassengerSelector
+        isOpen={isPassengerSelectorOpen}
+        onClose={() => setIsPassengerSelectorOpen(false)}
+        passengerCounts={passengerCounts}
+        onUpdatePassengers={setPassengerCounts}
       />
     </>
   );
