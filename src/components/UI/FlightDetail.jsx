@@ -1,63 +1,99 @@
+import { useEffect } from 'react';
 import Icon from '../../../public/icons/flower_icon.svg';
+import useFlightDetails from '../../hooks/useFlightDetails';
 
 const FlightDetails = () => {
+  const { flightDetails, loading, fetchFlightDetails } = useFlightDetails();
+
+  useEffect(() => {
+    fetchFlightDetails();
+  }, []);
+
+  if (loading) return <div>Loading...</div>;
+  if (!flightDetails) return null;
+
   return (
-    <div className="border border-gray-300 rounded-lg p-6 w-full max-w-xl">
-      <div className="flex justify-between items-start">
+    <div className="bg-white rounded-lg p-6 w-full max-w-xl border border-gray-300">
+      <h1 className="text-2xl font-bold mb-6">Detail Penerbangan</h1>
+
+      <div className="flex justify-between items-start mb-4">
         <div>
-          <p className="text-gray-700 font-semibold text-xl">07:00</p>
-          <p className="text-gray-500 text-lg">3 Maret 2023</p>
-          <p className="text-gray-500 text-lg">
-            Soekarno Hatta - Terminal 1A Domestik
-          </p>
+          <p className="text-2xl font-bold">{flightDetails.departure.time}</p>
+          <p className="text-gray-600">{flightDetails.departure.date}</p>
+          <p className="text-gray-600">{flightDetails.departure.airport}</p>
         </div>
-        <h2 className="text-gray-700 font-bold text-xl">Keberangkatan</h2>
+        <p className="text-purple-600 font-semibold">Keberangkatan</p>
       </div>
-      <hr className="border-gray-300 my-4" />
-      <div className="flex items-center">
-        <img src={Icon} alt="icon" className="w-8 h-8 mr-4" />
+
+      <hr className="my-4" />
+
+      <div className="flex items-center gap-4 mb-4">
+        <img src={Icon} alt="airline" className="w-8 h-8" />
         <div>
-          <h3 className="text-gray-700 font-bold text-lg">Jet Air - Economy</h3>
-          <p className="text-gray-500 text-lg">JT - 203</p>
+          <h3 className="font-bold text-lg">{flightDetails.flight.airline}</h3>
+          <p className="text-gray-600">{flightDetails.flight.code}</p>
           <div className="mt-4">
-            <h4 className="text-gray-700 font-semibold text-lg">Informasi:</h4>
-            <ul className="text-gray-500 space-y-2 text-lg">
-              <li>Baggage 20 kg</li>
-              <li>Cabin baggage 7 kg</li>
-              <li>In Flight Entertainment</li>
+            <h4 className="font-semibold mb-2">Informasi:</h4>
+            <ul className="space-y-1">
+              {flightDetails.flight.info.map((info, index) => (
+                <li key={index} className="text-gray-600">
+                  {info}
+                </li>
+              ))}
             </ul>
           </div>
         </div>
       </div>
-      <hr className="border-gray-300 my-4" />
-      <div className="flex justify-between items-start">
+
+      <hr className="my-4" />
+
+      <div className="flex justify-between items-start mb-4">
         <div>
-          <p className="text-gray-700 font-semibold text-xl">11:00</p>
-          <p className="text-gray-500 text-lg">3 Maret 2023</p>
-          <p className="text-gray-500 text-lg">
-            Melbourne International Airport
-          </p>
+          <p className="text-2xl font-bold">{flightDetails.arrival.time}</p>
+          <p className="text-gray-600">{flightDetails.arrival.date}</p>
+          <p className="text-gray-600">{flightDetails.arrival.airport}</p>
         </div>
-        <h2 className="text-gray-700 font-bold text-xl">Kedatangan</h2>
+        <p className="text-purple-600 font-semibold">Kedatangan</p>
       </div>
-      <hr className="border-gray-300 my-4" />
+
+      <hr className="my-4" />
+
       <div>
-        <h3 className="text-gray-700 font-bold text-lg">Rincian Harga</h3>
-        <div className="flex justify-between text-gray-500 text-lg">
-          <p>2 Adults</p>
-          <p>IDR 9.550.000</p>
-        </div>
-        <div className="flex justify-between text-gray-500 text-lg">
-          <p>1 Baby</p>
-          <p>IDR 0</p>
-        </div>
-        <div className="flex justify-between text-gray-500 text-lg">
-          <p>Tax</p>
-          <p>IDR 300.000</p>
-        </div>
-        <div className="flex justify-between border-t border-gray-300 pt-4 text-purple-700 font-bold text-2xl mt-4">
-          <p className="text-xl text-black">Total</p>
-          <p>IDR 9.850.000</p>
+        <h3 className="font-bold text-lg mb-4">Rincian Harga</h3>
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <p className="text-gray-600">
+              {flightDetails.pricing.adults.count} Adults
+            </p>
+            <p className="text-gray-600">
+              IDR {flightDetails.pricing.adults.price.toLocaleString()}
+            </p>
+          </div>
+          <div className="flex justify-between">
+            <p className="text-gray-600">
+              {flightDetails.pricing.baby.count} Baby
+            </p>
+            <p className="text-gray-600">
+              IDR {flightDetails.pricing.baby.price}
+            </p>
+          </div>
+          <div className="flex justify-between">
+            <p className="text-gray-600">Tax</p>
+            <p className="text-gray-600">
+              IDR {flightDetails.pricing.tax.toLocaleString()}
+            </p>
+          </div>
+          <div className="flex justify-between pt-4 border-t mt-4">
+            <p className="font-bold text-xl">Total</p>
+            <p className="font-bold text-xl text-purple-600">
+              IDR{' '}
+              {(
+                flightDetails.pricing.adults.price +
+                flightDetails.pricing.baby.price +
+                flightDetails.pricing.tax
+              ).toLocaleString()}
+            </p>
+          </div>
         </div>
       </div>
     </div>

@@ -245,12 +245,7 @@ const OrderForm = () => {
           ))}
         </div>
       </div>
-      {/* Seat Selection Section */}
-      <SeatSelection
-        selectedSeats={selectedSeats}
-        setSelectedSeats={setSelectedSeats}
-        passengers={passengers}
-      />
+      <SeatSelection passengers={passengers} />
 
       <button className="w-full max-w-2xl bg-[#7126B5] text-white py-4 rounded-lg text-xl font-semibold hover:opacity-90 transition-opacity">
         Simpan
