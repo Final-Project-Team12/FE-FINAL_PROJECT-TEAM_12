@@ -54,7 +54,7 @@ const LeftFilterTicket = () => {
 
   return (
     <>
-      <div className="ml-[260px] mr-[212px] mt-[47px] mb-[47px]">
+      <div className=" mb-[47px]">
         <div className="w-[260px] bg-white rounded-xl shadow-md p-4">
           <h3 className="text-lg font-semibold mb-4">Filter</h3>
 
