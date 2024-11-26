@@ -1,5 +1,7 @@
 import Navbar from './UI/Navbar';
 import HeaderTicket from './UI/HeaderTicket';
+import LeftFilterTicket from './UI/LeftFilterTicket';
+import DetailsTicket from './UI/DetailsTicket';
 import LeftFilterTicket from "./UI/LeftFilterTicket";
 import SortTicket from './UI/SortTicket';
 
@@ -8,8 +10,13 @@ const Ticket = () => {
     <>
       <Navbar />
       <HeaderTicket />
-      <SortTicket />
-      <LeftFilterTicket/>
+      <div>
+        <div className="flex ml-[260px] mr-[212px]">
+          <SortTicket />
+          <LeftFilterTicket />
+          <DetailsTicket />
+        </div>
+      </div>
     </>
   );
 };
