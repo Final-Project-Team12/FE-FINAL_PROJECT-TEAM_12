@@ -1,20 +1,21 @@
 import React from 'react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
-const LoadingTicket = () => {
+const SearchResultEmpty = () => {
   return (
     <>
       <div className=" justify-center items-center text-center">
         <div className=" mb-[47px] ml-[180px]">
           <div className="max-w-2xl] ">
-            <p className="text-gray-500">Mencari penerbangan terbaik...</p>
-            <div className="w-[260px]">
+            <div className="w-[440px]">
               <DotLottieReact
-                src="https://lottie.host/782ffe36-16a6-44f3-a7ea-e2202e74cdfa/g0SWWPUyYD.lottie"
+                src="https://lottie.host/c0f8fda0-009f-4f6d-9a1b-d9e3e738f2f3/bd6m5wAwBF.lottie"
                 loop
                 autoplay
               />
             </div>
+            <p className="">Maaf, pencarian Anda tidak ditemukan</p>
+            <p className="text-[#7126B5]">Coba cari perjalanan lainnya!</p>
           </div>
         </div>
       </div>
@@ -22,4 +23,4 @@ const LoadingTicket = () => {
   );
 };
 
-export default LoadingTicket;
+export default SearchResultEmpty;
