@@ -3,6 +3,7 @@ import NotFoundPage from './pages/NotFoundPage';
 import Homepage from './pages/Homepage';
 import FlightTicketPage from './pages/FligthTicketPage';
 import PaymentPage from './pages/PaymentPage';
+import PaymentLastPage from './pages/PaymentLastPage';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
           <Route path="/" element={<Homepage />} />
           <Route path="/fligth-ticket" element={<FlightTicketPage />} />
           <Route path="/checkout" element={<PaymentPage />} />
+          <Route path="/payment" element={<PaymentLastPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </BrowserRouter>

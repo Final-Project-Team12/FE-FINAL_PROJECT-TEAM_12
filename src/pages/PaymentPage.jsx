@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Clock, CheckCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/UI/Navbar';
 import Stepper from '../components/UI/Stepper';
 import OrderForm from '../components/UI/OrderForm';
@@ -9,6 +10,7 @@ const PaymentPage = () => {
   const [timeLeft, setTimeLeft] = useState(900);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -38,7 +40,7 @@ const PaymentPage = () => {
   };
 
   const handleProceedToPayment = () => {
-    console.log('Proceeding to payment...');
+    navigate('/payment');
   };
 
   return (
@@ -46,7 +48,7 @@ const PaymentPage = () => {
       <Navbar />
       <div className="w-full bg-white rounded-lg shadow-[0px_2px_10px_rgba(0,0,0,0.1)]">
         <div className="max-w-6xl mx-auto px-4 py-6">
-          <Stepper isPaymentActive={isFormSubmitted} />
+          <Stepper currentStep={isFormSubmitted ? 2 : 1} />
           <div className="px-10">
             {!showSuccess ? (
               <div className="bg-red-600 text-white rounded-md p-3 flex items-center justify-center space-x-2">
@@ -67,7 +69,6 @@ const PaymentPage = () => {
         <div className="flex flex-col space-y-4 w-1/2">
           <OrderForm onSubmitSuccess={handleFormSubmitSuccess} />
         </div>
-
         <div className="w-[450px] mt-4">
           <FlightDetails />
           {isFormSubmitted && (

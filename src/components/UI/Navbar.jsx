@@ -1,5 +1,6 @@
-import { Search, Plane } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { FaArrowRightToBracket } from 'react-icons/fa6';
+import ProductLogo from '../../../public/icons/logo.svg';
 
 const Navbar = () => {
   return (
@@ -8,8 +9,7 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-4 md:space-x-8">
             <div className="text-purple-600 font-bold text-xl flex items-center pl-2 sm:pl-4 md:pl-8">
-              <Plane className="mr-2" size={24} />
-              <span className="text-lg md:text-xl">Tiketku</span>
+              <img src={ProductLogo} alt="" />
             </div>
 
             <div className="hidden md:block relative w-[300px] lg:w-[450px]">
