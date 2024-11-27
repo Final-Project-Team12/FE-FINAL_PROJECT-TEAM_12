@@ -2,6 +2,7 @@ import Navbar from './UI/Navbar';
 import HeaderTicket from './UI/HeaderTicket';
 import LeftFilterTicket from './UI/LeftFilterTicket';
 import DetailsTicket from './UI/DetailsTicket';
+import LoadingTicket from './UI/LoadingTicket';
 
 const Ticket = () => {
   return (
@@ -11,7 +12,8 @@ const Ticket = () => {
       <div>
         <div className="flex ml-[260px] mr-[212px]">
           <LeftFilterTicket />
-          <DetailsTicket />
+          <LoadingTicket />
+          {/* <DetailsTicket /> */}
         </div>
       </div>
     </>
