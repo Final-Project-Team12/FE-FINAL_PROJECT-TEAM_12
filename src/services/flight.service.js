@@ -56,3 +56,13 @@ export const flightService = {
     infant: 0,
   },
 };
+
+export const saveOrderData = (orderData) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      // Simulate successful save
+      console.log('Order data saved:', orderData);
+      resolve('Data saved successfully!');
+    }, 1000);
+  });
+};
