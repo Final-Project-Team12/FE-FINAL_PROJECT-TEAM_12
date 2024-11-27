@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Clock } from 'lucide-react';
+import { Clock, CheckCircle } from 'lucide-react';
 import Navbar from '../components/UI/Navbar';
 import Stepper from '../components/UI/Stepper';
 import OrderForm from '../components/UI/OrderForm';
@@ -8,6 +8,7 @@ import FlightDetails from '../components/UI/FlightDetail';
 const PaymentPage = () => {
   const [timeLeft, setTimeLeft] = useState(900);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -33,10 +34,10 @@ const PaymentPage = () => {
 
   const handleFormSubmitSuccess = () => {
     setIsFormSubmitted(true);
+    setShowSuccess(true);
   };
 
   const handleProceedToPayment = () => {
-    // Handle navigation to payment page
     console.log('Proceeding to payment...');
   };
 
@@ -47,11 +48,18 @@ const PaymentPage = () => {
         <div className="max-w-6xl mx-auto px-4 py-6">
           <Stepper isPaymentActive={isFormSubmitted} />
           <div className="px-10">
-            <div className="bg-red-600 text-white rounded-md p-3 flex items-center justify-center space-x-2">
-              <Clock className="h-5 w-5" />
-              <span>Selesaikan dalam</span>
-              <span className="font-bold">{formatTime(timeLeft)}</span>
-            </div>
+            {!showSuccess ? (
+              <div className="bg-red-600 text-white rounded-md p-3 flex items-center justify-center space-x-2">
+                <Clock className="h-5 w-5" />
+                <span>Selesaikan dalam</span>
+                <span className="font-bold">{formatTime(timeLeft)}</span>
+              </div>
+            ) : (
+              <div className="bg-green-500 text-white rounded-md p-3 flex items-center justify-center space-x-2">
+                <CheckCircle className="h-5 w-5" />
+                <span className="font-bold">Data Anda berhasil tersimpan!</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
