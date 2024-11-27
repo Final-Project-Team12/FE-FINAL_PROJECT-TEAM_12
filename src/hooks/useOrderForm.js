@@ -58,18 +58,10 @@ const useOrderForm = () => {
     }));
   };
 
-  const handleFamilyToggle = (checked) => {
-    setHasFamily(checked);
-    if (!checked) {
-      handleOrderInputChange('orderFamily', '');
-    }
-  };
-
   const validateForm = () => {
     const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email);
     const isPhoneValid = /^\+?[\d\s-]{10,}$/.test(formData.phone);
 
-    // Validate basic required fields
     if (!formData.orderName || !formData.phone || !formData.email) {
       Swal.fire({
         icon: 'error',
@@ -79,7 +71,6 @@ const useOrderForm = () => {
       return false;
     }
 
-    // Validate email format
     if (!isEmailValid) {
       Swal.fire({
         icon: 'error',
@@ -89,7 +80,6 @@ const useOrderForm = () => {
       return false;
     }
 
-    // Validate phone format
     if (!isPhoneValid) {
       Swal.fire({
         icon: 'error',
@@ -99,7 +89,6 @@ const useOrderForm = () => {
       return false;
     }
 
-    // Validate family name if toggle is on
     if (hasFamily && !formData.orderFamily) {
       Swal.fire({
         icon: 'error',
@@ -111,7 +100,6 @@ const useOrderForm = () => {
 
     const passenger = formData.passenger;
 
-    // Validate passenger required fields
     if (
       !passenger.fullName ||
       !passenger.birthDate ||
@@ -128,7 +116,6 @@ const useOrderForm = () => {
       return false;
     }
 
-    // Validate passenger family name if toggle is on
     if (passenger.hasFamily && !passenger.familyName) {
       Swal.fire({
         icon: 'error',
@@ -138,7 +125,6 @@ const useOrderForm = () => {
       return false;
     }
 
-    // Validate seat selection
     if (selectedSeats.length === 0) {
       Swal.fire({
         icon: 'error',
@@ -193,7 +179,7 @@ const useOrderForm = () => {
 
   return {
     hasFamily,
-    setHasFamily: handleFamilyToggle,
+    setHasFamily,
     selectedSeats,
     setSelectedSeats,
     formData,
