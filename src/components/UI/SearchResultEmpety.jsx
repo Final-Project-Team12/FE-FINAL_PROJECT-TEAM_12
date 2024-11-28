@@ -9,7 +9,7 @@ const SearchResultEmpty = () => {
           <div className="max-w-2xl] ">
             <div className="w-[440px]">
               <DotLottieReact
-                src="https://lottie.host/9962d56e-26d1-4837-bf4f-2df70cd11a6c/BbHhsJlyXu.lottie"
+                src="https://lottie.host/9962d56e-26d1-4837-bf4f-2df70cd11a6c/BbHhsJlyXu.lottie "
                 loop
                 autoplay
               />
