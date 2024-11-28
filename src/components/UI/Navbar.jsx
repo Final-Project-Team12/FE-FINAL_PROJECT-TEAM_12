@@ -1,15 +1,21 @@
 import { Search } from 'lucide-react';
 import { FaArrowRightToBracket } from 'react-icons/fa6';
 import ProductLogo from '../../../public/icons/logo.svg';
+import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
+  const navigate = useNavigate();
+
+  const handleLogoClick = () => {
+    navigate('/');
+  };
   return (
     <nav className="sticky top-0 left-0 right-0 bg-white shadow-[0px_2px_10px_rgba(0,0,0,0.1)] z-30 overflow-x-hidden">
       <div className="container mx-auto px-4 lg:px-6">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-4 md:space-x-8">
             <div className="text-purple-600 font-bold text-xl flex items-center pl-2 sm:pl-4 md:pl-8">
-              <img src={ProductLogo} alt="" />
+              <img src={ProductLogo} alt="" onClick={handleLogoClick} />
             </div>
 
             <div className="hidden md:block relative w-[300px] lg:w-[450px]">

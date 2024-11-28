@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const DetailsTicket = () => {
+  const navigate = useNavigate();
+
+  const handleToCheckOut = () => {
+    navigate('/checkout');
+  };
+
   const flights = [
     {
       id: 1,
@@ -107,7 +114,7 @@ const DetailsTicket = () => {
   };
 
   return (
-    <div className="max-w-2xl  px-4 pb-4 space-y-4">
+    <div className="w-full px-4 pb-4 space-y-4">
       {flights.map((flight) => (
         <div
           key={flight.id}
@@ -168,7 +175,10 @@ const DetailsTicket = () => {
                 <div className="text-lg font-bold text-purple-600">
                   {flight.price}
                 </div>
-                <button className="mt-1 px-6 py-1 bg-purple-600 text-white rounded-md text-sm hover:bg-purple-700 transition-colors duration-200">
+                <button
+                  className="mt-1 px-6 py-1 bg-purple-600 text-white rounded-md text-sm hover:bg-purple-700 transition-colors duration-200"
+                  onClick={handleToCheckOut}
+                >
                   Pilih
                 </button>
               </div>
