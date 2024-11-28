@@ -11,7 +11,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Homepage />} />
-          <Route path="/fligth-ticket" element={<FlightTicketPage />} />
+          <Route path="/flight-ticket" element={<FlightTicketPage />} />
           <Route path="/checkout" element={<PaymentPage />} />
           <Route path="/payment" element={<PaymentLastPage />} />
           <Route path="*" element={<NotFoundPage />} />
