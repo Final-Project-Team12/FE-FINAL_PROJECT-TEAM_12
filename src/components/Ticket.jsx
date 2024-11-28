@@ -7,7 +7,7 @@ import SortTicket from './UI/SortTicket';
 const Ticket = () => {
   return (
     <>
-      <Navbar />
+      <Navbar /> 
       <HeaderTicket />
       <div>
         <div className="pb-10 mr-4">
