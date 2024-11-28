@@ -23,7 +23,7 @@ const SeatSelection = ({ selectedSeats, setSelectedSeats, maxSeats }) => {
 
   const getSeatColor = (seatId) => {
     if (selectedSeats.includes(seatId)) return 'bg-[#7126B5]';
-    return 'bg-green-400 hover:bg-green-500';
+    return 'bg-[#73CA5C] hover:bg-[#73CA5C]/80';
   };
 
   const getSeatContent = (seatId) => {
@@ -36,7 +36,7 @@ const SeatSelection = ({ selectedSeats, setSelectedSeats, maxSeats }) => {
       <div className="p-6">
         <h2 className="text-2xl font-bold mb-6">Pilih Kursi</h2>
 
-        <div className="bg-green-400 text-white p-4 rounded-lg mb-8 text-center">
+        <div className="bg-[#73CA5C] text-white p-4 rounded-t-lg mb-8 text-center">
           <h3 className="text-xl font-semibold">
             Economy - {seatLayout.availableSeats} Seats Available
           </h3>

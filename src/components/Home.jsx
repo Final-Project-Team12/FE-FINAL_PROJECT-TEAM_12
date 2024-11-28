@@ -1,17 +1,23 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Navbar from './UI/Navbar';
 import FlightSearch from './UI/FlightSearch';
 import Banner from './Elements/Banner/Banner';
 import DestinationFilter from './UI/DestinationFilter';
-import ImageDestination from '../../public/images/destination.jpeg';
 import { useFetchAllDestinations } from '../hooks/useDestination';
 
 const Home = () => {
   const { destination, loading, error, fetchAllDestinations } =
     useFetchAllDestinations();
+  const [showSkeleton, setShowSkeleton] = useState(true);
 
   useEffect(() => {
     fetchAllDestinations();
+
+    const timer = setTimeout(() => {
+      setShowSkeleton(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -21,7 +27,11 @@ const Home = () => {
         <div className="relative">
           <Banner />
           <FlightSearch />
-          <DestinationFilter travelData={destination} />
+          <DestinationFilter
+            travelData={destination}
+            loading={loading}
+            showSkeleton={showSkeleton}
+          />
         </div>
       </main>
     </div>
