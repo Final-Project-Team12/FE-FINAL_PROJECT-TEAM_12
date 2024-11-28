@@ -4,8 +4,10 @@ import Navbar from '../components/UI/Navbar';
 import Stepper from '../components/UI/Stepper';
 import FlightDetails from '../components/UI/FlightDetail';
 import PaymentSuccessImage from '../../public/images/Payment_Success.png';
+import { useNavigate } from 'react-router-dom';
 
 const PaymentLastPage = () => {
+  const navigate = useNavigate();
   const [isPaymentSuccess, setIsPaymentSuccess] = useState(false);
 
   const currentDate = new Date();
@@ -67,7 +69,10 @@ const PaymentLastPage = () => {
             <button className="mt-4 bg-purple-600 text-white py-3 px-6 rounded-lg w-full max-w-xs">
               Terbitkan Tiket
             </button>
-            <button className="mt-2 bg-purple-300 text-white py-3 px-6 rounded-lg w-full max-w-xs">
+            <button
+              className="mt-2 bg-purple-300 text-white py-3 px-6 rounded-lg w-full max-w-xs"
+              onClick={() => navigate('/')}
+            >
               Cari Penerbangan Lain
             </button>
           </div>

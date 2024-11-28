@@ -125,12 +125,14 @@ const PassengerSelector = ({
             </div>
           </div>
 
-          <button
-            onClick={onClose}
-            className="w-full mt-8 bg-purple-600 text-white py-3 rounded-xl text-lg font-semibold hover:bg-purple-700 transition-colors"
-          >
-            Simpan
-          </button>
+          <div className="flex justify-end">
+            <button
+              onClick={onClose}
+              className="w-1/2 mt-8 bg-[#7126B5] text-white py-3 rounded-xl text-lg font-semibold hover:bg-purple-700 transition-colors"
+            >
+              Simpan
+            </button>
+          </div>
         </div>
       </div>
     </div>

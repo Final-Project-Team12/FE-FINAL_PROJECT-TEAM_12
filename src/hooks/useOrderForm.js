@@ -12,6 +12,7 @@ const NATIONALITIES = [
 const useOrderForm = () => {
   const [hasFamily, setHasFamily] = useState(false);
   const [selectedSeats, setSelectedSeats] = useState([]);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     orderName: '',
     orderFamily: '',
@@ -150,6 +151,7 @@ const useOrderForm = () => {
 
     try {
       await saveOrderData(orderData);
+      setIsSubmitted(true);
       Swal.fire({
         icon: 'success',
         title: 'Berhasil!',
@@ -188,6 +190,7 @@ const useOrderForm = () => {
     handlePassengerFamilyChange,
     handleSubmit,
     NATIONALITIES,
+    isSubmitted,
   };
 };
 
