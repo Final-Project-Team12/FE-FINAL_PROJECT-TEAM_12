@@ -1,23 +1,65 @@
-import { useState } from 'react';
-import { Calendar } from 'lucide-react';
+import React from 'react';
 import SeatSelection from './SeatSelection';
+import useOrderForm from '../../hooks/useOrderForm';
 
-const OrderForm = () => {
-  const [hasFamily, setHasFamily] = useState(false);
-  const [selectedSeats, setSelectedSeats] = useState([]);
-  const [passengers, setPassengers] = useState([
-    { hasFamily: false, title: 'Mr.' },
-    { hasFamily: false, title: 'Mr.' },
-  ]);
+const DatePicker = ({ value, onChange, label, className = '' }) => {
+  return (
+    <div className={`flex flex-col ${className}`}>
+      <label className="text-purple-700 font-semibold mb-2">{label}</label>
+      <input
+        type="date"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer"
+      />
+    </div>
+  );
+};
 
-  const handlePassengerFamilyChange = (index, checked) => {
-    const updatedPassengers = [...passengers];
-    updatedPassengers[index].hasFamily = checked;
-    setPassengers(updatedPassengers);
+const ToggleSwitch = ({ isChecked, onChange, label }) => {
+  return (
+    <div className="flex items-center justify-between">
+      <label className="text-purple-700 font-semibold">{label}</label>
+      <label className="relative inline-block w-12 h-6 cursor-pointer">
+        <input
+          type="checkbox"
+          checked={isChecked}
+          onChange={onChange}
+          className="sr-only peer"
+        />
+        <div className="absolute w-12 h-6 bg-gray-300 peer-checked:bg-purple-700 rounded-full transition-all duration-300">
+          <div
+            className={`absolute w-5 h-5 bg-white rounded-full left-0.5 bottom-0.5 transition-all duration-300 ${isChecked ? 'translate-x-6' : 'translate-x-0'}`}
+          ></div>
+        </div>
+      </label>
+    </div>
+  );
+};
+
+const OrderForm = ({ onSubmitSuccess }) => {
+  const {
+    hasFamily,
+    setHasFamily,
+    selectedSeats,
+    setSelectedSeats,
+    formData,
+    handleOrderInputChange,
+    handlePassengerInputChange,
+    handlePassengerFamilyChange,
+    handleSubmit,
+    NATIONALITIES,
+  } = useOrderForm();
+
+  const handleFormSubmit = async () => {
+    const success = await handleSubmit();
+    if (success) {
+      onSubmitSuccess();
+    }
   };
 
   return (
-    <div className="mt-4 space-y-6 w-1/2">
+    <div className="mt-4 space-y-6 w-full">
       <div className="w-full border border-gray-300 rounded-lg p-6">
         <div>
           <h2 className="text-xl font-bold mb-6">Isi Data Pemesan</h2>
@@ -27,6 +69,7 @@ const OrderForm = () => {
           </div>
 
           <form className="space-y-6">
+            {/* Order Form Fields */}
             <div className="flex flex-col">
               <label className="text-purple-700 font-semibold mb-2">
                 Nama Lengkap
@@ -34,34 +77,19 @@ const OrderForm = () => {
               <input
                 type="text"
                 placeholder="Masukkan nama lengkap"
+                value={formData.orderName}
+                onChange={(e) =>
+                  handleOrderInputChange('orderName', e.target.value)
+                }
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
 
-            <div className="flex items-center justify-between">
-              <label className="text-purple-700 font-semibold">
-                Punya Nama Keluarga?
-              </label>
-              <div className="relative inline-block w-12 h-6">
-                <input
-                  type="checkbox"
-                  className="opacity-0 w-0 h-0"
-                  checked={hasFamily}
-                  onChange={(e) => setHasFamily(e.target.checked)}
-                />
-                <span
-                  className={`absolute cursor-pointer top-0 left-0 right-0 bottom-0 rounded-full transition-all duration-300 ${
-                    hasFamily ? 'bg-purple-700' : 'bg-gray-300'
-                  }`}
-                >
-                  <span
-                    className={`absolute h-5 w-5 left-0.5 bottom-0.5 bg-white rounded-full transition-all duration-300 ${
-                      hasFamily ? 'transform translate-x-6' : ''
-                    }`}
-                  ></span>
-                </span>
-              </div>
-            </div>
+            <ToggleSwitch
+              isChecked={hasFamily}
+              onChange={(e) => setHasFamily(e.target.checked)}
+              label="Punya Nama Keluarga?"
+            />
 
             {hasFamily && (
               <div className="flex flex-col">
@@ -71,6 +99,10 @@ const OrderForm = () => {
                 <input
                   type="text"
                   placeholder="Masukkan nama keluarga"
+                  value={formData.orderFamily}
+                  onChange={(e) =>
+                    handleOrderInputChange('orderFamily', e.target.value)
+                  }
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               </div>
@@ -83,6 +115,10 @@ const OrderForm = () => {
               <input
                 type="tel"
                 placeholder="Masukkan nomor telepon"
+                value={formData.phone}
+                onChange={(e) =>
+                  handleOrderInputChange('phone', e.target.value)
+                }
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
@@ -94,7 +130,11 @@ const OrderForm = () => {
               <input
                 type="email"
                 placeholder="Contoh: johndoe@gmail.com"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 placeholder-gray-400"
+                value={formData.email}
+                onChange={(e) =>
+                  handleOrderInputChange('email', e.target.value)
+                }
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
           </form>
@@ -105,149 +145,152 @@ const OrderForm = () => {
         <div>
           <h2 className="text-xl font-bold mb-6">Isi Data Penumpang</h2>
 
-          {passengers.map((passenger, index) => (
-            <div key={index} className="mb-8">
-              <div className="bg-gray-800 text-white p-4 rounded-lg mb-6">
-                <h3 className="text-xl font-semibold">
-                  Data Diri Penumpang {index + 1} - Adult
-                </h3>
-              </div>
+          <div className="bg-gray-800 text-white p-4 rounded-lg mb-6">
+            <h3 className="text-xl font-semibold">
+              Data Diri Penumpang - Adult
+            </h3>
+          </div>
 
-              <form className="space-y-4">
-                <div className="flex flex-col">
-                  <label className="text-purple-700 font-semibold mb-2">
-                    Title
-                  </label>
-                  <select
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none bg-white"
-                    value={passenger.title}
-                  >
-                    <option>Mr.</option>
-                    <option>Mrs.</option>
-                    <option>Ms.</option>
-                  </select>
-                </div>
-
-                <div className="flex flex-col">
-                  <label className="text-purple-700 font-semibold mb-2">
-                    Nama Lengkap
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Masukkan nama lengkap"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <label className="text-purple-700 font-semibold">
-                    Punya Nama Keluarga?
-                  </label>
-                  <div className="relative inline-block w-12 h-6">
-                    <input
-                      type="checkbox"
-                      className="opacity-0 w-0 h-0"
-                      checked={passenger.hasFamily}
-                      onChange={(e) =>
-                        handlePassengerFamilyChange(index, e.target.checked)
-                      }
-                    />
-                    <span
-                      className={`absolute cursor-pointer top-0 left-0 right-0 bottom-0 rounded-full transition-all duration-300 ${
-                        passenger.hasFamily ? 'bg-purple-700' : 'bg-gray-300'
-                      }`}
-                    >
-                      <span
-                        className={`absolute h-5 w-5 left-0.5 bottom-0.5 bg-white rounded-full transition-all duration-300 ${
-                          passenger.hasFamily ? 'transform translate-x-6' : ''
-                        }`}
-                      ></span>
-                    </span>
-                  </div>
-                </div>
-
-                {passenger.hasFamily && (
-                  <div className="flex flex-col">
-                    <label className="text-purple-700 font-semibold mb-2">
-                      Nama Keluarga
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Masukkan nama keluarga"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    />
-                  </div>
-                )}
-
-                <div className="flex flex-col">
-                  <label className="text-purple-700 font-semibold mb-2">
-                    Tanggal Lahir
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      placeholder="dd/mm/yyyy"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    />
-                    <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  </div>
-                </div>
-
-                <div className="flex flex-col">
-                  <label className="text-purple-700 font-semibold mb-2">
-                    Kewarganegaraan
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Masukkan kewarganegaraan"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  />
-                </div>
-
-                <div className="flex flex-col">
-                  <label className="text-purple-700 font-semibold mb-2">
-                    KTP/Paspor
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Masukkan nomor KTP/Paspor"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  />
-                </div>
-
-                <div className="flex flex-col">
-                  <label className="text-purple-700 font-semibold mb-2">
-                    Negara Penerbit
-                  </label>
-                  <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none bg-white">
-                    <option value="">Pilih negara penerbit</option>
-                    <option value="indonesia">Indonesia</option>
-                    <option value="malaysia">Malaysia</option>
-                    <option value="singapore">Singapore</option>
-                  </select>
-                </div>
-
-                <div className="flex flex-col">
-                  <label className="text-purple-700 font-semibold mb-2">
-                    Berlaku Sampai
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      placeholder="dd/mm/yyyy"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    />
-                    <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  </div>
-                </div>
-              </form>
+          <form className="space-y-4">
+            <div className="flex flex-col">
+              <label className="text-purple-700 font-semibold mb-2">
+                Title
+              </label>
+              <select
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none bg-white cursor-pointer"
+                value={formData.passenger.title}
+                onChange={(e) =>
+                  handlePassengerInputChange('title', e.target.value)
+                }
+              >
+                <option value="Mr.">Mr.</option>
+                <option value="Mrs.">Mrs.</option>
+                <option value="Ms.">Ms.</option>
+              </select>
             </div>
-          ))}
+
+            <div className="flex flex-col">
+              <label className="text-purple-700 font-semibold mb-2">
+                Nama Lengkap
+              </label>
+              <input
+                type="text"
+                placeholder="Masukkan nama lengkap"
+                value={formData.passenger.fullName}
+                onChange={(e) =>
+                  handlePassengerInputChange('fullName', e.target.value)
+                }
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+            </div>
+
+            <ToggleSwitch
+              isChecked={formData.passenger.hasFamily}
+              onChange={(e) => handlePassengerFamilyChange(e.target.checked)}
+              label="Punya Nama Keluarga?"
+            />
+
+            {formData.passenger.hasFamily && (
+              <div className="flex flex-col">
+                <label className="text-purple-700 font-semibold mb-2">
+                  Nama Keluarga
+                </label>
+                <input
+                  type="text"
+                  placeholder="Masukkan nama keluarga"
+                  value={formData.passenger.familyName}
+                  onChange={(e) =>
+                    handlePassengerInputChange('familyName', e.target.value)
+                  }
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+            )}
+
+            <DatePicker
+              label="Tanggal Lahir"
+              value={formData.passenger.birthDate}
+              onChange={(value) =>
+                handlePassengerInputChange('birthDate', value)
+              }
+            />
+
+            <div className="flex flex-col">
+              <label className="text-purple-700 font-semibold mb-2">
+                Kewarganegaraan
+              </label>
+              <select
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none bg-white cursor-pointer"
+                value={formData.passenger.nationality}
+                onChange={(e) =>
+                  handlePassengerInputChange('nationality', e.target.value)
+                }
+              >
+                <option value="">Pilih kewarganegaraan</option>
+                {NATIONALITIES.map(({ value, label }) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex flex-col">
+              <label className="text-purple-700 font-semibold mb-2">
+                KTP/Paspor
+              </label>
+              <input
+                type="text"
+                placeholder="Masukkan nomor KTP/Paspor"
+                value={formData.passenger.idNumber}
+                onChange={(e) =>
+                  handlePassengerInputChange('idNumber', e.target.value)
+                }
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+            </div>
+
+            <div className="flex flex-col">
+              <label className="text-purple-700 font-semibold mb-2">
+                Negara Penerbit
+              </label>
+              <select
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none bg-white cursor-pointer"
+                value={formData.passenger.issuingCountry}
+                onChange={(e) =>
+                  handlePassengerInputChange('issuingCountry', e.target.value)
+                }
+              >
+                <option value="">Pilih negara penerbit</option>
+                {NATIONALITIES.map(({ value, label }) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <DatePicker
+              label="Berlaku Sampai"
+              value={formData.passenger.expiryDate}
+              onChange={(value) =>
+                handlePassengerInputChange('expiryDate', value)
+              }
+            />
+          </form>
         </div>
       </div>
-      <SeatSelection passengers={passengers} />
 
-      <button className="w-full max-w-2xl bg-[#7126B5] text-white py-4 rounded-lg text-xl font-semibold hover:opacity-90 transition-opacity">
+      <SeatSelection
+        selectedSeats={selectedSeats}
+        setSelectedSeats={setSelectedSeats}
+        maxSeats={1}
+      />
+
+      <button
+        onClick={handleFormSubmit}
+        className="w-full max-w-2xl bg-[#7126B5] text-white py-4 rounded-lg text-xl font-semibold hover:opacity-90 transition-opacity"
+      >
         Simpan
       </button>
     </div>

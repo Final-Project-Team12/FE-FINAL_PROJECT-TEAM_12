@@ -46,59 +46,76 @@ const FlightSearch = () => {
 
   return (
     <>
-      <div className="relative -mt-20 z-20">
-        <div className="bg-white max-w-6xl mx-auto rounded-2xl shadow-lg overflow-hidden">
-          <div className="p-4 md:p-6">
-            <h2 className="text-lg md:text-xl font-bold mb-4 md:mb-6">
+      <div className="relative -mt-16 sm:-mt-18 md:-mt-20 z-20 px-4 sm:px-6 md:px-0">
+        <div className="bg-white w-full max-w-[360px] sm:max-w-[640px] md:max-w-6xl mx-auto rounded-xl sm:rounded-2xl shadow-lg overflow-hidden">
+          <div className="p-3 sm:p-4 md:p-6">
+            <h2 className="text-base sm:text-lg md:text-xl font-bold mb-3 sm:mb-4 md:mb-6">
               Pilih Jadwal Penerbangan spesial di{' '}
               <span className="text-purple-600">Tiketku!</span>
             </h2>
 
-            <div className="space-y-4 md:space-y-6">
+            <div className="space-y-3 sm:space-y-4 md:space-y-6">
               {/* From and To Section */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 items-center relative">
-                <div>
-                  <div className="text-gray-500 text-xs mb-1">From</div>
-                  <div
-                    className="relative flex items-center cursor-pointer"
-                    onClick={() => setIsFromModalOpen(true)}
-                  >
-                    <div className="flex items-center px-3">
-                      <MdFlightTakeoff size={20} className="text-gray-400" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-8 items-start md:items-center relative">
+                {/* From Field with Swap Button */}
+                <div className="flex items-start gap-2">
+                  <div className="flex-1">
+                    <div className="text-gray-500 text-[10px] sm:text-xs mb-1">
+                      From
                     </div>
-                    <input
-                      type="text"
-                      value={fromCity}
-                      placeholder="Jakarta (JKTA)"
-                      className="flex-1 py-2 text-sm md:text-base focus:outline-none focus:border-purple-600 border-b cursor-pointer"
-                      readOnly
-                    />
+                    <div
+                      className="relative flex items-center cursor-pointer"
+                      onClick={() => setIsFromModalOpen(true)}
+                    >
+                      <div className="flex items-center px-2 sm:px-3">
+                        <MdFlightTakeoff className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
+                      </div>
+                      <input
+                        type="text"
+                        value={fromCity}
+                        placeholder="Jakarta (JKTA)"
+                        className="flex-1 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base focus:outline-none focus:border-purple-600 border-b cursor-pointer"
+                        readOnly
+                      />
+                    </div>
+                  </div>
+                  {/* Swap Button for Mobile/Tablet */}
+                  <div className="md:hidden pt-6">
+                    <button
+                      onClick={handleSwapCities}
+                      className="bg-black rounded-full p-1.5 hover:bg-gray-800 transition-colors"
+                    >
+                      <ArrowLeftRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
+                    </button>
                   </div>
                 </div>
 
+                {/* Swap Button for Desktop */}
                 <div className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
                   <button
                     onClick={handleSwapCities}
                     className="bg-black rounded-full p-1.5 mx-4 hover:bg-gray-800 transition-colors"
                   >
-                    <ArrowLeftRight size={16} className="text-white" />
+                    <ArrowLeftRight className="w-4 h-4 text-white" />
                   </button>
                 </div>
 
                 <div>
-                  <div className="text-gray-500 text-xs mb-1">To</div>
+                  <div className="text-gray-500 text-[10px] sm:text-xs mb-1">
+                    To
+                  </div>
                   <div
                     className="relative flex items-center cursor-pointer"
                     onClick={() => setIsToModalOpen(true)}
                   >
-                    <div className="flex items-center px-3">
-                      <MdFlightTakeoff size={20} className="text-gray-400" />
+                    <div className="flex items-center px-2 sm:px-3">
+                      <MdFlightTakeoff className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
                     </div>
                     <input
                       type="text"
                       value={toCity}
                       placeholder="Bandung (BDG)"
-                      className="flex-1 py-2 text-sm md:text-base focus:outline-none focus:border-purple-600 border-b cursor-pointer"
+                      className="flex-1 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base focus:outline-none focus:border-purple-600 border-b cursor-pointer"
                       readOnly
                     />
                   </div>
@@ -106,22 +123,24 @@ const FlightSearch = () => {
               </div>
 
               {/* Date and Passengers Section */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   {/* Departure Date */}
                   <div>
-                    <div className="text-gray-500 text-xs mb-1">Departure</div>
+                    <div className="text-gray-500 text-[10px] sm:text-xs mb-1">
+                      Departure
+                    </div>
                     <div
                       className="relative flex items-center cursor-pointer"
                       onClick={() => setIsDepartureDateModalOpen(true)}
                     >
-                      <div className="flex items-center px-3">
-                        <MdDateRange size={20} className="text-gray-400" />
+                      <div className="flex items-center px-2 sm:px-3">
+                        <MdDateRange className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
                       </div>
                       <input
                         type="text"
                         value={formatDate(departureDate)}
-                        className="flex-1 py-2 text-sm md:text-base focus:outline-none focus:border-purple-600 border-b cursor-pointer"
+                        className="flex-1 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base focus:outline-none focus:border-purple-600 border-b cursor-pointer"
                         readOnly
                       />
                     </div>
@@ -130,18 +149,22 @@ const FlightSearch = () => {
                   {/* Return Date with Toggle */}
                   <div>
                     <div className="flex justify-between items-center mb-1">
-                      <span className="text-gray-500 text-xs">Return</span>
+                      <span className="text-gray-500 text-[10px] sm:text-xs">
+                        Return
+                      </span>
                       <Switch
                         checked={isRoundTrip}
                         onChange={setIsRoundTrip}
                         className={`${
                           isRoundTrip ? 'bg-purple-600' : 'bg-gray-200'
-                        } relative inline-flex h-5 w-10 items-center rounded-full transition-colors focus:outline-none`}
+                        } relative inline-flex h-4 sm:h-5 w-8 sm:w-10 items-center rounded-full transition-colors focus:outline-none`}
                       >
                         <span
                           className={`${
-                            isRoundTrip ? 'translate-x-6' : 'translate-x-1'
-                          } inline-block h-3 w-3 transform rounded-full bg-white transition-transform`}
+                            isRoundTrip
+                              ? 'translate-x-4 sm:translate-x-6'
+                              : 'translate-x-1'
+                          } inline-block h-2 sm:h-3 w-2 sm:w-3 transform rounded-full bg-white transition-transform`}
                         />
                       </Switch>
                     </div>
@@ -153,15 +176,15 @@ const FlightSearch = () => {
                         isRoundTrip && setIsReturnDateModalOpen(true)
                       }
                     >
-                      <div className="flex items-center px-3">
-                        <MdDateRange size={20} className="text-gray-400" />
+                      <div className="flex items-center px-2 sm:px-3">
+                        <MdDateRange className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
                       </div>
                       <input
                         type="text"
                         value={
                           isRoundTrip ? formatDate(returnDate) : 'Pilih Tanggal'
                         }
-                        className="flex-1 py-2 text-sm md:text-base focus:outline-none focus:border-purple-600 border-b cursor-pointer"
+                        className="flex-1 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base focus:outline-none focus:border-purple-600 border-b cursor-pointer"
                         readOnly
                         disabled={!isRoundTrip}
                       />
@@ -170,20 +193,19 @@ const FlightSearch = () => {
                 </div>
 
                 {/* Passengers and Seat Class */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
-                    <div className="text-gray-500 text-xs mb-1">Passengers</div>
+                    <div className="text-gray-500 text-[10px] sm:text-xs mb-1">
+                      Passengers
+                    </div>
                     <div className="relative flex items-center">
-                      <div className="flex items-center px-3">
-                        <MdOutlineAirlineSeatReclineNormal
-                          size={20}
-                          className="text-gray-400"
-                        />
+                      <div className="flex items-center px-2 sm:px-3">
+                        <MdOutlineAirlineSeatReclineNormal className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
                       </div>
                       <input
                         type="text"
                         value={getTotalPassengers()}
-                        className="flex-1 py-2 text-sm md:text-base focus:outline-none focus:border-purple-600 border-b cursor-pointer"
+                        className="flex-1 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base focus:outline-none focus:border-purple-600 border-b cursor-pointer"
                         readOnly
                         onClick={() => setIsPassengerSelectorOpen(true)}
                       />
@@ -191,11 +213,13 @@ const FlightSearch = () => {
                   </div>
 
                   <div>
-                    <div className="text-gray-500 text-xs mb-1">Seat Class</div>
+                    <div className="text-gray-500 text-[10px] sm:text-xs mb-1">
+                      Seat Class
+                    </div>
                     <input
                       type="text"
                       value={selectedSeatClass}
-                      className="w-full py-2 border-b text-sm md:text-base focus:outline-none focus:border-purple-600 cursor-pointer"
+                      className="w-full py-1.5 sm:py-2 text-xs sm:text-sm md:text-base border-b focus:outline-none focus:border-purple-600 cursor-pointer"
                       readOnly
                       onClick={() => setIsSeatClassModalOpen(true)}
                     />
@@ -205,7 +229,7 @@ const FlightSearch = () => {
             </div>
           </div>
 
-          <button className="w-full bg-purple-600 text-white py-4 md:py-3 rounded-b-2xl font-medium hover:bg-purple-700 transition-colors text-sm md:text-base">
+          <button className="w-full bg-purple-600 text-white py-3 sm:py-3.5 md:py-4 text-xs sm:text-sm md:text-base rounded-b-xl sm:rounded-b-2xl font-medium hover:bg-purple-700 transition-colors">
             Cari Penerbangan
           </button>
         </div>

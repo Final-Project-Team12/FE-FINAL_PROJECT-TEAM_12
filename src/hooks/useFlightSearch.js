@@ -6,6 +6,7 @@ export const useFlightSearch = () => {
   const [toCity, setToCity] = useState('');
   const [departureDate, setDepartureDate] = useState(new Date());
   const [returnDate, setReturnDate] = useState(new Date());
+  const [isRoundTrip, setIsRoundTrip] = useState(false);
   const [passengerCounts, setPassengerCounts] = useState(
     flightService.defaultPassengerCounts
   );
@@ -50,12 +51,30 @@ export const useFlightSearch = () => {
     return `${total} Penumpang`;
   };
 
+  // Handle round trip toggle
+  const handleRoundTripToggle = (value) => {
+    setIsRoundTrip(value);
+    if (!value) {
+      // Reset return date when switching to one-way
+      setReturnDate(new Date());
+    }
+  };
+
+  // Handle return date selection
+  const handleReturnDateSelect = (date) => {
+    if (isRoundTrip && date >= departureDate) {
+      setReturnDate(date);
+      setIsReturnDateModalOpen(false);
+    }
+  };
+
   return {
     // States
     fromCity,
     toCity,
     departureDate,
     returnDate,
+    isRoundTrip,
     passengerCounts,
     selectedSeatClass,
     isFromModalOpen,
@@ -70,6 +89,7 @@ export const useFlightSearch = () => {
     setToCity,
     setDepartureDate,
     setReturnDate,
+    setIsRoundTrip: handleRoundTripToggle,
     setPassengerCounts,
     setSelectedSeatClass,
     setIsFromModalOpen,
@@ -83,5 +103,6 @@ export const useFlightSearch = () => {
     formatDate,
     handleSwapCities,
     getTotalPassengers,
+    handleReturnDateSelect,
   };
 };

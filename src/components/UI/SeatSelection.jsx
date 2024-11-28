@@ -1,24 +1,33 @@
 import React from 'react';
 import { useSeatSelection } from '../../hooks/useSeatSelection';
 
-const SeatSelection = ({ passengers }) => {
-  const { selectedSeats, seatLayout, loading, handleSeatSelect } =
-    useSeatSelection(passengers.length);
+const SeatSelection = ({ selectedSeats, setSelectedSeats, maxSeats }) => {
+  const { seatLayout, loading } = useSeatSelection();
 
   if (loading || !seatLayout) return <div>Loading...</div>;
 
   const rows = Array.from({ length: seatLayout.totalRows }, (_, i) => i + 1);
   const { leftColumns, rightColumns } = seatLayout;
 
+  const handleSeatSelect = (seatId) => {
+    setSelectedSeats((prev) => {
+      if (prev.includes(seatId)) {
+        return prev.filter((id) => id !== seatId);
+      }
+      if (prev.length >= maxSeats) {
+        return prev;
+      }
+      return [...prev, seatId];
+    });
+  };
+
   const getSeatColor = (seatId) => {
     if (selectedSeats.includes(seatId)) return 'bg-[#7126B5]';
-    if (seatLayout.specialSeats[seatId]) return 'bg-[#7126B5]';
     return 'bg-green-400 hover:bg-green-500';
   };
 
   const getSeatContent = (seatId) => {
     if (selectedSeats.includes(seatId)) return seatId;
-    if (seatLayout.specialSeats[seatId]) return seatLayout.specialSeats[seatId];
     return '';
   };
 

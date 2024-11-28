@@ -7,13 +7,6 @@ import ImageDestination from '../../public/images/destination.jpeg';
 import { useFetchAllDestinations } from '../hooks/useDestination';
 
 const Home = () => {
-  // const { travelData } = useFetchAllDestinations.destination;
-  // useEffect(() => {
-  //   useFetchAllDestinations.fetchAllDestinations();
-  //   // let data = useFetchAllDestinations.destination;
-  //   // console.log(data);
-  // }, []);
-
   const { destination, loading, error, fetchAllDestinations } =
     useFetchAllDestinations();
 
