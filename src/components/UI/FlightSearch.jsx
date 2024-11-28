@@ -10,8 +10,11 @@ import PassengerSelector from '../Elements/Modal/PassengerSelector';
 import SeatClassModal from '../Elements/Modal/SeatClassModal';
 import { useFlightSearch } from '../../hooks/useFlightSearch';
 import { Switch } from '@headlessui/react';
+import { useNavigate } from 'react-router-dom';
 
 const FlightSearch = () => {
+  const navigate = useNavigate();
+
   const {
     fromCity,
     toCity,
@@ -43,6 +46,10 @@ const FlightSearch = () => {
     handleSwapCities,
     getTotalPassengers,
   } = useFlightSearch();
+
+  const handleSearch = () => {
+    navigate('/flight-ticket');
+  };
 
   return (
     <>
@@ -229,7 +236,10 @@ const FlightSearch = () => {
             </div>
           </div>
 
-          <button className="w-full bg-purple-600 text-white py-3 sm:py-3.5 md:py-4 text-xs sm:text-sm md:text-base rounded-b-xl sm:rounded-b-2xl font-medium hover:bg-purple-700 transition-colors">
+          <button
+            onClick={handleSearch}
+            className="w-full bg-purple-600 text-white py-3 sm:py-3.5 md:py-4 text-xs sm:text-sm md:text-base rounded-b-xl sm:rounded-b-2xl font-medium hover:bg-purple-700 transition-colors"
+          >
             Cari Penerbangan
           </button>
         </div>
