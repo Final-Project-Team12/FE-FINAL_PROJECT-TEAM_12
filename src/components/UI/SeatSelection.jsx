@@ -1,7 +1,11 @@
 import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { setSelectedSeats } from '../../store/slices/paymentSlice';
 import { useSeatSelection } from '../../hooks/useSeatSelection';
 
-const SeatSelection = ({ selectedSeats, setSelectedSeats, maxSeats }) => {
+const SeatSelection = ({ maxSeats }) => {
+  const dispatch = useDispatch();
+  const selectedSeats = useSelector((state) => state.payment.selectedSeats);
   const { seatLayout, loading } = useSeatSelection();
 
   if (loading || !seatLayout) return <div>Loading...</div>;
@@ -10,15 +14,13 @@ const SeatSelection = ({ selectedSeats, setSelectedSeats, maxSeats }) => {
   const { leftColumns, rightColumns } = seatLayout;
 
   const handleSeatSelect = (seatId) => {
-    setSelectedSeats((prev) => {
-      if (prev.includes(seatId)) {
-        return prev.filter((id) => id !== seatId);
-      }
-      if (prev.length >= maxSeats) {
-        return prev;
-      }
-      return [...prev, seatId];
-    });
+    const newSelectedSeats = selectedSeats.includes(seatId)
+      ? selectedSeats.filter((id) => id !== seatId)
+      : selectedSeats.length < maxSeats
+        ? [...selectedSeats, seatId]
+        : selectedSeats;
+
+    dispatch(setSelectedSeats(newSelectedSeats));
   };
 
   const getSeatColor = (seatId) => {

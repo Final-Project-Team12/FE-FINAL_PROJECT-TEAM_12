@@ -5,7 +5,7 @@ import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-const ITEMS_PER_PAGE = 8;
+const ITEMS_PER_PAGE = 5;
 
 const continents = [
   { id: 'all', name: 'Semua' },
@@ -70,19 +70,19 @@ const DestinationFilter = ({ travelData, loading, showSkeleton }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 mt-4 sm:mt-6 py-3 sm:py-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6 mt-4 sm:mt-6 py-3 sm:py-4">
         {showSkeleton
           ? Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => (
               <div
                 key={index}
                 className="bg-white rounded-lg shadow-lg overflow-hidden p-2 sm:p-3 flex flex-col"
               >
-                <Skeleton height={112} />
+                <Skeleton height={96} />
                 <div className="mt-2 sm:mt-3 flex flex-col justify-between flex-1">
-                  <Skeleton width="60%" height={20} />
-                  <Skeleton width="40%" height={16} />
-                  <Skeleton width="50%" height={16} />
-                  <Skeleton width="70%" height={20} />
+                  <Skeleton width="60%" height={16} />
+                  <Skeleton width="40%" height={12} />
+                  <Skeleton width="50%" height={12} />
+                  <Skeleton width="70%" height={16} />
                 </div>
               </div>
             ))
