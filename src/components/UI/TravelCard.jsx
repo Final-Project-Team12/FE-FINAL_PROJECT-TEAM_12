@@ -9,7 +9,7 @@ const TravelCard = ({ travel }) => {
         <img
           src={travel.image}
           alt={`${travel.from} to ${travel.to}`}
-          className="w-full h-28 sm:h-32 object-cover rounded-lg"
+          className="w-full h-20 sm:h-24 object-cover rounded-lg"
         />
 
         <div className="absolute top-0 right-0 px-2 sm:px-2.5 py-1 rounded-e-none rounded-s-lg text-xs font-bold text-white bg-[#7126B5]">

@@ -1,13 +1,11 @@
 import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import Icon from '../../../public/icons/flower_icon.svg';
-import useFlightDetails from '../../hooks/useFlightDetails';
+import { useFlightDetails } from '../../hooks/useFlightDetails';
 
 const FlightDetails = () => {
-  const { flightDetails, loading, fetchFlightDetails } = useFlightDetails();
-
-  useEffect(() => {
-    fetchFlightDetails();
-  }, []);
+  const { flightDetails, loading } = useFlightDetails();
+  const isSubmitted = useSelector((state) => state.payment.isSubmitted);
 
   if (loading) return <div>Loading...</div>;
   if (!flightDetails) return null;
