@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import { Box, Heart, DollarSign } from 'lucide-react';
 
-const LeftFilterTicket = () => {
+const TicketFilterSidebar = () => {
   const [filters, setFilters] = useState({
     transit: false,
     fasilitas: false,
@@ -38,7 +39,7 @@ const LeftFilterTicket = () => {
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
-      strokeWidth={1.5}
+      strokeWidth={2}
       stroke="currentColor"
       className="w-4 h-4"
     >
@@ -55,8 +56,8 @@ const LeftFilterTicket = () => {
   return (
     <>
       <div className=" mb-[47px]">
-        <div className="w-[260px] bg-white rounded-xl shadow-md p-4">
-          <h3 className="text-lg font-semibold mb-4">Filter</h3>
+        <div className="w-[260px] bg-white rounded-2xl border border-slate-200 shadow-md p-6">
+          <h3 className="text-lg font-medium mb-6">Filter</h3>
 
           {/* Transit */}
           <div>
@@ -65,13 +66,16 @@ const LeftFilterTicket = () => {
               onClick={() => toggleFilter('transit')}
               aria-expanded={filters.transit}
             >
-              <span className="font-medium">Transit</span>
+              <div className="flex items-center gap-2">
+                <Box size={24} className="text-slate-500" />
+                <span className="font-normal text-left">Transit</span>
+              </div>
               <span className="text-gray-500">
                 <ChevronIcon isOpen={filters.transit} />
               </span>
             </div>
             {filters.transit && (
-              <ul className="ml-4 mt-2 text-sm text-gray-700">
+              <ul className="ml-8 mt-2 text-sm text-gray-700">
                 <li>
                   <input type="checkbox" id="direct" />
                   <label htmlFor="direct" className="ml-2">
@@ -93,7 +97,7 @@ const LeftFilterTicket = () => {
               </ul>
             )}
           </div>
-          <hr className="my-4" />
+          <hr className="my-4 bg-slate-400" />
 
           {/* Fasilitas */}
           <div>
@@ -102,13 +106,16 @@ const LeftFilterTicket = () => {
               onClick={() => toggleFilter('fasilitas')}
               aria-expanded={filters.fasilitas}
             >
-              <span className="font-medium">Fasilitas</span>
+              <div className="flex items-center gap-2">
+                <Heart size={24} className="text-slate-500" />
+                <span className="font-normal text-left">Fasilitas</span>
+              </div>
               <span className="text-gray-500">
                 <ChevronIcon isOpen={filters.fasilitas} />
               </span>
             </div>
             {filters.fasilitas && (
-              <ul className="ml-4 mt-2 text-sm text-gray-700">
+              <ul className="ml-8 mt-2 text-sm text-gray-700">
                 <li>
                   <input type="checkbox" id="wifi" />
                   <label htmlFor="wifi" className="ml-2">
@@ -124,25 +131,41 @@ const LeftFilterTicket = () => {
               </ul>
             )}
           </div>
-          <hr className="my-4" />
+          <hr className="my-4 bg-slate-400" />
 
-          {/* Harga */}
-          <div>
-            <div
-              className="flex items-center justify-between cursor-pointer"
-              onClick={() => setModalOpen(true)}
-            >
-              <span className="font-medium">Harga</span>
-              <span className="text-gray-500">
-                <ChevronIcon isOpen={isModalOpen} />
-              </span>
+        {/* Harga */}
+        <div>
+          <div
+            className="flex items-center justify-between cursor-pointer"
+            onClick={() => setModalOpen(true)}
+          >
+            <div className="flex items-center gap-2">
+              <DollarSign size={24} className="text-slate-500" />
+              <span className="font-normal text-left">Harga</span>
             </div>
-            {appliedPriceRange && (
-              <p className="mt-2 text-sm text-gray-700">
+            <span className="text-gray-500">
+              <ChevronIcon isOpen={isModalOpen} />
+            </span>
+          </div>
+          {appliedPriceRange && (
+            <div className="mt-2 ml-8 text-sm text-gray-700 flex items-center gap-2">
+              <p>
                 Rp{appliedPriceRange.min} - Rp{appliedPriceRange.max}
               </p>
-            )}
-          </div>
+              <button
+                onClick={() => {
+                  setPriceRange({ min: '', max: '' });
+                  setAppliedPriceRange(null);
+                }}
+                className="text-gray-500 hover:text-gray-700"
+                aria-label="Reset rentang harga"
+              >
+                &times;
+              </button>
+            </div>
+          )}
+        </div>
+
         </div>
       </div>
 
@@ -202,4 +225,4 @@ const LeftFilterTicket = () => {
   );
 };
 
-export default LeftFilterTicket;
+export default TicketFilterSidebar;

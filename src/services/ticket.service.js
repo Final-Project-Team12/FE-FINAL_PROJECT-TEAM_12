@@ -21,6 +21,7 @@ export const getAllDestinations = async (page, limit) => {
 
 export const getSeatLayout = async () => {
   try {
+    // Simulated API response
     const seatLayout = {
       totalRows: 12,
       totalSeats: 72,

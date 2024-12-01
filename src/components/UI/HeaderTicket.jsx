@@ -49,7 +49,7 @@ const HeaderTicket = () => {
               className="w-6 h-6 ml-4 hover:scale-125 hover: transition-all duration-10 text-white"
             />
             <div className="ml-3 text-white">
-              Ini data dinamisnya
+              JKT {'>'} MLB - 2 Penumpang - Economy
             </div>
           </div>
           <button className="w-[220px] h-[50px] rounded-[12px] bg-[#73CA5C] font-bold text-white">

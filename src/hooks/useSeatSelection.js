@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { getSeatLayout } from '../services/ticket.service';
 
 export const useSeatSelection = () => {
