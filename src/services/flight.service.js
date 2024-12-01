@@ -1,5 +1,6 @@
 export const getFlightDetails = async (flightId) => {
   try {
+    // Simulated API response
     const flightDetails = {
       departure: {
         time: '07:00',
@@ -57,12 +58,22 @@ export const flightService = {
   },
 };
 
-export const saveOrderData = (orderData) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      // Simulate successful save
-      console.log('Order data saved:', orderData);
-      resolve('Data saved successfully!');
-    }, 1000);
-  });
+export const saveOrderData = async (orderData) => {
+  try {
+    // In a real application, you would make an API call here
+    // const response = await axiosInstance.post('/api/orders', orderData);
+
+    // Simulated API call
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        console.log('Order data saved:', orderData);
+        resolve({ isSuccess: true, message: 'Order saved successfully' });
+      }, 1000);
+    });
+  } catch (error) {
+    return {
+      isSuccess: false,
+      message: error.message || 'Failed to save order',
+    };
+  }
 };

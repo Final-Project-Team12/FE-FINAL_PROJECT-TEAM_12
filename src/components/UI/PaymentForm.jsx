@@ -71,13 +71,6 @@ const PaymentForm = ({ onPaymentSuccess }) => {
           </div>
           {activeAccordion === 2 && (
             <div className="p-6 border-x border-b border-gray-200">
-              <div className="flex justify-center gap-4 mb-6">
-                <img src="/mastercard.png" alt="Mastercard" className="h-8" />
-                <img src="/visa.png" alt="Visa" className="h-8" />
-                <img src="/amex.png" alt="American Express" className="h-8" />
-                <img src="/paypal.png" alt="PayPal" className="h-8" />
-              </div>
-
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-2">
@@ -120,8 +113,8 @@ const PaymentForm = ({ onPaymentSuccess }) => {
                       Expiry date
                     </label>
                     <input
-                      type="text"
-                      placeholder="07/24"
+                      type="date"
+                      placeholder="MM/YY"
                       className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                       required
                     />

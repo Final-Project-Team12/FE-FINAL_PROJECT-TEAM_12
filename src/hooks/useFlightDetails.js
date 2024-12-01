@@ -1,28 +1,35 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+  setFlightDetails,
+  setLoading,
+  setError,
+} from '../store/slices/flightSlice';
 import { getFlightDetails } from '../services/flight.service';
 
-const useFlightDetails = (flightId) => {
-  const [flightDetails, setFlightDetails] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+export const useFlightDetails = (flightId) => {
+  const dispatch = useDispatch();
+  const { flightDetails, loading, error } = useSelector(
+    (state) => state.flight
+  );
 
   const fetchFlightDetails = async () => {
-    setLoading(true);
+    dispatch(setLoading(true));
     try {
       const response = await getFlightDetails(flightId);
       if (response.isSuccess) {
-        setFlightDetails(response.data);
+        dispatch(setFlightDetails(response.data));
       } else {
-        setError(response.message);
+        dispatch(setError(response.message));
       }
     } catch (error) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
+      dispatch(setError(error.message));
     }
   };
 
-  return { flightDetails, loading, error, fetchFlightDetails };
-};
+  useEffect(() => {
+    fetchFlightDetails();
+  }, [flightId]);
 
-export default useFlightDetails;
+  return { flightDetails, loading, error };
+};

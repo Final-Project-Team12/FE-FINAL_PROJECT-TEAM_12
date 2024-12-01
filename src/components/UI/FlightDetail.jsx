@@ -1,13 +1,11 @@
 import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import Icon from '../../../public/icons/flower_icon.svg';
-import useFlightDetails from '../../hooks/useFlightDetails';
+import { useFlightDetails } from '../../hooks/useFlightDetails';
 
 const FlightDetails = () => {
-  const { flightDetails, loading, fetchFlightDetails } = useFlightDetails();
-
-  useEffect(() => {
-    fetchFlightDetails();
-  }, []);
+  const { flightDetails, loading } = useFlightDetails();
+  const isSubmitted = useSelector((state) => state.payment.isSubmitted);
 
   if (loading) return <div>Loading...</div>;
   if (!flightDetails) return null;
@@ -22,7 +20,7 @@ const FlightDetails = () => {
           <p className="text-gray-600">{flightDetails.departure.date}</p>
           <p className="text-gray-600">{flightDetails.departure.airport}</p>
         </div>
-        <p className="text-purple-600 font-semibold">Keberangkatan</p>
+        <p className="text-[#7126B5] font-semibold">Keberangkatan</p>
       </div>
 
       <hr className="my-4" />
@@ -53,7 +51,7 @@ const FlightDetails = () => {
           <p className="text-gray-600">{flightDetails.arrival.date}</p>
           <p className="text-gray-600">{flightDetails.arrival.airport}</p>
         </div>
-        <p className="text-purple-600 font-semibold">Kedatangan</p>
+        <p className="text-[#7126B5] font-semibold">Kedatangan</p>
       </div>
 
       <hr className="my-4" />
@@ -85,7 +83,7 @@ const FlightDetails = () => {
           </div>
           <div className="flex justify-between pt-4 border-t mt-4">
             <p className="font-bold text-xl">Total</p>
-            <p className="font-bold text-xl text-purple-600">
+            <p className="font-bold text-xl text-[#7126B5]">
               IDR{' '}
               {(
                 flightDetails.pricing.adults.price +
