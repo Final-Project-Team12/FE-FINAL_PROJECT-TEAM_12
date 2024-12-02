@@ -251,7 +251,7 @@ const OrderForm = () => {
               : 'bg-[#7126B5] hover:opacity-90'
           } text-white py-4 rounded-lg text-xl font-semibold transition-all`}
         >
-          {isSubmitted ? 'Tersimpan' : 'Simpan'}
+          {isSubmitted ? 'Simpan' : 'Simpan'}
         </button>
       </div>
     </div>
