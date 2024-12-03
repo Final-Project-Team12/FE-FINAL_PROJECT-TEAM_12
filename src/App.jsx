@@ -5,6 +5,7 @@ import FlightTicketPage from './pages/FligthTicketPage';
 import PaymentPage from './pages/PaymentPage';
 import PaymentLastPage from './pages/PaymentLastPage';
 import ExamplePages from './pages/ExamplePages';
+import RegisterPage from './pages/RegisterPage';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/checkout" element={<PaymentPage />} />
           <Route path="/payment" element={<PaymentLastPage />} />
           <Route path="/animation" element={<ExamplePages />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </BrowserRouter>
