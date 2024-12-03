@@ -8,16 +8,23 @@ import CitySelectionModal from '../Elements/Modal/CitySelectionModal';
 import DatePickerModal from '../Elements/Modal/DatePickerModal';
 import PassengerSelector from '../Elements/Modal/PassengerSelector';
 import SeatClassModal from '../Elements/Modal/SeatClassModal';
-import { useFlightSearch } from '../../hooks/useFlightSearch';
 import { Switch } from '@headlessui/react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  setSelectedFromCity,
+  setSelectedToCity,
+  swapCities,
+  selectSelectedCities,
+} from '../../store/slices/citySelectionSlice';
+import { useFlightSearch } from '../../hooks/useFlightSearch';
 
 const FlightSearch = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { fromCity, toCity } = useSelector(selectSelectedCities);
 
   const {
-    fromCity,
-    toCity,
     departureDate,
     returnDate,
     passengerCounts,
@@ -29,8 +36,6 @@ const FlightSearch = () => {
     isReturnDateModalOpen,
     isPassengerSelectorOpen,
     isSeatClassModalOpen,
-    setFromCity,
-    setToCity,
     setDepartureDate,
     setReturnDate,
     setPassengerCounts,
@@ -43,13 +48,28 @@ const FlightSearch = () => {
     setIsPassengerSelectorOpen,
     setIsSeatClassModalOpen,
     formatDate,
-    handleSwapCities,
     getTotalPassengers,
   } = useFlightSearch();
 
   const handleSearch = (e) => {
     e.preventDefault();
     navigate('/flight-ticket');
+  };
+
+  const handleSwapCities = () => {
+    dispatch(swapCities());
+  };
+
+  const handleFromCitySelection = (city) => {
+    dispatch(
+      setSelectedFromCity(`${city} (${city.substring(0, 4).toUpperCase()})`)
+    );
+  };
+
+  const handleToCitySelection = (city) => {
+    dispatch(
+      setSelectedToCity(`${city} (${city.substring(0, 4).toUpperCase()})`)
+    );
   };
 
   return (
@@ -64,7 +84,9 @@ const FlightSearch = () => {
               </h2>
 
               <div className="space-y-3 sm:space-y-4 md:space-y-6">
+                {/* From-To Section */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-8 items-start md:items-center relative">
+                  {/* From Field */}
                   <div className="flex items-start gap-2">
                     <div className="flex-1">
                       <div className="text-gray-500 text-[10px] sm:text-xs mb-1">
@@ -77,7 +99,9 @@ const FlightSearch = () => {
                         <input
                           type="text"
                           value={fromCity}
-                          onChange={(e) => setFromCity(e.target.value)}
+                          onChange={(e) =>
+                            dispatch(setSelectedFromCity(e.target.value))
+                          }
                           placeholder="Jakarta (JKTA)"
                           className="flex-1 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base focus:outline-none focus:border-[#7126B5] border-b"
                           onClick={() => setIsFromModalOpen(true)}
@@ -85,6 +109,7 @@ const FlightSearch = () => {
                       </div>
                     </div>
 
+                    {/* Mobile Swap Button */}
                     <div className="md:hidden pt-6">
                       <button
                         type="button"
@@ -96,6 +121,7 @@ const FlightSearch = () => {
                     </div>
                   </div>
 
+                  {/* Desktop Swap Button */}
                   <div className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
                     <button
                       type="button"
@@ -106,6 +132,7 @@ const FlightSearch = () => {
                     </button>
                   </div>
 
+                  {/* To Field */}
                   <div>
                     <div className="text-gray-500 text-[10px] sm:text-xs mb-1">
                       To
@@ -117,7 +144,9 @@ const FlightSearch = () => {
                       <input
                         type="text"
                         value={toCity}
-                        onChange={(e) => setToCity(e.target.value)}
+                        onChange={(e) =>
+                          dispatch(setSelectedToCity(e.target.value))
+                        }
                         placeholder="Bandung (BDG)"
                         className="flex-1 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base focus:outline-none focus:border-[#7126B5] border-b"
                         onClick={() => setIsToModalOpen(true)}
@@ -126,8 +155,11 @@ const FlightSearch = () => {
                   </div>
                 </div>
 
+                {/* Dates and Passengers Section */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-8">
+                  {/* Dates Section */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                    {/* Departure Date */}
                     <div>
                       <div className="text-gray-500 text-[10px] sm:text-xs mb-1">
                         Departure
@@ -148,6 +180,7 @@ const FlightSearch = () => {
                       </div>
                     </div>
 
+                    {/* Return Date */}
                     <div>
                       <div className="flex justify-between items-center mb-1">
                         <span className="text-gray-500 text-[10px] sm:text-xs">
@@ -195,7 +228,9 @@ const FlightSearch = () => {
                     </div>
                   </div>
 
+                  {/* Passengers and Seat Class */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                    {/* Passengers */}
                     <div>
                       <div className="text-gray-500 text-[10px] sm:text-xs mb-1">
                         Passengers
@@ -207,15 +242,14 @@ const FlightSearch = () => {
                         <input
                           type="text"
                           value={getTotalPassengers()}
-                          onChange={(e) => {
-                            /* Handle passenger input change */
-                          }}
-                          className="flex-1 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base focus:outline-none focus:border-[#7126B5] border-b"
+                          readOnly
+                          className="flex-1 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base focus:outline-none focus:border-[#7126B5] border-b cursor-pointer"
                           onClick={() => setIsPassengerSelectorOpen(true)}
                         />
                       </div>
                     </div>
 
+                    {/* Seat Class */}
                     <div>
                       <div className="text-gray-500 text-[10px] sm:text-xs mb-1">
                         Seat Class
@@ -223,8 +257,8 @@ const FlightSearch = () => {
                       <input
                         type="text"
                         value={selectedSeatClass}
-                        onChange={(e) => setSelectedSeatClass(e.target.value)}
-                        className="w-full py-1.5 sm:py-2 text-xs sm:text-sm md:text-base border-b focus:outline-none focus:border-[#7126B5]"
+                        readOnly
+                        className="w-full py-1.5 sm:py-2 text-xs sm:text-sm md:text-base border-b focus:outline-none focus:border-[#7126B5] cursor-pointer"
                         onClick={() => setIsSeatClassModalOpen(true)}
                       />
                     </div>
@@ -247,18 +281,14 @@ const FlightSearch = () => {
       <CitySelectionModal
         isOpen={isFromModalOpen}
         onClose={() => setIsFromModalOpen(false)}
-        onSelect={(city) =>
-          setFromCity(`${city} (${city.substring(0, 4).toUpperCase()})`)
-        }
+        onSelect={handleFromCitySelection}
         title="From"
       />
 
       <CitySelectionModal
         isOpen={isToModalOpen}
         onClose={() => setIsToModalOpen(false)}
-        onSelect={(city) =>
-          setToCity(`${city} (${city.substring(0, 4).toUpperCase()})`)
-        }
+        onSelect={handleToCitySelection}
         title="To"
       />
 
