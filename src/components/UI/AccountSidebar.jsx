@@ -1,4 +1,4 @@
-import { Box, Heart, DollarSign } from 'lucide-react';
+import { LogOut, PencilLine, Settings } from 'lucide-react';
 
 const AccountSidebar = () => {
   return (
@@ -10,7 +10,7 @@ const AccountSidebar = () => {
           <div>
             <div className="flex items-center justify-between cursor-pointer">
               <div className="flex items-center gap-2">
-                <Box size={24} className="text-slate-500" />
+                <PencilLine size={24} className="text-purple-700" />
                 <span className="font-normal text-left">Ubah Profil</span>
               </div>
             </div>
@@ -21,7 +21,7 @@ const AccountSidebar = () => {
           <div>
             <div className="flex items-center justify-between cursor-pointer">
               <div className="flex items-center gap-2">
-                <Heart size={24} className="text-slate-500" />
+                <Settings size={24} className="text-purple-700" />
                 <span className="font-normal text-left">Pengaturan Akun</span>
               </div>
             </div>
@@ -32,12 +32,15 @@ const AccountSidebar = () => {
         <div>
           <div className="flex items-center justify-between cursor-pointer">
             <div className="flex items-center gap-2">
-              <DollarSign size={24} className="text-slate-500" />
+              <LogOut size={24} className="text-purple-700" />
               <span className="font-normal text-left">Logout</span>
             </div>
           </div>
         </div>
-
+        <hr className="my-4 bg-slate-400" />
+        <div>
+          <footer className="text-xs font-normal text-slate-500 mb-6 text-center">Version 1.1.0</footer>
+        </div>
         </div>
       </div>
     </>
