@@ -6,6 +6,7 @@ import PaymentPage from './pages/PaymentPage';
 import PaymentLastPage from './pages/PaymentLastPage';
 import ExamplePages from './pages/ExamplePages';
 import RegisterPage from './pages/RegisterPage';
+import AccountPage from './pages/AccountPage';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/payment" element={<PaymentLastPage />} />
           <Route path="/animation" element={<ExamplePages />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/account" element={<AccountPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </BrowserRouter>
