@@ -7,6 +7,7 @@ import PaymentLastPage from './pages/PaymentLastPage';
 import ExamplePages from './pages/ExamplePages';
 import RegisterPage from './pages/RegisterPage';
 import ResetPassword from './pages/ResetPassword';
+import OrderHistoryPage from './pages/OrderHistoryPage';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/payment" element={<PaymentLastPage />} />
           <Route path="/animation" element={<ExamplePages />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/orderhistory" element={<OrderHistoryPage />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

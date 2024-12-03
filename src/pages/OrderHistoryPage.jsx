@@ -1,5 +1,7 @@
+import History from '../components/History';
+
 const OrderHistoryPage = () => {
-  return;
+  return <History />;
 };
 
 export default OrderHistoryPage;
