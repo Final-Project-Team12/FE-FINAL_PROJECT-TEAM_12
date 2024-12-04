@@ -1,7 +1,9 @@
+import Register from '../components/UI/Register';
+
 const RegisterPage = () => {
   return (
     <div>
-      <p>hello from register</p>
+      <Register />
     </div>
   );
 };
