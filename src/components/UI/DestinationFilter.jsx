@@ -6,15 +6,15 @@ import 'react-loading-skeleton/dist/skeleton.css';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useFlights } from '../../hooks/useFlight';
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 5;
 
 const continents = [
   { id: 'all', name: 'Semua' },
-  { id: 'asia', name: 'Asia' },
-  { id: 'america', name: 'Amerika Utara' },
+  { id: 'europe', name: 'Eropa' },
+  { id: 'north_america', name: 'Amerika Utara' },
   { id: 'south_america', name: 'Amerika Selatan' },
   { id: 'australia', name: 'Australia' },
-  { id: 'europe', name: 'Eropa' },
+  { id: 'asia', name: 'Asia' },
   { id: 'africa', name: 'Afrika' },
   { id: 'antarctica', name: 'Antartika' },
 ];
@@ -35,29 +35,36 @@ const DestinationFilter = () => {
 
   useEffect(() => {
     fetchFlights(currentPage, ITEMS_PER_PAGE);
-  }, [currentPage]);
+  }, [currentPage, fetchFlights]);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handlePrevPage = () => {
-    if (currentPage > 1) {
+    if (pagination?.hasPreviousPage) {
       setCurrentPage(currentPage - 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const handleNextPage = () => {
-    if (pagination && currentPage < pagination.totalPages) {
+    if (pagination?.hasNextPage) {
       setCurrentPage(currentPage + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const filteredFlights = flights.outbound_flights.filter((flight) => {
     if (activeContinent === 'all') return true;
-    return flight.destination_airport.continent.name
-      .toLowerCase()
-      .includes(activeContinent);
+    const continentName =
+      flight.destination_airport.continent.name.toLowerCase();
+    if (activeContinent === 'north_america')
+      return continentName === 'north america';
+    if (activeContinent === 'south_america')
+      return continentName === 'south america';
+    return continentName === activeContinent;
   });
 
   const mapFlightToTravelCard = (flight) => ({
@@ -72,6 +79,57 @@ const DestinationFilter = () => {
     destinationImage: flight.destination_airport.image_url,
     offers: flight.offers,
   });
+
+  const renderPagination = () => {
+    if (!pagination || pagination.totalPages <= 1) return null;
+
+    const pageNumbers = [];
+    for (let i = 1; i <= pagination.totalPages; i++) {
+      pageNumbers.push(i);
+    }
+
+    return (
+      <div className="flex justify-center items-center gap-2 mt-6 mb-4">
+        <button
+          onClick={handlePrevPage}
+          disabled={!pagination.hasPreviousPage}
+          className={`p-2 rounded-lg ${
+            !pagination.hasPreviousPage
+              ? 'text-gray-400 cursor-not-allowed'
+              : 'text-[#7126B5] hover:bg-purple-100'
+          }`}
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+
+        {pageNumbers.map((number) => (
+          <button
+            key={number}
+            onClick={() => handlePageChange(number)}
+            className={`px-3 py-1 rounded-lg ${
+              currentPage === number
+                ? 'bg-[#7126B5] text-white'
+                : 'text-gray-600 hover:bg-purple-100'
+            }`}
+          >
+            {number}
+          </button>
+        ))}
+
+        <button
+          onClick={handleNextPage}
+          disabled={!pagination.hasNextPage}
+          className={`p-2 rounded-lg ${
+            !pagination.hasNextPage
+              ? 'text-gray-400 cursor-not-allowed'
+              : 'text-[#7126B5] hover:bg-purple-100'
+          }`}
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
+      </div>
+    );
+  };
 
   return (
     <div className="mt-6 sm:mt-8 max-w-6xl mx-auto px-4 sm:px-6 md:px-8 overflow-x-hidden">
@@ -127,47 +185,7 @@ const DestinationFilter = () => {
             ))}
       </div>
 
-      {!loading && !showSkeleton && pagination && pagination.totalPages > 1 && (
-        <div className="flex justify-center items-center gap-2 mt-6 mb-4">
-          <button
-            onClick={handlePrevPage}
-            disabled={currentPage === 1}
-            className={`p-2 rounded-lg ${
-              currentPage === 1
-                ? 'text-gray-400 cursor-not-allowed'
-                : 'text-[#7126B5] hover:bg-purple-100'
-            }`}
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-
-          {Array.from({ length: pagination.totalPages }).map((_, index) => (
-            <button
-              key={index + 1}
-              onClick={() => handlePageChange(index + 1)}
-              className={`px-3 py-1 rounded-lg ${
-                currentPage === index + 1
-                  ? 'bg-[#7126B5] text-white'
-                  : 'text-gray-600 hover:bg-purple-100'
-              }`}
-            >
-              {index + 1}
-            </button>
-          ))}
-
-          <button
-            onClick={handleNextPage}
-            disabled={currentPage === pagination.totalPages}
-            className={`p-2 rounded-lg ${
-              currentPage === pagination.totalPages
-                ? 'text-gray-400 cursor-not-allowed'
-                : 'text-[#7126B5] hover:bg-purple-100'
-            }`}
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
-        </div>
-      )}
+      {!loading && !showSkeleton && renderPagination()}
     </div>
   );
 };

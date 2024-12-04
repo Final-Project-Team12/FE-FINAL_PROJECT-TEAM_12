@@ -12,12 +12,6 @@ const TravelCard = ({ travel }) => {
     });
   };
 
-  const formatDuration = (minutes) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return `${hours}j ${mins}m`;
-  };
-
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden p-2 sm:p-3 flex flex-col hover:scale-105 transition-transform">
       <div className="relative">
@@ -50,13 +44,10 @@ const TravelCard = ({ travel }) => {
 
         <div className="flex items-center gap-1 sm:gap-1.5 text-gray-600 text-xs sm:text-sm mb-2 sm:mb-3">
           <Timer className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          <span>
-            {formatDate(travel.departureTime)} -{' '}
-            {formatDuration(travel.duration)}
-          </span>
+          <span>{formatDate(travel.departureTime)}</span>
         </div>
 
-        <div className="text-sm sm:text-base">
+        <div className="text-sm sm:text-sm">
           Mulai dari{' '}
           <span className="text-red-500 font-bold">
             IDR {Number(travel.price).toLocaleString('id-ID')}

@@ -80,7 +80,8 @@ export const saveOrderData = async (orderData) => {
   }
 };
 
-export const getFlights = async (page = 1, limit = 20) => {
+// Fetch Flights Destination
+export const getFlights = async (page = 1, limit = 5) => {
   try {
     const response = await axiosInstance.get('/flights', {
       params: { page, limit },
