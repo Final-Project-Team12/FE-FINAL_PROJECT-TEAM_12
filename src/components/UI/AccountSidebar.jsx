@@ -3,7 +3,7 @@ import { LogOut, PencilLine, Settings } from 'lucide-react';
 const AccountSidebar = () => {
   return (
     <>
-      <div className=" mb-[47px]">
+      <div className=" mb-[47px] mt-7">
         <div className="w-[260px] bg-white p-6">
 
           {/* Ubah Profil */}

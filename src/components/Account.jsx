@@ -1,14 +1,16 @@
 import AccountSidebar from "./UI/AccountSidebar";
+import HeaderAccount from "./UI/HeaderAccount";
 import NavbarLogin from "./UI/NavbarLogin";
 
 const Account = () => {
   return (
-    <div className="min-h-screen bg-gray-50 overflow-x-hidden">
+    <>
       <NavbarLogin />
+      <HeaderAccount/>
       <div className="flex ml-[260px] mr-[212px]">
         <AccountSidebar/>
       </div>
-    </div>
+    </>
   );
 }
 
