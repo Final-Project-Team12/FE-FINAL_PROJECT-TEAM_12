@@ -1,30 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import TravelCard from './TravelCard';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useFlights } from '../../hooks/useFlight';
 
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 10;
 
 const continents = [
   { id: 'all', name: 'Semua' },
   { id: 'asia', name: 'Asia' },
-  { id: 'america', name: 'Amerika' },
+  { id: 'america', name: 'Amerika Utara' },
+  { id: 'south_america', name: 'Amerika Selatan' },
   { id: 'australia', name: 'Australia' },
   { id: 'europe', name: 'Eropa' },
   { id: 'africa', name: 'Afrika' },
+  { id: 'antarctica', name: 'Antartika' },
 ];
 
-const DestinationFilter = ({ travelData, loading, showSkeleton }) => {
+const DestinationFilter = () => {
   const [activeContinent, setActiveContinent] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const { flights, loading, error, pagination, fetchFlights } = useFlights();
+  const [showSkeleton, setShowSkeleton] = useState(true);
 
-  const totalPages = Math.ceil(travelData.length / ITEMS_PER_PAGE);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSkeleton(false);
+    }, 2000);
 
-  const indexOfLastItem = currentPage * ITEMS_PER_PAGE;
-  const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
-  const currentItems = travelData.slice(indexOfFirstItem, indexOfLastItem);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    fetchFlights(currentPage, ITEMS_PER_PAGE);
+  }, [currentPage]);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -37,10 +48,30 @@ const DestinationFilter = ({ travelData, loading, showSkeleton }) => {
   };
 
   const handleNextPage = () => {
-    if (currentPage < totalPages) {
+    if (pagination && currentPage < pagination.totalPages) {
       setCurrentPage(currentPage + 1);
     }
   };
+
+  const filteredFlights = flights.outbound_flights.filter((flight) => {
+    if (activeContinent === 'all') return true;
+    return flight.destination_airport.continent.name
+      .toLowerCase()
+      .includes(activeContinent);
+  });
+
+  const mapFlightToTravelCard = (flight) => ({
+    id: flight.plane_id,
+    from: flight.origin_airport.name,
+    to: flight.destination_airport.name,
+    airline: flight.airline.airline_name,
+    airlineImage: flight.airline.image_url,
+    departureTime: flight.departure_time,
+    duration: flight.duration,
+    price: flight.seats_detail[0]?.price,
+    destinationImage: flight.destination_airport.image_url,
+    offers: flight.offers,
+  });
 
   return (
     <div className="mt-6 sm:mt-8 max-w-6xl mx-auto px-4 sm:px-6 md:px-8 overflow-x-hidden">
@@ -70,8 +101,10 @@ const DestinationFilter = ({ travelData, loading, showSkeleton }) => {
         </div>
       </div>
 
+      {error && <div className="text-red-500 text-center my-4">{error}</div>}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6 mt-4 sm:mt-6 py-3 sm:py-4">
-        {showSkeleton
+        {showSkeleton || loading
           ? Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => (
               <div
                 key={index}
@@ -86,12 +119,15 @@ const DestinationFilter = ({ travelData, loading, showSkeleton }) => {
                 </div>
               </div>
             ))
-          : currentItems.map((travel) => (
-              <TravelCard key={travel.id} travel={travel} />
+          : filteredFlights.map((flight) => (
+              <TravelCard
+                key={flight.plane_id}
+                travel={mapFlightToTravelCard(flight)}
+              />
             ))}
       </div>
 
-      {!showSkeleton && totalPages > 1 && (
+      {!loading && !showSkeleton && pagination && pagination.totalPages > 1 && (
         <div className="flex justify-center items-center gap-2 mt-6 mb-4">
           <button
             onClick={handlePrevPage}
@@ -105,7 +141,7 @@ const DestinationFilter = ({ travelData, loading, showSkeleton }) => {
             <ChevronLeft className="w-5 h-5" />
           </button>
 
-          {Array.from({ length: totalPages }).map((_, index) => (
+          {Array.from({ length: pagination.totalPages }).map((_, index) => (
             <button
               key={index + 1}
               onClick={() => handlePageChange(index + 1)}
@@ -121,9 +157,9 @@ const DestinationFilter = ({ travelData, loading, showSkeleton }) => {
 
           <button
             onClick={handleNextPage}
-            disabled={currentPage === totalPages}
+            disabled={currentPage === pagination.totalPages}
             className={`p-2 rounded-lg ${
-              currentPage === totalPages
+              currentPage === pagination.totalPages
                 ? 'text-gray-400 cursor-not-allowed'
                 : 'text-[#7126B5] hover:bg-purple-100'
             }`}
