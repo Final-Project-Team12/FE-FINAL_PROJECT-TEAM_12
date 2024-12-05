@@ -5,7 +5,6 @@ import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useFlights } from '../../hooks/useFlight';
-import { useFlightSearch } from '../../hooks/useFlightSearch';
 
 const ITEMS_PER_PAGE = 5;
 
@@ -16,7 +15,6 @@ const DestinationFilter = () => {
   const { flights, loading, error, pagination, fetchFlights } = useFlights();
   const [paginatedFlights, setPaginatedFlights] = useState([]);
   const [lastKnownCount, setLastKnownCount] = useState(ITEMS_PER_PAGE);
-  const { setFlightSearchData } = useFlightSearch();
 
   useEffect(() => {
     if (flights?.outbound_flights) {
@@ -75,28 +73,6 @@ const DestinationFilter = () => {
       }
     }
   }, [flights, activeContinent, loading]);
-
-  const handleTravelCardSelect = (flight) => {
-    const flightData = {
-      fromCity: `${flight.origin_airport.name} (${flight.origin_airport.airport_code})`,
-      toCity: `${flight.destination_airport.name} (${flight.destination_airport.airport_code})`,
-      departureDate: new Date(flight.departure_time),
-      selectedSeatClass: flight.seats_detail[0]?.class || 'Economy',
-      isRoundTrip: false,
-      passengerCounts: {
-        adult: 1,
-        child: 0,
-        infant: 0,
-      },
-    };
-
-    setFlightSearchData(flightData);
-
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
-  };
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -218,11 +194,7 @@ const DestinationFilter = () => {
               </div>
             ))
           : paginatedFlights.map((flight) => (
-              <TravelCard
-                key={flight.plane_id}
-                travel={flight}
-                onSelect={() => handleTravelCardSelect(flight)}
-              />
+              <TravelCard key={flight.plane_id} travel={flight} />
             ))}
       </div>
 
