@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 import InputField from '../Elements/InputField/InputField';
 import Button from '../Elements/Buttons/Button';
 
@@ -44,6 +46,15 @@ const RegisterForm = () => {
             </Button>
           </div>
         </form>
+
+        <div className="mt-[48px] flex justify-center">
+          <p>
+            Sudah punya akun?{' '}
+            <Link to="/login" className="font-bold text-[#7126B5]">
+              Masuk di sini
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
