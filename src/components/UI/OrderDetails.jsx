@@ -14,6 +14,13 @@ const OrderDetails = ({ selectedCard }) => {
         return 'bg-gray-200';
     }
   };
+  const totalPriceAll =
+    selectedCard.pricePerPerson * selectedCard.totalPassengers +
+    selectedCard.tax;
+  selectedCard.totalPriceAll = totalPriceAll;
+
+  const totalPrice = selectedCard.pricePerPerson * selectedCard.totalPassengers;
+
   return (
     <div className="flex flex-col">
       <div className="flex justify-between">
@@ -115,15 +122,31 @@ const OrderDetails = ({ selectedCard }) => {
       <div className="flex justify-center mt-4 mb-2">
         <hr className="w-11/12 h-px bg-gray-200 border-1 dark:bg-gray-200"></hr>
       </div>
-      <div className="flex justify-between ml-5">
-        <p className="font-bold text-sm">Rincian Harga</p>
+      <div className="flex justify-col ml-5">
+        <div>
+          <p className="font-bold text-sm">Rincian Harga</p>
+        </div>
+      </div>
+      <div className="flex justify-between ml-5 text-sm font-regular">
+        <p>{selectedCard.totalPassengers} Adults</p>
+        <p>IDR {totalPrice.toLocaleString('id-ID')}</p>
+      </div>
+      <div className="flex justify-between ml-5 text-sm font-regular">
+        <p>1 Baby</p>
+        <p>IDR 0</p>
+      </div>
+      <div className="flex justify-between ml-5 text-sm font-regular">
+        <p>Tax</p>
+        <p>IDR {selectedCard.tax.toLocaleString('id-ID')}</p>
       </div>
       <div className="flex justify-center mt-4 mb-2">
         <hr className="w-11/12 h-px bg-gray-200 border-1 dark:bg-gray-200"></hr>
       </div>
       <div className="w-11/12 flex justify-between ml-5">
         <p className="font-bold">Total</p>
-        <p className="font-bold text-purple-800">{selectedCard.price}</p>
+        <p className="font-bold text-purple-800">
+          IDR {totalPriceAll.toLocaleString('id-ID')}
+        </p>
       </div>
       <div className="w-full mt-4">
         {selectedCard.status === 'Issued' && (
