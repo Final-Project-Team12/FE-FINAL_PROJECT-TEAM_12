@@ -1,24 +1,5 @@
 import axiosInstance from '../api/axiosInstance';
 
-export const getAllDestinations = async (page, limit) => {
-  try {
-    const response = await axiosInstance.get('/pagination/tickets', {
-      params: { page: page, limit: limit },
-    });
-
-    if (response.status === 200) {
-      return response.data;
-    } else {
-      throw new Error(response);
-    }
-  } catch (error) {
-    return {
-      isSuccess: false,
-      message: error.response?.data?.message,
-    };
-  }
-};
-
 export const getSeatLayout = async () => {
   try {
     // Simulated API response

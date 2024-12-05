@@ -3,17 +3,26 @@ import { Timer } from 'lucide-react';
 import { FaArrowRightLong } from 'react-icons/fa6';
 
 const TravelCard = ({ travel }) => {
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('id-ID', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden p-2 sm:p-3 flex flex-col hover:scale-105 transition-transform">
       <div className="relative">
         <img
-          src={travel.image}
+          src={travel.destinationImage}
           alt={`${travel.from} to ${travel.to}`}
           className="w-full h-20 sm:h-24 object-cover rounded-lg"
         />
 
         <div className="absolute top-0 right-0 px-2 sm:px-2.5 py-1 rounded-e-none rounded-s-lg text-xs font-bold text-white bg-[#7126B5]">
-          {travel.badge}
+          {travel.offers}
         </div>
       </div>
 
@@ -24,18 +33,25 @@ const TravelCard = ({ travel }) => {
           <span>{travel.to}</span>
         </div>
 
-        <div className="text-[#7126B5] font-medium text-xs sm:text-sm mb-1 sm:mb-1.5">
-          {travel.airline}
+        <div className="flex items-center gap-1.5 text-[#7126B5] font-medium text-xs sm:text-sm mb-1 sm:mb-1.5">
+          <img
+            src={travel.airlineImage}
+            alt={travel.airline}
+            className="h-2 sm:h-2.5 w-auto object-contain"
+          />
+          <span>{travel.airline}</span>
         </div>
 
         <div className="flex items-center gap-1 sm:gap-1.5 text-gray-600 text-xs sm:text-sm mb-2 sm:mb-3">
           <Timer className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          <span>{travel.date}</span>
+          <span>{formatDate(travel.departureTime)}</span>
         </div>
 
-        <div className="text-sm sm:text-base">
+        <div className="text-sm sm:text-sm">
           Mulai dari{' '}
-          <span className="text-red-500 font-bold">IDR {travel.price}</span>
+          <span className="text-red-500 font-bold">
+            IDR {Number(travel.price).toLocaleString('id-ID')}
+          </span>
         </div>
       </div>
     </div>
