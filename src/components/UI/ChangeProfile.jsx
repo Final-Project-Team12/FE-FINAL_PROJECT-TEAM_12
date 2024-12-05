@@ -4,65 +4,81 @@ const ChangeProfile = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="w-full p-4 space-y-4 mt-14 border rounded-lg">
+    <div className="w-full p-4 space-y-4 mt-14 border rounded-lg mb-10">
+      <div>
         <div>
-          {/* Header section */}
-          <div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="p-1 bg-yellow-100 rounded">
-                  <img src="../../public/icons/Thumbnail.svg" alt="" />
-                </div>
-                <span className="text-[12px] font-medium">
-                  kdsfjakl
-                </span>
-              </div>
-              <img src="../../public/icons/Neutral button.svg" alt="" />
-            </div>
-
-            <div className="mt-2 flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="text-left">
-                  <div className="text-[14px] font-bold">
-                    jdfs
-                  </div>
-                  <div className="text-[12px]">sdkjfgad</div>
-                </div>
-
-                <div className="flex flex-col items-center">
-                  <div className="text-[12px] text-[#8A8A8A]">
-                    dsjkff
-                  </div>
-                  <img src="../../public/icons/Arrow.svg" alt="" />
-                  <div className="text-[12px] text-[#8A8A8A]">Direct</div>
-                </div>
-
-                <div className="text-left">
-                  <div className="text-[14px] font-bold">
-                    jsdfka
-                  </div>
-                  <div className="text-[12px]">sdjkfs</div>
-                </div>
-
-                <img
-                  src="../../public/icons/icon-park-outline_baggage-delay.svg"
-                  alt=""
-                />
-              </div>
-
-              <div className="text-right">
-                <div className="text-lg font-bold text-purple-600">
-                  skdjfsk
-                </div>
-                <button
-                  className="mt-1 px-6 py-1 bg-purple-600 text-white rounded-md text-sm hover:bg-purple-700 transition-colors duration-200"
-                >
-                  Pilih
-                </button>
-              </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <h2 className="text-xl font-bold mb-[16px] mt-8">
+                Ubah Data Profil
+              </h2>
             </div>
           </div>
         </div>
+
+        <div className="flex flex-col">
+          <div className="w-full h-[40px] rounded-t-[6px] bg-[#A06ECE] mb-2 flex items-center">
+            <div className="ml-3 text-white">Data Diri</div>
+          </div>
+
+          <div className="px-4 py-2">
+            <label
+              for="nama-lengkap"
+              className="block mb-1 text-sm font-bold text-purple-800 dark:text-white"
+            >
+              Nama Lengkap
+            </label>
+            <input
+              type="text"
+              id="nama-lengkap"
+              className=" border text-sm rounded-md focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 "
+              placeholder="Nama Lengkap "
+              value="John Doe"
+              required
+            />
+          </div>
+          <div className="px-4 py-2">
+            <label
+              for="nomor-telepon"
+              className="block mb-1 text-sm font-bold text-purple-800 dark:text-white"
+            >
+              Nomor Telepon
+            </label>
+            <input
+              type="text"
+              id="nomor-telepon"
+              className=" border text-sm rounded-md focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 "
+              placeholder="+628xxxxxxxx "
+              value="+6281234567891"
+              required
+            />
+          </div>
+          <div className="px-4 py-2 mb-4">
+            <label
+              for="email"
+              className="block mb-1 text-sm font-bold text-purple-800 dark:text-white"
+            >
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              className=" border text-sm rounded-md focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 "
+              placeholder="email@example.com "
+              value="johndoe@email.com"
+              required
+            />
+          </div>
+          <div className="flex flex-col items-center ">
+            <button
+              type="submit"
+              className="mt-1 px-6 py-2 bg-purple-900 text-white rounded-md text-sm  hover:bg-purple-950  transition-colors duration-400"
+            >
+              Simpan
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

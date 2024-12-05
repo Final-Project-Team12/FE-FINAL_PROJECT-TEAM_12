@@ -10,7 +10,7 @@ const HeaderTicket = () => {
         <h2 className="text-xl font-bold mb-[24px]">Akun</h2>
         <div className="flex gap-3 mx-4">
           <div
-            className="w-[700px] h-[50px] rounded-[12px] bg-[#A06ECE] flex items-center hover:bg-purple-800 hover: transition-all duration-10 cursor-pointer group"
+            className="w-full h-[50px] rounded-[12px] bg-[#A06ECE] flex items-center hover:bg-purple-800 hover: transition-all duration-10 cursor-pointer group"
             onClick={() => navigate('/')}
           >
             <ArrowLeft
