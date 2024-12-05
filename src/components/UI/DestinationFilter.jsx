@@ -8,23 +8,48 @@ import { useFlights } from '../../hooks/useFlight';
 
 const ITEMS_PER_PAGE = 5;
 
-const continents = [
-  { id: 'all', name: 'Semua' },
-  { id: 'europe', name: 'Eropa' },
-  { id: 'north_america', name: 'Amerika Utara' },
-  { id: 'south_america', name: 'Amerika Selatan' },
-  { id: 'australia', name: 'Australia' },
-  { id: 'asia', name: 'Asia' },
-  { id: 'africa', name: 'Afrika' },
-  { id: 'antarctica', name: 'Antartika' },
-];
-
 const DestinationFilter = () => {
   const [activeContinent, setActiveContinent] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [continents, setContinents] = useState([{ id: 'all', name: 'Semua' }]);
   const { flights, loading, error, pagination, fetchFlights } = useFlights();
   const [paginatedFlights, setPaginatedFlights] = useState([]);
   const [lastKnownCount, setLastKnownCount] = useState(ITEMS_PER_PAGE);
+
+  useEffect(() => {
+    if (flights?.outbound_flights) {
+      const uniqueContinents = new Set();
+
+      flights.outbound_flights.forEach((flight) => {
+        if (flight.origin_airport?.continent) {
+          uniqueContinents.add(
+            JSON.stringify({
+              id: flight.origin_airport.continent.continent_id,
+              name: flight.origin_airport.continent.name,
+            })
+          );
+        }
+        if (flight.destination_airport?.continent) {
+          uniqueContinents.add(
+            JSON.stringify({
+              id: flight.destination_airport.continent.continent_id,
+              name: flight.destination_airport.continent.name,
+            })
+          );
+        }
+      });
+
+      const continentArray = Array.from(uniqueContinents).map((str) =>
+        JSON.parse(str)
+      );
+
+      const sortedContinents = continentArray.sort((a, b) =>
+        a.name.localeCompare(b.name)
+      );
+
+      setContinents([{ id: 'all', name: 'Semua' }, ...sortedContinents]);
+    }
+  }, [flights]);
 
   useEffect(() => {
     fetchFlights(currentPage, ITEMS_PER_PAGE);
@@ -34,13 +59,11 @@ const DestinationFilter = () => {
     if (flights && flights.outbound_flights) {
       const filtered = flights.outbound_flights.filter((flight) => {
         if (activeContinent === 'all') return true;
-        const continentName =
-          flight.destination_airport.continent.name.toLowerCase();
-        if (activeContinent === 'north_america')
-          return continentName === 'north america';
-        if (activeContinent === 'south_america')
-          return continentName === 'south america';
-        return continentName === activeContinent;
+
+        return (
+          flight.destination_airport.continent.continent_id.toString() ===
+          activeContinent.toString()
+        );
       });
 
       setPaginatedFlights(filtered);
