@@ -75,7 +75,7 @@ const FlightTicketCard = ({ flight, onCardClick, isSelected }) => {
           </div>
         </div>
         <div className="w-full pt-1">
-          <hr class="h-px bg-gray-200 border-1 dark:bg-gray-500"></hr>
+          <hr className="h-px bg-gray-200 border-1 dark:bg-gray-500"></hr>
         </div>
         <div className="flex justify-between">
           <div className="mt-2">
