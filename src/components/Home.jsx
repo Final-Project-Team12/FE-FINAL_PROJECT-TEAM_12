@@ -3,7 +3,6 @@ import Navbar from './UI/Navbar';
 import FlightSearch from './UI/FlightSearch';
 import Banner from './Elements/Banner/Banner';
 import DestinationFilter from './UI/DestinationFilter';
-import { useFetchAllDestinations } from '../hooks/useDestination';
 
 const Home = () => {
   const { destination, loading, error, fetchAllDestinations } =
