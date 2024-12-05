@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { getFlights } from '../services/flight.service';
 
 export const useFlights = (initialPage = 1, initialLimit = 5) => {
