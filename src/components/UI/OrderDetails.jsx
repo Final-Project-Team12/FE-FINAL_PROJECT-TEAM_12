@@ -3,7 +3,7 @@ import React from 'react';
 const OrderDetails = ({ selectedCard }) => {
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-4">Detail Pesanan</h2>
+      <h2 className="text-1xl font-bold mb-4">Detail Pesanan</h2>
       <p>Airline: {selectedCard.airline}</p>
       <p>Flight Number: {selectedCard.flightNumber}</p>
       <p>

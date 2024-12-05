@@ -89,9 +89,10 @@ const History = () => {
       <Navbar />
       <HeaderHistory />
       <div>
-        <div className="flex ml-[260px] mr-[212px]">
-          <div className="grid grid-cols-2 gap-16 py-4">
-            <div className="w-[550px] space-y-4">
+        <div className=" ml-[260px] mr-[212px] py-4 pl-8">
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Left Section: Flight Tickets */}
+            <div className="lg:w-[550px] sm:w-full space-y-4">
               {flightData.map((flight) => (
                 <FlightTicketCard
                   key={flight.id}
@@ -101,11 +102,15 @@ const History = () => {
                 />
               ))}
             </div>
-            <div className="w-full">
+
+            {/* Right Section: Order Details */}
+            <div className="lg:w-1/4 w-full">
               {selectedCard ? (
                 <OrderDetails selectedCard={selectedCard} />
               ) : (
-                <p>No card selected</p>
+                <p className="text-center text-gray-500">
+                  Select a flight to view details
+                </p>
               )}
             </div>
           </div>
