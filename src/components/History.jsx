@@ -1,6 +1,8 @@
+import React, { useState } from 'react';
 import Navbar from './UI/Navbar';
 import HeaderHistory from './UI/HeaderHistory';
 import FlightTicketCard from './UI/FlightTicketCard';
+import OrderDetails from './UI/OrderDetails';
 
 const History = () => {
   const flightData = [
@@ -9,12 +11,14 @@ const History = () => {
       airline: 'Jet Air - Economy',
       flightNumber: 'JT-203',
       departure: {
+        location: 'Jakarta',
         time: '07:00',
         date: '3 Maret 2023',
         airport: 'Soekarno Hatta - Terminal 1A Domestik',
         code: 'JKT',
       },
       arrival: {
+        location: 'Melbourne',
         time: '11:00',
         date: '3 Maret 2023',
         airport: 'Melbourne International Airport',
@@ -71,6 +75,15 @@ const History = () => {
       flightClass: 'First Class',
     },
   ];
+  const [selectedCardId, setSelectedCardId] = useState(null);
+
+  const handleCardClick = (id) => {
+    setSelectedCardId(id);
+  };
+  const selectedCard =
+    selectedCardId !== null
+      ? flightData.find((flight) => flight.id === selectedCardId)
+      : null;
   return (
     <>
       <Navbar />
@@ -78,14 +91,25 @@ const History = () => {
       <div>
         <div className="flex ml-[260px] mr-[212px]">
           <div className="max-w-6xl mx-auto px-4 flex space-x-6 mt-8 justify-center">
-            <div className="flex flex-col space-y-4 w-1/2">
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {flightData.map((flight, index) => (
-                  <FlightTicketCard key={index} flight={flight} />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="w-[550px] px-4 pb-4 space-y-4">
+                {flightData.map((flight) => (
+                  <FlightTicketCard
+                    key={flight.id}
+                    flight={flight}
+                    onCardClick={handleCardClick}
+                    isSelected={flight.id === selectedCardId}
+                  />
                 ))}
               </div>
             </div>
-            <div className="w-[450px] mt-4">test</div>
+            <div className="w-full">
+              {selectedCard ? (
+                <OrderDetails selectedCard={selectedCard} />
+              ) : (
+                <p>No card selected</p>
+              )}
+            </div>
           </div>
         </div>
       </div>
