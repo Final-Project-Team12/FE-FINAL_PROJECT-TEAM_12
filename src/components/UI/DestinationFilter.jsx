@@ -31,24 +31,25 @@ const DestinationFilter = () => {
   }, [currentPage, fetchFlights]);
 
   useEffect(() => {
-    const filtered = flights.outbound_flights.filter((flight) => {
-      if (activeContinent === 'all') return true;
-      const continentName =
-        flight.destination_airport.continent.name.toLowerCase();
-      if (activeContinent === 'north_america')
-        return continentName === 'north america';
-      if (activeContinent === 'south_america')
-        return continentName === 'south america';
-      return continentName === activeContinent;
-    });
+    if (flights && flights.outbound_flights) {
+      const filtered = flights.outbound_flights.filter((flight) => {
+        if (activeContinent === 'all') return true;
+        const continentName =
+          flight.destination_airport.continent.name.toLowerCase();
+        if (activeContinent === 'north_america')
+          return continentName === 'north america';
+        if (activeContinent === 'south_america')
+          return continentName === 'south america';
+        return continentName === activeContinent;
+      });
 
-    setPaginatedFlights(filtered);
+      setPaginatedFlights(filtered);
 
-    // Update the last known count whenever we get actual data
-    if (!loading && filtered.length > 0) {
-      setLastKnownCount(filtered.length);
+      if (!loading && filtered.length > 0) {
+        setLastKnownCount(filtered.length);
+      }
     }
-  }, [flights.outbound_flights, activeContinent, loading]);
+  }, [flights, activeContinent, loading]);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
