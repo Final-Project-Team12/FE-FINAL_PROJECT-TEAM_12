@@ -1,3 +1,5 @@
+import axiosInstance from '../api/axiosInstance';
+
 export const getFlightDetails = async (flightId) => {
   try {
     // Simulated API response
@@ -74,6 +76,33 @@ export const saveOrderData = async (orderData) => {
     return {
       isSuccess: false,
       message: error.message || 'Failed to save order',
+    };
+  }
+};
+
+// Fetch Flights Destination
+export const getFlights = async (page = 1, limit = 5) => {
+  try {
+    const response = await axiosInstance.get('/flights', {
+      params: { page, limit },
+    });
+
+    if (response.status === 200) {
+      return {
+        isSuccess: true,
+        data: response.data.data,
+        pagination: response.data.pagination,
+        message: response.data.message,
+      };
+    }
+
+    throw new Error(response.data.message || 'Failed to fetch flights');
+  } catch (error) {
+    return {
+      isSuccess: false,
+      message: error.response?.data?.message || 'Failed to fetch flights',
+      data: null,
+      pagination: null,
     };
   }
 };
