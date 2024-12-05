@@ -46,7 +46,7 @@ const History = () => {
         airport: 'Melbourne International Airport',
         code: 'MLB',
       },
-      duration: '4h 0m',
+      duration: '1h 15m',
       price: 'IDR 5.950.000',
       status: 'Unpaid', // Status for the label
       bookingCode: 'DEF67890', // Booking code
@@ -68,7 +68,7 @@ const History = () => {
         airport: 'Melbourne International Airport',
         code: 'MLB',
       },
-      duration: '4h 0m',
+      duration: '1h 15m',
       price: 'IDR 7.225.000',
       status: 'Cancelled',
       bookingCode: 'XYZ98765',
@@ -90,18 +90,16 @@ const History = () => {
       <HeaderHistory />
       <div>
         <div className="flex ml-[260px] mr-[212px]">
-          <div className="max-w-6xl mx-auto px-4 flex space-x-6 mt-8 justify-center">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="w-[550px] px-4 pb-4 space-y-4">
-                {flightData.map((flight) => (
-                  <FlightTicketCard
-                    key={flight.id}
-                    flight={flight}
-                    onCardClick={handleCardClick}
-                    isSelected={flight.id === selectedCardId}
-                  />
-                ))}
-              </div>
+          <div className="grid grid-cols-2 gap-16 py-4">
+            <div className="w-[550px] space-y-4">
+              {flightData.map((flight) => (
+                <FlightTicketCard
+                  key={flight.id}
+                  flight={flight}
+                  onCardClick={handleCardClick}
+                  isSelected={flight.id === selectedCardId}
+                />
+              ))}
             </div>
             <div className="w-full">
               {selectedCard ? (
