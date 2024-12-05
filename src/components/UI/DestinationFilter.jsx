@@ -23,49 +23,48 @@ const DestinationFilter = () => {
   const [activeContinent, setActiveContinent] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const { flights, loading, error, pagination, fetchFlights } = useFlights();
-  const [showSkeleton, setShowSkeleton] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowSkeleton(false);
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, []);
+  const [paginatedFlights, setPaginatedFlights] = useState([]);
+  const [lastKnownCount, setLastKnownCount] = useState(ITEMS_PER_PAGE);
 
   useEffect(() => {
     fetchFlights(currentPage, ITEMS_PER_PAGE);
   }, [currentPage, fetchFlights]);
 
+  useEffect(() => {
+    const filtered = flights.outbound_flights.filter((flight) => {
+      if (activeContinent === 'all') return true;
+      const continentName =
+        flight.destination_airport.continent.name.toLowerCase();
+      if (activeContinent === 'north_america')
+        return continentName === 'north america';
+      if (activeContinent === 'south_america')
+        return continentName === 'south america';
+      return continentName === activeContinent;
+    });
+
+    setPaginatedFlights(filtered);
+
+    // Update the last known count whenever we get actual data
+    if (!loading && filtered.length > 0) {
+      setLastKnownCount(filtered.length);
+    }
+  }, [flights.outbound_flights, activeContinent, loading]);
+
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handlePrevPage = () => {
     if (pagination?.hasPreviousPage) {
       setCurrentPage(currentPage - 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const handleNextPage = () => {
     if (pagination?.hasNextPage) {
       setCurrentPage(currentPage + 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
-
-  const filteredFlights = flights.outbound_flights.filter((flight) => {
-    if (activeContinent === 'all') return true;
-    const continentName =
-      flight.destination_airport.continent.name.toLowerCase();
-    if (activeContinent === 'north_america')
-      return continentName === 'north america';
-    if (activeContinent === 'south_america')
-      return continentName === 'south america';
-    return continentName === activeContinent;
-  });
 
   const mapFlightToTravelCard = (flight) => ({
     id: flight.plane_id,
@@ -81,7 +80,13 @@ const DestinationFilter = () => {
   });
 
   const renderPagination = () => {
-    if (!pagination || pagination.totalPages <= 1) return null;
+    if (
+      !pagination ||
+      pagination.totalPages <= 1 ||
+      (activeContinent !== 'all' && paginatedFlights.length <= ITEMS_PER_PAGE)
+    ) {
+      return null;
+    }
 
     const pageNumbers = [];
     for (let i = 1; i <= pagination.totalPages; i++) {
@@ -162,8 +167,8 @@ const DestinationFilter = () => {
       {error && <div className="text-red-500 text-center my-4">{error}</div>}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6 mt-4 sm:mt-6 py-3 sm:py-4">
-        {showSkeleton || loading
-          ? Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => (
+        {loading
+          ? Array.from({ length: lastKnownCount }).map((_, index) => (
               <div
                 key={index}
                 className="bg-white rounded-lg shadow-lg overflow-hidden p-2 sm:p-3 flex flex-col"
@@ -177,7 +182,7 @@ const DestinationFilter = () => {
                 </div>
               </div>
             ))
-          : filteredFlights.map((flight) => (
+          : paginatedFlights.map((flight) => (
               <TravelCard
                 key={flight.plane_id}
                 travel={mapFlightToTravelCard(flight)}
@@ -185,7 +190,7 @@ const DestinationFilter = () => {
             ))}
       </div>
 
-      {!loading && !showSkeleton && renderPagination()}
+      {!loading && renderPagination()}
     </div>
   );
 };

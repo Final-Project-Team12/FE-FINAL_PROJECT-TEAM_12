@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form';
 import Button from '../Elements/Buttons/Button';
 import InputField from '../Elements/InputField/InputField';
 import { useAuth } from '../../hooks/useAuth';
+import { Link } from 'react-router-dom';
 
 const LoginForm = () => {
   const { login, loading, error } = useAuth();
@@ -76,15 +77,18 @@ const LoginForm = () => {
           </div>
 
           <div className="mt-6">
-            <Button type="submit" disabled={loading}>
+            <Button className="h-[48px]" type="submit" disabled={loading}>
               {loading ? 'Loading...' : 'Masuk'}
             </Button>
 
             <p className="text-center text-sm text-gray-600 mt-4">
               Belum punya akun?{' '}
-              <a href="/register" className="text-[#7126B5] hover:underline">
+              <Link
+                to="/register"
+                className="text-[#7126B5] hover:underline font-bold"
+              >
                 Daftar di sini
-              </a>
+              </Link>
             </p>
           </div>
         </form>
