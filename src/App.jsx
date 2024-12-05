@@ -7,7 +7,7 @@ import PaymentPage from './pages/PaymentPage';
 import PaymentLastPage from './pages/PaymentLastPage';
 import ExamplePages from './pages/ExamplePages';
 import RegisterPage from './pages/RegisterPage';
-import ResetPasswordPage from './pages/ResetPassword';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import OrderHistoryPage from './pages/OrderHistoryPage';
 import LoginPage from './pages/LoginPage';
 import AccountPage from './pages/AccountPage';
