@@ -4,32 +4,24 @@ import {
   MdDateRange,
   MdOutlineAirlineSeatReclineNormal,
 } from 'react-icons/md';
+import { Switch } from '@headlessui/react';
+import { useNavigate } from 'react-router-dom';
 import CitySelectionModal from '../Elements/Modal/CitySelectionModal';
 import DatePickerModal from '../Elements/Modal/DatePickerModal';
 import PassengerSelector from '../Elements/Modal/PassengerSelector';
 import SeatClassModal from '../Elements/Modal/SeatClassModal';
-import { Switch } from '@headlessui/react';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  setSelectedFromCity,
-  setSelectedToCity,
-  swapCities,
-  selectSelectedCities,
-} from '../../store/slices/citySelectionSlice';
 import { useFlightSearch } from '../../hooks/useFlightSearch';
 
 const FlightSearch = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { fromCity, toCity } = useSelector(selectSelectedCities);
-
   const {
+    fromCity,
+    toCity,
     departureDate,
     returnDate,
+    isRoundTrip,
     passengerCounts,
     selectedSeatClass,
-    isRoundTrip,
     isFromModalOpen,
     isToModalOpen,
     isDepartureDateModalOpen,
@@ -38,38 +30,37 @@ const FlightSearch = () => {
     isSeatClassModalOpen,
     setDepartureDate,
     setReturnDate,
+    setIsRoundTrip,
     setPassengerCounts,
     setSelectedSeatClass,
-    setIsRoundTrip,
     setIsFromModalOpen,
     setIsToModalOpen,
     setIsDepartureDateModalOpen,
     setIsReturnDateModalOpen,
     setIsPassengerSelectorOpen,
     setIsSeatClassModalOpen,
+    handleFromCitySelection,
+    handleToCitySelection,
+    handleSwapCities,
     formatDate,
     getTotalPassengers,
+    setFlightSearchData,
   } = useFlightSearch();
 
   const handleSearch = (e) => {
     e.preventDefault();
+
+    if (
+      !fromCity ||
+      !toCity ||
+      !departureDate ||
+      (isRoundTrip && !returnDate)
+    ) {
+      alert('Mohon lengkapi data pencarian penerbangan');
+      return;
+    }
+
     navigate('/flight-ticket');
-  };
-
-  const handleSwapCities = () => {
-    dispatch(swapCities());
-  };
-
-  const handleFromCitySelection = (city) => {
-    dispatch(
-      setSelectedFromCity(`${city} (${city.substring(0, 4).toUpperCase()})`)
-    );
-  };
-
-  const handleToCitySelection = (city) => {
-    dispatch(
-      setSelectedToCity(`${city} (${city.substring(0, 4).toUpperCase()})`)
-    );
   };
 
   return (
@@ -99,11 +90,9 @@ const FlightSearch = () => {
                         <input
                           type="text"
                           value={fromCity}
-                          onChange={(e) =>
-                            dispatch(setSelectedFromCity(e.target.value))
-                          }
+                          readOnly
                           placeholder="Jakarta (JKTA)"
-                          className="flex-1 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base focus:outline-none focus:border-[#7126B5] border-b"
+                          className="flex-1 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base focus:outline-none focus:border-[#7126B5] border-b cursor-pointer"
                           onClick={() => setIsFromModalOpen(true)}
                         />
                       </div>
@@ -144,11 +133,9 @@ const FlightSearch = () => {
                       <input
                         type="text"
                         value={toCity}
-                        onChange={(e) =>
-                          dispatch(setSelectedToCity(e.target.value))
-                        }
+                        readOnly
                         placeholder="Bandung (BDG)"
-                        className="flex-1 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base focus:outline-none focus:border-[#7126B5] border-b"
+                        className="flex-1 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base focus:outline-none focus:border-[#7126B5] border-b cursor-pointer"
                         onClick={() => setIsToModalOpen(true)}
                       />
                     </div>
@@ -171,10 +158,8 @@ const FlightSearch = () => {
                         <input
                           type="text"
                           value={formatDate(departureDate)}
-                          onChange={(e) =>
-                            setDepartureDate(new Date(e.target.value))
-                          }
-                          className="flex-1 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base focus:outline-none focus:border-[#7126B5] border-b"
+                          readOnly
+                          className="flex-1 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base focus:outline-none focus:border-[#7126B5] border-b cursor-pointer"
                           onClick={() => setIsDepartureDateModalOpen(true)}
                         />
                       </div>
@@ -213,10 +198,8 @@ const FlightSearch = () => {
                               ? formatDate(returnDate)
                               : 'Pilih Tanggal'
                           }
-                          onChange={(e) =>
-                            setReturnDate(new Date(e.target.value))
-                          }
-                          className={`flex-1 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base focus:outline-none focus:border-[#7126B5] border-b ${
+                          readOnly
+                          className={`flex-1 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base focus:outline-none focus:border-[#7126B5] border-b cursor-pointer ${
                             !isRoundTrip && 'opacity-50'
                           }`}
                           onClick={() =>
@@ -297,21 +280,33 @@ const FlightSearch = () => {
         onClose={() => setIsDepartureDateModalOpen(false)}
         onSelect={(date) => {
           setDepartureDate(date);
+          // Update return date if needed
+          if (isRoundTrip && returnDate < date) {
+            setReturnDate(date);
+          }
           setIsDepartureDateModalOpen(false);
         }}
         selectedDate={departureDate}
         title="Select Departure Date"
+        minDate={new Date()} // Prevent selecting past dates
       />
 
       <DatePickerModal
         isOpen={isReturnDateModalOpen}
         onClose={() => setIsReturnDateModalOpen(false)}
         onSelect={(date) => {
-          setReturnDate(date);
-          setIsReturnDateModalOpen(false);
+          if (date >= departureDate) {
+            setReturnDate(date);
+            setIsReturnDateModalOpen(false);
+          } else {
+            alert(
+              'Tanggal kembali tidak boleh lebih awal dari tanggal berangkat'
+            );
+          }
         }}
         selectedDate={returnDate}
         title="Select Return Date"
+        minDate={departureDate} // Prevent selecting dates before departure
       />
 
       <SeatClassModal

@@ -1,31 +1,60 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useState, useEffect } from 'react';
 import { Search, X, Loader } from 'lucide-react';
-import {
-  setSearchQuery,
-  searchCities,
-  addToRecentCities,
-  removeFromRecentCities,
-  clearRecentCities,
-  selectCitySelection,
-  clearSearchResults,
-} from '../../../store/slices/citySelectionSlice';
 
-const CitySelectionModal = ({ isOpen, onClose, onSelect, title, type }) => {
-  const dispatch = useDispatch();
-  const { searchQuery, searchResults, recentCities, isLoading, error } =
-    useSelector(selectCitySelection);
+const availableCities = [
+  'Jakarta',
+  'Bandung',
+  'Surabaya',
+  'Yogyakarta',
+  'Medan',
+  'Bali',
+  'Makassar',
+  'Palembang',
+  'Semarang',
+  'Malang',
+];
+
+const CitySelectionModal = ({ isOpen, onClose, onSelect, title }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [recentCities, setRecentCities] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    // Load recent cities from localStorage when component mounts
+    const savedRecentCities = localStorage.getItem('recentCities');
+    if (savedRecentCities) {
+      setRecentCities(JSON.parse(savedRecentCities));
+    }
+  }, []);
 
   useEffect(() => {
     if (searchQuery) {
-      dispatch(searchCities(searchQuery));
+      setIsLoading(true);
+      // Simulate API delay
+      const timeoutId = setTimeout(() => {
+        const filteredCities = availableCities.filter((city) =>
+          city.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        setSearchResults(filteredCities);
+        setIsLoading(false);
+      }, 500);
+
+      return () => clearTimeout(timeoutId);
     } else {
-      dispatch(clearSearchResults());
+      setSearchResults([]);
     }
-  }, [searchQuery, dispatch]);
+  }, [searchQuery]);
 
   const handleSelection = (city) => {
-    dispatch(addToRecentCities(city));
+    // Update recent cities
+    const updatedRecentCities = [
+      city,
+      ...recentCities.filter((c) => c !== city).slice(0, 4),
+    ];
+    setRecentCities(updatedRecentCities);
+    localStorage.setItem('recentCities', JSON.stringify(updatedRecentCities));
+
     onSelect(city);
     onClose();
   };
@@ -37,6 +66,19 @@ const CitySelectionModal = ({ isOpen, onClose, onSelect, title, type }) => {
     }
   };
 
+  const clearRecentCities = () => {
+    setRecentCities([]);
+    localStorage.removeItem('recentCities');
+  };
+
+  const removeFromRecentCities = (cityToRemove) => {
+    const updatedRecentCities = recentCities.filter(
+      (city) => city !== cityToRemove
+    );
+    setRecentCities(updatedRecentCities);
+    localStorage.setItem('recentCities', JSON.stringify(updatedRecentCities));
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -45,12 +87,7 @@ const CitySelectionModal = ({ isOpen, onClose, onSelect, title, type }) => {
         className="absolute inset-0 bg-black bg-opacity-50"
         onClick={onClose}
       />
-      <div
-        className="bg-white w-full max-w-xl rounded-2xl overflow-hidden relative transform transition-all duration-300 ease-out max-h-[80vh] flex flex-col"
-        style={{
-          animation: 'slideUp 0.3s ease-out',
-        }}
-      >
+      <div className="bg-white w-full max-w-xl rounded-2xl overflow-hidden relative transform transition-all duration-300 ease-out max-h-[80vh] flex flex-col">
         <div className="p-4 flex-1 overflow-y-auto">
           <form onSubmit={handleManualEntry}>
             <div className="flex items-center gap-4 mb-6">
@@ -61,7 +98,7 @@ const CitySelectionModal = ({ isOpen, onClose, onSelect, title, type }) => {
                   placeholder="Masukkan Kota atau Negara"
                   className="ml-2 flex-1 outline-none text-sm"
                   value={searchQuery}
-                  onChange={(e) => dispatch(setSearchQuery(e.target.value))}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   autoFocus
                 />
               </div>
@@ -80,8 +117,6 @@ const CitySelectionModal = ({ isOpen, onClose, onSelect, title, type }) => {
                   <div className="flex items-center justify-center p-4">
                     <Loader className="w-6 h-6 text-gray-400 animate-spin" />
                   </div>
-                ) : error ? (
-                  <div className="p-3 text-red-500">{error}</div>
                 ) : searchResults.length > 0 ? (
                   searchResults.map((city) => (
                     <div
@@ -109,7 +144,7 @@ const CitySelectionModal = ({ isOpen, onClose, onSelect, title, type }) => {
                 <h3 className="font-semibold text-lg">Pencarian terkini</h3>
                 <button
                   className="text-red-500 text-sm hover:text-red-600"
-                  onClick={() => dispatch(clearRecentCities())}
+                  onClick={clearRecentCities}
                 >
                   Hapus Semua
                 </button>
@@ -125,7 +160,7 @@ const CitySelectionModal = ({ isOpen, onClose, onSelect, title, type }) => {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        dispatch(removeFromRecentCities(city));
+                        removeFromRecentCities(city);
                       }}
                       className="hover:bg-gray-100 p-1 rounded-full"
                     >
