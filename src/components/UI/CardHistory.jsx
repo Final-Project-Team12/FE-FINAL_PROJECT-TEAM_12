@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 const CardHistory = () => {
-  const navigate = useNavigate();
-
   const flights = [
     {
       id: 1,
@@ -23,11 +20,9 @@ const CardHistory = () => {
       },
       duration: '4h 0m',
       price: 'IDR 4.950.000',
-      info: {
-        baggage: '20 kg',
-        cabinBaggage: '7 kg',
-        entertainment: true,
-      },
+      status: 'Issued', // Status for the label
+      bookingCode: 'ABC12345', // Booking code
+      flightClass: 'Economy', // Flight class
     },
     {
       id: 2,
@@ -47,11 +42,9 @@ const CardHistory = () => {
       },
       duration: '4h 0m',
       price: 'IDR 5.950.000',
-      info: {
-        baggage: '20 kg',
-        cabinBaggage: '7 kg',
-        entertainment: true,
-      },
+      status: 'Unpaid', // Status for the label
+      bookingCode: 'DEF67890', // Booking code
+      flightClass: 'Business', // Flight class
     },
     {
       id: 3,
@@ -71,35 +64,9 @@ const CardHistory = () => {
       },
       duration: '4h 0m',
       price: 'IDR 7.225.000',
-      info: {
-        baggage: '20 kg',
-        cabinBaggage: '7 kg',
-        entertainment: true,
-      },
-    },
-    {
-      id: 4,
-      airline: 'Jet Air - Economy',
-      flightNumber: 'JT-209',
-      departure: {
-        time: '20:15',
-        date: '3 Maret 2023',
-        airport: 'Soekarno Hatta - Terminal 1A Domestik',
-        code: 'JKT',
-      },
-      arrival: {
-        time: '23:30',
-        date: '3 Maret 2023',
-        airport: 'Melbourne International Airport',
-        code: 'MLB',
-      },
-      duration: '3h 15m',
-      price: 'IDR 8.010.000',
-      info: {
-        baggage: '20 kg',
-        cabinBaggage: '7 kg',
-        entertainment: true,
-      },
+      status: 'Cancelled', // Status for the label
+      bookingCode: 'XYZ98765', // Booking code
+      flightClass: 'First Class', // Flight class
     },
   ];
 
@@ -107,6 +74,20 @@ const CardHistory = () => {
 
   const toggleAccordion = (id) => {
     setOpenId(openId === id ? null : id);
+  };
+
+  // Function to set the background color based on status
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'Issued':
+        return 'bg-green-500'; // Green for Issued
+      case 'Unpaid':
+        return 'bg-red-500'; // Red for Unpaid
+      case 'Cancelled':
+        return 'bg-gray-500'; // Gray for Cancelled
+      default:
+        return 'bg-gray-200';
+    }
   };
 
   return (
@@ -120,63 +101,51 @@ const CardHistory = () => {
               : 'border-gray-200 hover:border-gray-300'
           }`}
         >
-          {/* Header section */}
           <div
             className="p-4 cursor-pointer hover:bg-gray-50"
             onClick={() => toggleAccordion(flight.id)}
           >
+            <span
+              className={`text-white text-xs font-light rounded-full px-3 py-1 ${getStatusColor(flight.status)}`}
+            >
+              {flight.status}
+            </span>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="p-1 bg-yellow-100 rounded">
-                  <img src="../../public/icons/Thumbnail.svg" alt="" />
+                  <img
+                    src="path_to_image/airline_logo.svg"
+                    alt="Airline Logo"
+                    className="w-8 h-8"
+                  />
                 </div>
-                <span className="text-[12px] font-medium">
-                  {flight.airline}
-                </span>
+                <span className="text-sm font-medium">{flight.airline}</span>
               </div>
-              <img src="../../public/icons/Neutral button.svg" alt="" />
             </div>
 
-            <div className="mt-2 flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="text-left">
-                  <div className="text-[14px] font-bold">
+            {/* Flight Info */}
+            <div className="mt-2 text-sm text-gray-500">
+              <div className="flex justify-between items-center">
+                <div className="flex flex-col">
+                  <div className="font-medium text-black">
+                    {flight.departure.date}
+                  </div>
+                  <div>{flight.departure.airport}</div>
+                </div>
+
+                <div className="text-center">
+                  <div className="font-medium text-black">
                     {flight.departure.time}
                   </div>
-                  <div className="text-[12px]">{flight.departure.code}</div>
+                  <div className="text-xs text-gray-500">{flight.duration}</div>
                 </div>
 
-                <div className="flex flex-col items-center">
-                  <div className="text-[12px] text-[#8A8A8A]">
-                    {flight.duration}
-                  </div>
-                  <img src="../../public/icons/Arrow.svg" alt="" />
-                  <div className="text-[12px] text-[#8A8A8A]">Direct</div>
-                </div>
-
-                <div className="text-left">
-                  <div className="text-[14px] font-bold">
+                <div className="flex flex-col items-end">
+                  <div className="font-medium text-black">
                     {flight.arrival.time}
                   </div>
-                  <div className="text-[12px]">{flight.arrival.code}</div>
+                  <div>{flight.arrival.airport}</div>
                 </div>
-
-                <img
-                  src="../../public/icons/icon-park-outline_baggage-delay.svg"
-                  alt=""
-                />
-              </div>
-
-              <div className="text-right">
-                <div className="text-lg font-bold text-purple-600">
-                  {flight.price}
-                </div>
-                <button
-                  className="mt-1 px-6 py-1 bg-purple-600 text-white rounded-md text-sm hover:bg-purple-700 transition-colors duration-200"
-                  onClick=""
-                >
-                  Pilih
-                </button>
               </div>
             </div>
           </div>
@@ -185,76 +154,62 @@ const CardHistory = () => {
           {openId === flight.id && (
             <div className="p-4 bg-white">
               <div className="space-y-4">
-                <div>
-                  <hr className="mb-[22px] border-[#8A8A8A]" />
+                {/* Booking Code and Class */}
+                <div className="flex justify-between text-sm text-gray-500">
+                  <div>
+                    Booking Code:{' '}
+                    <span className="font-semibold text-black">
+                      {flight.bookingCode}
+                    </span>
+                  </div>
+                  <div>
+                    Class:{' '}
+                    <span className="font-semibold text-black">
+                      {flight.flightClass}
+                    </span>
+                  </div>
+                </div>
 
-                  <h3 className="text-[14px] font-bold text-[#4B1979] mb-2">
-                    Detail Penerbangan
-                  </h3>
+                <hr className="my-4 border-gray-300" />
 
-                  <div className="space-y-3">
-                    <div>
-                      <div className="flex justify-between">
-                        <div className="text-[16px] font-bold flex">
-                          {flight.departure.time}
-                        </div>
-                        <p className="text-[12px] font-bold text-[#A06ECE]">
-                          Keberangkatan
-                        </p>
-                      </div>
-                      <div className="text-[14px]">{flight.departure.date}</div>
-                      <div className="text-[14px] font-medium">
-                        {flight.departure.airport}
-                      </div>
-                    </div>
+                {/* Price */}
+                <div className="flex justify-between items-center text-lg font-bold text-purple-600">
+                  <div className="text-xl">{flight.price}</div>
+                </div>
 
-                    <hr className="w-1/2 mx-auto" />
+                <hr className="my-4 border-gray-300" />
 
-                    <div className="flex flex-row gap-3">
-                      <img src="../../public/icons/Thumbnail.svg" alt="" />
-                      <div className="flex flex-col gap-3">
-                        <div>
-                          <div className="text-[14px] font-bold">
-                            {flight.airline}
-                          </div>
-                          <div className="text-[14px] font-bold">
-                            {flight.flightNumber}
-                          </div>
-                        </div>
+                {/* Flight Info */}
+                <div className="space-y-2">
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-600">
+                      Informasi:
+                    </h3>
+                    <p className="text-sm">Baggage: 20 kg</p>
+                    <p className="text-sm">Cabin Baggage: 7 kg</p>
+                    <p className="text-sm">
+                      {flight.flightClass === 'Economy'
+                        ? 'In-flight Entertainment Available'
+                        : 'No Entertainment'}
+                    </p>
+                  </div>
+                </div>
 
-                        <div>
-                          <h3 className="text-[14px] font-bold">Informasi:</h3>
-                          <p className="text-[14px]">
-                            Baggaage {flight.info.baggage}
-                          </p>
-                          <p className="text-[14px] ">
-                            Cabin baggaage {flight.info.cabinBaggage}
-                          </p>
-                          <p className="text-[14px] ">
-                            {flight.info.entertainment
-                              ? 'In Flight Entertainment'
-                              : 'Non-Entertainment'}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
+                <hr className="my-4 border-gray-300" />
 
-                    <hr className="w-1/2 mx-auto" />
-
-                    <div>
-                      <div className="flex justify-between">
-                        <div className="text-[14px] font-bold">
-                          {flight.arrival.time}
-                        </div>
-                        <p className="text-[12px] font-bold text-[#A06ECE]">
-                          Kedatangan
-                        </p>
-                      </div>
-                      <div className="text-[14px]">{flight.arrival.date}</div>
-                      <div className="text-[14px] font-medium">
-                        {flight.arrival.airport}
-                      </div>
-                    </div>
+                {/* Arrival Info */}
+                <div className="flex justify-between text-sm text-gray-500">
+                  <div>
+                    Arrival Time:{' '}
+                    <span className="font-semibold text-black">
+                      {flight.arrival.time}
+                    </span>
+                  </div>
+                  <div>
+                    Arrival Airport:{' '}
+                    <span className="font-semibold text-black">
+                      {flight.arrival.airport}
+                    </span>
                   </div>
                 </div>
               </div>
