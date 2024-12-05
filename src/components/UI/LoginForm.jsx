@@ -3,9 +3,13 @@ import Button from '../Elements/Buttons/Button';
 import InputField from '../Elements/InputField/InputField';
 import { useAuth } from '../../hooks/useAuth';
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
 const LoginForm = () => {
   const { login, loading, error } = useAuth();
+  const [showError, setShowError] = useState(false);
+  const [submissionCount, setSubmissionCount] = useState(0);
+
   const {
     register,
     handleSubmit,
@@ -17,21 +21,27 @@ const LoginForm = () => {
     },
   });
 
+  useEffect(() => {
+    if (error && submissionCount > 0) {
+      setShowError(true);
+      const timer = setTimeout(() => {
+        setShowError(false);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [error, submissionCount]);
+
   const onSubmit = async (data) => {
+    setSubmissionCount((prev) => prev + 1);
     await login(data);
   };
 
   return (
-    <div className="w-full h-full flex items-center justify-center p-6">
-      <div className="w-full max-w-md">
+    <div className="w-full h-screen flex items-center justify-center p-6">
+      <div className="w-full max-w-md relative">
         <h1 className="text-2xl font-bold mb-6">Masuk</h1>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          {error && (
-            <div className="p-2 text-xs text-red-500 bg-red-100 rounded">
-              {error}
-            </div>
-          )}
-
           <div>
             <InputField
               label="Email/No Telepon"
@@ -92,6 +102,21 @@ const LoginForm = () => {
             </p>
           </div>
         </form>
+
+        <div
+          className={`
+            absolute 
+            right-0 
+            -bottom-20
+            w-full
+            transition-all duration-300 ease-in-out
+            ${showError ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}
+          `}
+        >
+          <div className="p-3 text-sm text-white text-center bg-red-500 font-medium rounded-lg shadow-lg">
+            {error}
+          </div>
+        </div>
       </div>
     </div>
   );
