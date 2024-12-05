@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import Location from '../../../public/icons/location.svg';
+import Arrow from '../../../public/icons/arrow.svg';
 
 const FlightTicketCard = ({ flight, onCardClick, isSelected }) => {
   const {
@@ -7,7 +9,8 @@ const FlightTicketCard = ({ flight, onCardClick, isSelected }) => {
     departure,
     arrival,
     bookingCode,
-    class: flightClass,
+    duration,
+    flightClass,
     price,
   } = flight;
 
@@ -24,11 +27,6 @@ const FlightTicketCard = ({ flight, onCardClick, isSelected }) => {
     }
   };
 
-  const borderStyles = {
-    selected: 'border-purple-500',
-    unselected: 'border-gray-200 hover:border-gray-300',
-  };
-
   const handleCardClick = () => {
     onCardClick(id);
   };
@@ -42,38 +40,55 @@ const FlightTicketCard = ({ flight, onCardClick, isSelected }) => {
       }`}
       onClick={handleCardClick}
     >
-      <span
-        className={`text-white text-xs font-light rounded-full px-3 py-1 ${getStatusColor(status)}`}
-      >
-        {status}
-      </span>
       <div className="p-4">
+        <span
+          className={`text-white text-xs font-light rounded-full px-3 py-1 ${getStatusColor(status)}`}
+        >
+          {status}
+        </span>
+        <div className="flex justify-between py-3">
+          <div className="flex gap-2">
+            <div>
+              <img src={Location} alt="Location Icon" />
+            </div>
+            <div>
+              <p className="font-bold">{departure.location}</p>
+              <p className="font-regular">{departure.date}</p>
+              <p className="font-regular">{departure.time}</p>
+            </div>
+          </div>
+          <div className="flex flex-col items-center justify-center">
+            <div>{duration}</div>
+            <div>
+              <img src={Arrow} alt="arrow icon" />
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <div>
+              <img src={Location} alt="Location Icon" />
+            </div>
+            <div>
+              <p className="font-bold">{arrival.location}</p>
+              <p className="font-regular">{arrival.date}</p>
+              <p className="font-regular">{arrival.time}</p>
+            </div>
+          </div>
+        </div>
+        <div className="w-full pt-1">
+          <hr class="h-px bg-gray-200 border-1 dark:bg-gray-500"></hr>
+        </div>
         <div className="flex justify-between">
-          <div>
-            <p className="font-bold">{departure.location}</p>
-            <p className="text-gray-500">
-              {departure.date} - {departure.time}
-            </p>
+          <div className="mt-2">
+            <p className="font-bold">Booking Code:</p>
+            <p>{bookingCode}</p>
           </div>
-          <div>d</div>
-          <div>
-            <p className="font-bold">{arrival.location}</p>
-            <p className="text-gray-500">
-              {arrival.date} - {arrival.time}
-            </p>
+          <div className="mt-2">
+            <p className="font-bold">Class:</p>
+            <p>{flightClass}</p>
           </div>
-        </div>
-        <div className="mt-4">
-          <p className="font-bold">Booking Code:</p>
-          <p>{bookingCode}</p>
-        </div>
-        <div className="mt-4">
-          <p className="font-bold">Class:</p>
-          <p>{flightClass}</p>
-        </div>
-        <div className="mt-4">
-          <p className="font-bold">Price:</p>
-          <p>{price}</p>
+          <div className="mt-6">
+            <p className="font-bold text-purple-900">{price}</p>
+          </div>
         </div>
       </div>
     </div>
