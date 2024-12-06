@@ -23,7 +23,7 @@ const ChangeProfile = () => {
 
           <div className="px-4 py-2">
             <label
-              for="nama-lengkap"
+              htmlFor="nama-lengkap"
               className="block mb-1 text-sm font-bold text-purple-800 dark:text-white"
             >
               Nama Lengkap
@@ -39,7 +39,7 @@ const ChangeProfile = () => {
           </div>
           <div className="px-4 py-2">
             <label
-              for="nomor-telepon"
+              htmlFor="nomor-telepon"
               className="block mb-1 text-sm font-bold text-purple-800 dark:text-white"
             >
               Nomor Telepon
@@ -55,7 +55,7 @@ const ChangeProfile = () => {
           </div>
           <div className="px-4 py-2 mb-4">
             <label
-              for="email"
+              htmlFor="email"
               className="block mb-1 text-sm font-bold text-purple-800 dark:text-white"
             >
               Email

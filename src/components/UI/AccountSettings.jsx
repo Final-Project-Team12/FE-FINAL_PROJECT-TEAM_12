@@ -1,3 +1,5 @@
+import InputField from '../Elements/InputField/InputField';
+
 const AccountSettings = () => {
   return (
     <div className="w-full p-4 space-y-4 mt-14 border rounded-lg mb-10">
@@ -24,11 +26,13 @@ const AccountSettings = () => {
             >
               Current Password
             </label>
-            <input
+            <InputField
               type="password"
-              id="current-password"
-              className=" border text-sm rounded-md focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 "
-              required
+              // error={errors.password}
+              showPasswordToggle
+              // {...register('password', {
+              //   required: 'Password wajib diisi',
+              // })}
             />
           </div>
           <div className="px-4 py-2">
@@ -38,11 +42,17 @@ const AccountSettings = () => {
             >
               New Password
             </label>
-            <input
+            <InputField
               type="password"
-              id="new-password"
-              className=" border text-sm rounded-md focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 "
-              required
+              // error={errors.password}
+              showPasswordToggle
+              // {...register('password', {
+              //   required: 'Password wajib diisi',
+              //   minLength: {
+              //     value: 6,
+              //     message: 'Password minimal 6 karakter',
+              //   },
+              // })}
             />
           </div>
           <div className="px-4 py-2 mb-4">
@@ -52,11 +62,17 @@ const AccountSettings = () => {
             >
               Confirm New Password
             </label>
-            <input
+            <InputField
               type="password"
-              id="new-password"
-              className=" border text-sm rounded-md focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 "
-              required
+              // error={errors.password}
+              showPasswordToggle
+              // {...register('password', {
+              //   required: 'Password wajib diisi',
+              //   minLength: {
+              //     value: 6,
+              //     message: 'Password minimal 6 karakter',
+              //   },
+              // })}
             />
           </div>
           <div className="flex flex-col items-center ">
