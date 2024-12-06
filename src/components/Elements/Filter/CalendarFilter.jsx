@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { DateRange } from 'react-date-range';
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
+import FilterIcon from '../../../../public/icons/filter_icon.svg';
 
 const CalendarFilter = ({ onDateRangeChange }) => {
   const [showCalendar, setShowCalendar] = useState(false);
@@ -37,12 +38,12 @@ const CalendarFilter = ({ onDateRangeChange }) => {
 
   return (
     <div className="relative">
-      <div
-        className="w-[110px] h-[50px] rounded-[12px] bg-[#A06ECE] flex items-center cursor-pointer"
+      <button
+        className="h-[40px] px-4 mt-1 rounded-full border border-purple-500 flex items-center "
         onClick={handleFilterButtonClick}
       >
-        <div className="mx-auto text-white">Filter</div>
-      </div>
+        <img className="w-6 pr-1" src={FilterIcon} alt="" /> Filter
+      </button>
       {showCalendar && (
         <>
           <div
