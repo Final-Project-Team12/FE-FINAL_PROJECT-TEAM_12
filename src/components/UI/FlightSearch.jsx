@@ -329,7 +329,7 @@ const FlightSearch = () => {
         }}
         selectedDate={departureDate}
         title="Select Departure Date"
-        minDate={new Date()} // Prevent selecting past dates
+        minDate={new Date()}
       />
 
       <DatePickerModal
@@ -347,7 +347,7 @@ const FlightSearch = () => {
         }}
         selectedDate={returnDate}
         title="Select Return Date"
-        minDate={departureDate} // Prevent selecting dates before departure
+        minDate={departureDate}
       />
 
       <SeatClassModal
