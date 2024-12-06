@@ -11,6 +11,7 @@ import ResetPasswordPage from './pages/ResetPasswordPage';
 import OrderHistoryPage from './pages/OrderHistoryPage';
 import LoginPage from './pages/LoginPage';
 import AccountPage from './pages/AccountPage';
+import AccountSettings from './components/UI/AccountSettings';
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
           <Route path="/orderhistory" element={<OrderHistoryPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/account" element={<AccountPage />} />
+          <Route path="/account-settings" element={<AccountSettings />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </BrowserRouter>

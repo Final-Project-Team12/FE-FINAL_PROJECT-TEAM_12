@@ -1,4 +1,4 @@
-const ChangeProfile = () => {
+const AccountSettings = () => {
   return (
     <div className="w-full p-4 space-y-4 mt-14 border rounded-lg mb-10">
       <div>
@@ -6,7 +6,7 @@ const ChangeProfile = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <h2 className="text-xl font-bold mb-[16px] mt-8">
-                Ubah Data Profil
+                Pengaturan Akun
               </h2>
             </div>
           </div>
@@ -14,54 +14,48 @@ const ChangeProfile = () => {
 
         <div className="flex flex-col">
           <div className="w-full h-[40px] rounded-t-[6px] bg-[#A06ECE] mb-2 flex items-center">
-            <div className="ml-3 text-white">Data Diri</div>
+            <div className="ml-3 text-white">Reset Password</div>
           </div>
 
           <div className="px-4 py-2">
             <label
-              htmlFor="nama-lengkap"
+              htmlFor="current-password"
               className="block mb-1 text-sm font-bold text-purple-800 dark:text-white"
             >
-              Nama Lengkap
+              Current Password
             </label>
             <input
-              type="text"
-              id="nama-lengkap"
+              type="password"
+              id="current-password"
               className=" border text-sm rounded-md focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 "
-              placeholder="Nama Lengkap "
-              value="John Doe"
               required
             />
           </div>
           <div className="px-4 py-2">
             <label
-              htmlFor="nomor-telepon"
+              htmlFor="new-password"
               className="block mb-1 text-sm font-bold text-purple-800 dark:text-white"
             >
-              Nomor Telepon
+              New Password
             </label>
             <input
-              type="text"
-              id="nomor-telepon"
+              type="password"
+              id="new-password"
               className=" border text-sm rounded-md focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 "
-              placeholder="+628xxxxxxxx "
-              value="+6281234567891"
               required
             />
           </div>
           <div className="px-4 py-2 mb-4">
             <label
-              htmlFor="email"
+              htmlFor="confirm-password"
               className="block mb-1 text-sm font-bold text-purple-800 dark:text-white"
             >
-              Email
+              Confirm New Password
             </label>
             <input
-              type="email"
-              id="email"
+              type="password"
+              id="new-password"
               className=" border text-sm rounded-md focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 "
-              placeholder="email@example.com "
-              value="johndoe@email.com"
               required
             />
           </div>
@@ -79,4 +73,4 @@ const ChangeProfile = () => {
   );
 };
 
-export default ChangeProfile;
+export default AccountSettings;

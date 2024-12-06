@@ -1,8 +1,5 @@
 import { LogOut, PencilLine, Settings } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-
 const AccountSidebar = () => {
-  const navigate = useNavigate();
 
   return (
     <>
@@ -12,8 +9,7 @@ const AccountSidebar = () => {
           <div>
             <div
               className="flex items-center justify-between cursor-pointer group"
-              onClick={() => navigate('/account')}
-            >
+              >
               <div className="flex items-center gap-2">
                 <PencilLine size={24} className="text-purple-700" />
                 <span className="font-normal text-left">Ubah Profil</span>
@@ -24,7 +20,7 @@ const AccountSidebar = () => {
 
           {/* Pengaturan Akun */}
           <div>
-            <div className="flex items-center justify-between cursor-pointer group" onClick={() => navigate('/account')}>
+            <div className="flex items-center justify-between cursor-pointer group" onClick={() => navigate('/account-settings')}>
               <div className="flex items-center gap-2">
                 <Settings size={24} className="text-purple-700" />
                 <span className="font-normal text-left">Pengaturan Akun</span>

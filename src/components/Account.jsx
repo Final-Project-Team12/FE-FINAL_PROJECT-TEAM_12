@@ -11,6 +11,7 @@ const Account = () => {
       <div className="flex ml-[260px] mr-[212px]">
         <AccountSidebar/>
         <ChangeProfile/>
+        
       </div>
     </>
   );
