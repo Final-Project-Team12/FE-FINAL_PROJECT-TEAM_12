@@ -11,8 +11,12 @@ const FlightTicketCard = ({ flight, onCardClick, isSelected }) => {
     bookingCode,
     duration,
     flightClass,
-    price,
+    pricePerPerson,
+    totalPassengers,
+    tax,
   } = flight;
+
+  const totalPrice = pricePerPerson * totalPassengers + tax;
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -87,7 +91,9 @@ const FlightTicketCard = ({ flight, onCardClick, isSelected }) => {
             <p>{flightClass}</p>
           </div>
           <div className="mt-6">
-            <p className="font-bold text-purple-900">{price}</p>
+            <p className="font-bold text-purple-900">
+              IDR {totalPrice.toLocaleString('id-ID')}
+            </p>
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Check, X } from 'lucide-react';
+import { useSelector } from 'react-redux';
 
 const SeatClassModal = ({
   isOpen,
@@ -7,18 +8,16 @@ const SeatClassModal = ({
   onSelect,
   selectedClass = 'Economy',
 }) => {
+  const seatPrices = useSelector((state) => state.flightSearch.seatPrices);
+
   if (!isOpen) return null;
 
   const seatClasses = [
-    { name: 'Economy', price: 'IDR 4.950.000' },
-    { name: 'Premium Economy', price: 'IDR 7.550.000' },
-    { name: 'Business', price: 'IDR 29.220.000' },
-    { name: 'First Class', price: 'IDR 87.620.000' },
+    { name: 'Economy', price: seatPrices.Economy },
+    { name: 'Premium Economy', price: seatPrices['Premium Economy'] },
+    { name: 'Business', price: seatPrices.Business },
+    { name: 'First Class', price: seatPrices['First Class'] },
   ];
-
-  const handleSelect = (seatClass) => {
-    onSelect(seatClass);
-  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
@@ -26,7 +25,7 @@ const SeatClassModal = ({
         <div className="px-4 pt-4 pb-6 border-b border-gray-200">
           <button
             onClick={onClose}
-            className="absolute right-3 top-4 text-gray-500 hover:text-gray-700 z-10"
+            className="absolute right-3 top-4 text-gray-500 hover:text-gray-700"
           >
             <X size={20} />
           </button>
@@ -36,7 +35,7 @@ const SeatClassModal = ({
           {seatClasses.map((seatClass) => (
             <div
               key={seatClass.name}
-              onClick={() => handleSelect(seatClass.name)}
+              onClick={() => onSelect(seatClass.name)}
               className="cursor-pointer relative border-b border-gray-200"
             >
               <div
@@ -64,7 +63,7 @@ const SeatClassModal = ({
                           : 'text-[#4B1979]'
                       }`}
                     >
-                      {seatClass.price}
+                      IDR {seatClass.price.toLocaleString('id-ID')}
                     </p>
                   </div>
                   {selectedClass === seatClass.name && (
