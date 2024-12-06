@@ -12,6 +12,7 @@ const initialState = {
     infant: 0,
   },
   selectedSeatClass: 'Economy',
+  selectedFlight: null,
   seatPrices: {
     Economy: 0,
     'Premium Economy': 0,
@@ -43,10 +44,10 @@ export const flightSearchSlice = createSlice({
       };
     },
     setSeatPrices: (state, action) => {
-      state.seatPrices = {
-        ...state.seatPrices,
-        ...action.payload,
-      };
+      state.seatPrices = action.payload;
+    },
+    updateSelectedSeatClass: (state, action) => {
+      state.selectedSeatClass = action.payload;
     },
   },
 });
@@ -57,6 +58,7 @@ export const {
   swapCities,
   updatePassengerCount,
   setSeatPrices,
+  updateSelectedSeatClass,
 } = flightSearchSlice.actions;
 
 export default flightSearchSlice.reducer;

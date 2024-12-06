@@ -19,33 +19,45 @@ const TravelCard = ({ travel }) => {
     });
   };
 
-  const calculateSeatPrices = (basePrice) => {
-    return {
-      Economy: basePrice,
-      'Premium Economy': basePrice * 1.5,
-      Business: basePrice * 3.5,
-      'First Class': basePrice * 5,
-    };
+  // Get the initial economy class details and other seat prices
+  const getFlightPrices = (seatsDetail) => {
+    // Membuat mapping yang benar sesuai dengan API
+    const priceMap = {};
+    seatsDetail.forEach((seat) => {
+      // Gunakan nama kelas yang sesuai
+      if (seat.class === 'Economy Premium') {
+        priceMap['Premium Economy'] = seat.price;
+      } else {
+        priceMap[seat.class] = seat.price;
+      }
+    });
+    return priceMap;
+  };
+
+  const getEconomyClass = (seatsDetail) => {
+    return seatsDetail.find((seat) => seat.class === 'Economy');
   };
 
   const handleCardClick = () => {
-    const basePrice = travel.seats_detail[0]?.price || 0;
-    const seatPrices = calculateSeatPrices(basePrice);
+    const economyClass = getEconomyClass(travel.seats_detail);
+    const seatPrices = getFlightPrices(travel.seats_detail);
+
+    if (!economyClass) return;
 
     dispatch(setSeatPrices(seatPrices));
-
     dispatch(
       updateFlightSearch({
         fromCity: `${travel.origin_airport.name} (${travel.origin_airport.airport_code})`,
         toCity: `${travel.destination_airport.name} (${travel.destination_airport.airport_code})`,
         departureDate: new Date(travel.departure_time),
-        selectedSeatClass: travel.seats_detail[0]?.class || 'Economy',
+        selectedSeatClass: 'Economy',
         isRoundTrip: false,
         passengerCounts: {
           adult: 1,
           child: 0,
           infant: 0,
         },
+        selectedFlight: travel,
       })
     );
 
@@ -54,6 +66,8 @@ const TravelCard = ({ travel }) => {
       behavior: 'smooth',
     });
   };
+
+  const economyClass = getEconomyClass(travel.seats_detail);
 
   return (
     <div
@@ -66,7 +80,6 @@ const TravelCard = ({ travel }) => {
           alt={`${travel.origin_airport.name} to ${travel.destination_airport.name}`}
           className="w-full h-20 sm:h-24 object-cover rounded-lg"
         />
-
         <div className="absolute top-0 right-0 px-2 sm:px-2.5 py-1 rounded-e-none rounded-s-lg text-xs font-bold text-white bg-[#7126B5]">
           {travel.offers}
         </div>
@@ -96,7 +109,7 @@ const TravelCard = ({ travel }) => {
         <div className="text-sm sm:text-sm">
           Mulai dari{' '}
           <span className="text-red-500 font-bold">
-            IDR {travel.seats_detail[0]?.price.toLocaleString('id-ID')}
+            IDR {economyClass?.price.toLocaleString('id-ID')}
           </span>
         </div>
       </div>

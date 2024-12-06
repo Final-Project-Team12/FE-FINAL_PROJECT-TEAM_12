@@ -21,7 +21,6 @@ const CitySelectionModal = ({ isOpen, onClose, onSelect, title }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Load recent cities from localStorage when component mounts
     const savedRecentCities = localStorage.getItem('recentCities');
     if (savedRecentCities) {
       setRecentCities(JSON.parse(savedRecentCities));
