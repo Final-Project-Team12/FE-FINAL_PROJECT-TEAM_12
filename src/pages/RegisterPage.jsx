@@ -1,4 +1,4 @@
-import Otp from '../components/UI/OTP';
+import Otp from '../components/UI/Otp';
 
 const RegisterPage = () => {
   return (
