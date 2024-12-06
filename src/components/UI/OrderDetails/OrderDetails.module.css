@@ -1,0 +1,39 @@
+.orderDetailsContainer {
+  @apply lg:w-2/5 w-full sticky top-[84px] max-h-[calc(100vh-84px)] overflow-auto;
+}
+.orderDetailsContainer::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.orderDetailsContainer::-webkit-scrollbar-thumb {
+  background-color: transparent;
+}
+
+.orderDetailsContainer::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+.orderDetailsContainer {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.orderDetailsContainer.showScrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.orderDetailsContainer.showScrollbar::-webkit-scrollbar-thumb {
+  background-color: #6b7280;
+  border-radius: 4px;
+}
+
+.orderDetailsContainer.showScrollbar::-webkit-scrollbar-track {
+  background-color: #f1f5f9;
+}
+
+.orderDetailsContainer.showScrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #6b7280 #f1f5f9;
+}

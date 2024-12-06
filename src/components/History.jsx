@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Navbar from './UI/Navbar';
 import HeaderHistory from './UI/HeaderHistory';
 import FlightTicketCard from './UI/FlightTicketCard';
-import OrderDetails from './UI/OrderDetails';
+import OrderDetails from './UI/OrderDetails/OrderDetails';
+import styles from './UI/OrderDetails/OrderDetails.module.css';
 
 const History = () => {
   const flightData = [
@@ -153,6 +154,9 @@ const History = () => {
   ];
 
   const [selectedCardId, setSelectedCardId] = useState(null);
+  const orderDetailsRef = useRef(null);
+  const [orderDetailsHeight, setOrderDetailsHeight] = useState(0);
+  const [containerHeight, setContainerHeight] = useState(0);
 
   const handleCardClick = (id) => {
     setSelectedCardId(id);
@@ -161,33 +165,56 @@ const History = () => {
     selectedCardId !== null
       ? flightData.find((flight) => flight.id === selectedCardId)
       : null;
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (orderDetailsRef.current) {
+        setOrderDetailsHeight(orderDetailsRef.current.offsetHeight);
+      }
+      setContainerHeight(window.innerHeight - 84); // Subtract the header height
+    };
+
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Initial setup
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
   return (
     <>
       <Navbar />
       <HeaderHistory />
-      <div>
-        <div className=" ml-[260px] mr-[212px] py-4 pl-8">
-          <div className="flex flex-col lg:flex-row gap-12">
-            <div className="lg:w-3/5 sm:w-full space-y-4">
-              {flightData.map((flight) => (
-                <FlightTicketCard
-                  key={flight.id}
-                  flight={flight}
-                  onCardClick={handleCardClick}
-                  isSelected={flight.id === selectedCardId}
-                />
-              ))}
-            </div>
-            <div className="lg:w-2/5 w-full">
-              {selectedCard ? (
-                <OrderDetails selectedCard={selectedCard} />
-              ) : (
-                <p className="text-center text-gray-500">
-                  Select a flight to view details
-                </p>
-              )}
-            </div>
-          </div>
+      <div className="flex flex-col lg:flex-row gap-12 px-[260px] py-4 min-h-[calc(100vh-84px)]">
+        <div className="lg:w-3/5 sm:w-full space-y-4">
+          {flightData.map((flight) => (
+            <FlightTicketCard
+              key={flight.id}
+              flight={flight}
+              onCardClick={handleCardClick}
+              isSelected={flight.id === selectedCardId}
+            />
+          ))}
+        </div>
+        <div
+          ref={orderDetailsRef}
+          className={`${styles.orderDetailsContainer} ${selectedCard ? '' : 'hidden'}`}
+          style={{
+            maxHeight: selectedCard ? `${containerHeight - 20}px` : 'none',
+            overflow: 'auto',
+          }}
+        >
+          {selectedCard ? (
+            <OrderDetails
+              className={styles.orderDetailsContainer}
+              selectedCard={selectedCard}
+            />
+          ) : (
+            <p className="text-center text-gray-500">
+              Select a flight to view details
+            </p>
+          )}
         </div>
       </div>
     </>

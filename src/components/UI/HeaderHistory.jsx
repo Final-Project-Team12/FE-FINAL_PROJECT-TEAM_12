@@ -6,9 +6,9 @@ const HeaderHistory = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="border-b shadow-[0px_4px_10px_rgba(0,0,0,0.1)]">
-      <div className="ml-[260px] mr-[212px] mt-[47px] mb-5">
-        <h2 className="text-xl font-bold mb-[24px]">Riwayat Pemesanan</h2>
+    <div className="border-b py-2 -mt-2 shadow-[0px_4px_10px_rgba(0,0,0,0.1)]">
+      <div className="ml-[260px] mr-[212px] mb-5">
+        <h2 className="text-xl font-bold my-[24px]">Riwayat Pemesanan</h2>
         <div className="flex gap-3 mx-4">
           <div
             className="w-[700px] h-[50px] rounded-[12px] bg-[#A06ECE] flex items-center "

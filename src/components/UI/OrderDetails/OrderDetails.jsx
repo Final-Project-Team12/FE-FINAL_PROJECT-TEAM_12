@@ -1,5 +1,5 @@
 import React from 'react';
-import FlowerLogo from '../../../public/icons/flower_icon.svg';
+import FlowerLogo from '../../../../public/icons/flower_icon.svg';
 
 const OrderDetails = ({ selectedCard }) => {
   const getStatusColor = (status) => {
