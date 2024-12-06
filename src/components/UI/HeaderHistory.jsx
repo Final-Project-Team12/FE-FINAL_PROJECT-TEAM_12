@@ -1,17 +1,19 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import SortTicket from './SortTicket';
+import CalendarFilter from '../Elements/Filter/CalendarFilter';
 
-const HeaderHistory = () => {
+const HeaderHistory = ({ onDateRangeChange }) => {
   const navigate = useNavigate();
-
+  const handleDateRangeChange = (startDate, endDate) => {
+    onDateRangeChange(startDate, endDate);
+  };
   return (
     <div className="border-b py-2 -mt-2 shadow-[0px_4px_10px_rgba(0,0,0,0.1)]">
       <div className="ml-[260px] mr-[212px] mb-5">
         <h2 className="text-xl font-bold my-[24px]">Riwayat Pemesanan</h2>
         <div className="flex gap-3 mx-4">
           <div
-            className="w-[700px] h-[50px] rounded-[12px] bg-[#A06ECE] flex items-center "
+            className="w-[700px] h-[50px] rounded-[12px] bg-[#A06ECE] flex items-center cursor-pointer"
             onClick={() => navigate('/')}
           >
             <img
@@ -22,9 +24,9 @@ const HeaderHistory = () => {
             <div className="ml-3 text-white">Beranda</div>
           </div>
           <div className="w-[110px] h-[50px]">
-            <SortTicket />
+            <CalendarFilter onDateRangeChange={handleDateRangeChange} />
           </div>
-          <div className="w-[110px]">nanti dulu </div>
+          <div className="w-[110px]">nanti dulu</div>
         </div>
       </div>
     </div>
