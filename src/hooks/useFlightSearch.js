@@ -1,15 +1,21 @@
 import { useState } from 'react';
-import { flightService } from '../services/flight.service';
 
 export const useFlightSearch = () => {
+  // City states with default empty values
   const [fromCity, setFromCity] = useState('');
   const [toCity, setToCity] = useState('');
+
+  // Date states
   const [departureDate, setDepartureDate] = useState(new Date());
   const [returnDate, setReturnDate] = useState(new Date());
   const [isRoundTrip, setIsRoundTrip] = useState(false);
-  const [passengerCounts, setPassengerCounts] = useState(
-    flightService.defaultPassengerCounts
-  );
+
+  // Passenger and seat states
+  const [passengerCounts, setPassengerCounts] = useState({
+    adult: 1,
+    child: 0,
+    infant: 0,
+  });
   const [selectedSeatClass, setSelectedSeatClass] = useState('Economy');
 
   // Modal states
@@ -39,10 +45,18 @@ export const useFlightSearch = () => {
     return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
   };
 
+  const handleFromCitySelection = (city) => {
+    setFromCity(city);
+  };
+
+  const handleToCitySelection = (city) => {
+    setToCity(city);
+  };
+
   const handleSwapCities = () => {
-    const tempFrom = fromCity;
+    const tempCity = fromCity;
     setFromCity(toCity);
-    setToCity(tempFrom);
+    setToCity(tempCity);
   };
 
   const getTotalPassengers = () => {
@@ -51,21 +65,14 @@ export const useFlightSearch = () => {
     return `${total} Penumpang`;
   };
 
-  // Handle round trip toggle
-  const handleRoundTripToggle = (value) => {
-    setIsRoundTrip(value);
-    if (!value) {
-      // Reset return date when switching to one-way
-      setReturnDate(new Date());
-    }
-  };
-
-  // Handle return date selection
-  const handleReturnDateSelect = (date) => {
-    if (isRoundTrip && date >= departureDate) {
-      setReturnDate(date);
-      setIsReturnDateModalOpen(false);
-    }
+  // Function to update all flight search fields at once
+  const setFlightSearchData = (data) => {
+    if (data.fromCity) setFromCity(data.fromCity);
+    if (data.toCity) setToCity(data.toCity);
+    if (data.departureDate) setDepartureDate(new Date(data.departureDate));
+    if (data.selectedSeatClass) setSelectedSeatClass(data.selectedSeatClass);
+    if (data.isRoundTrip !== undefined) setIsRoundTrip(data.isRoundTrip);
+    if (data.passengerCounts) setPassengerCounts(data.passengerCounts);
   };
 
   return {
@@ -89,7 +96,7 @@ export const useFlightSearch = () => {
     setToCity,
     setDepartureDate,
     setReturnDate,
-    setIsRoundTrip: handleRoundTripToggle,
+    setIsRoundTrip,
     setPassengerCounts,
     setSelectedSeatClass,
     setIsFromModalOpen,
@@ -98,11 +105,15 @@ export const useFlightSearch = () => {
     setIsReturnDateModalOpen,
     setIsPassengerSelectorOpen,
     setIsSeatClassModalOpen,
+    setFlightSearchData,
 
-    // Methods
-    formatDate,
+    // Handlers
+    handleFromCitySelection,
+    handleToCitySelection,
     handleSwapCities,
+
+    // Utility functions
+    formatDate,
     getTotalPassengers,
-    handleReturnDateSelect,
   };
 };
