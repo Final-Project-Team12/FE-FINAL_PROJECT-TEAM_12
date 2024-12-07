@@ -131,18 +131,29 @@ const getTotalPassengers = (passengerCounts) => {
   return Object.values(passengerCounts).reduce((sum, count) => sum + count, 0);
 };
 
+// Flight Management and Booking
 export const flightManagementAndBookingService = {
   async fetchAvailableFlightsWithFiltersAndPagination(params) {
+    const facilityMapping = {
+      wifi: 'wifi_available',
+      meals: 'meal_available',
+      entertainment: 'in_flight_entertainment',
+      power: 'power_outlets',
+    };
+
+    const facilityParams = params.facilities?.reduce((acc, facility) => {
+      if (facilityMapping[facility]) {
+        acc[facilityMapping[facility]] = true;
+      }
+      return acc;
+    }, {});
+
     const queryString = new URLSearchParams({
       page: params.page || 1,
       limit: params.limit || 3,
-      priceSort: params.priceSort || '',
-      departureSort: params.departureSort || '',
-      arrivalSort: params.arrivalSort || '',
-      durationSort: params.durationSort || '',
       minPrice: params.minPrice || '',
       maxPrice: params.maxPrice || '',
-      facilities: params.facilities?.join(',') || '',
+      ...facilityParams,
     }).toString();
 
     const response = await axiosInstance.get(`/flights?${queryString}`);

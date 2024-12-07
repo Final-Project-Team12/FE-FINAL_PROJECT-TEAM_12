@@ -1,4 +1,3 @@
-// src/redux/store.js
 import { configureStore } from '@reduxjs/toolkit';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
@@ -6,11 +5,12 @@ import authReducer from './slices/authSlice';
 import paymentReducer from './slices/paymentSlice';
 import flightReducer from './slices/flightSlice';
 import flightSearchReducer from './slices/flightSearchSlice';
+import flightFilterReducer from './slices/flightFilterSlice';
 
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['payment', 'flight', 'flightSearch'],
+  whitelist: ['payment', 'flight', 'flightSearch', 'flightFilter'],
 };
 
 const persistedPaymentReducer = persistReducer(persistConfig, paymentReducer);
@@ -19,6 +19,10 @@ const persistedFlightSearchReducer = persistReducer(
   persistConfig,
   flightSearchReducer
 );
+const persistedFlightFilterReducer = persistReducer(
+  persistConfig,
+  flightFilterReducer
+);
 
 export const store = configureStore({
   reducer: {
@@ -26,6 +30,7 @@ export const store = configureStore({
     payment: persistedPaymentReducer,
     flight: persistedFlightReducer,
     flightSearch: persistedFlightSearchReducer,
+    flightFilter: persistedFlightFilterReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -35,9 +40,13 @@ export const store = configureStore({
           'persist/REHYDRATE',
           'persist/REGISTER',
         ],
-        // Mengabaikan date objects dalam state
         ignoredActionPaths: ['payload.departureDate', 'payload.returnDate'],
-        ignoredPaths: ['flightSearch.departureDate', 'flightSearch.returnDate'],
+        ignoredPaths: [
+          'flightSearch.departureDate',
+          'flightSearch.returnDate',
+          'flightFilter.departureDate',
+          'flightFilter.returnDate',
+        ],
       },
     }),
 });
