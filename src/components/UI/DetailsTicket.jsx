@@ -6,6 +6,8 @@ import {
   fetchFilteredFlights,
   goToNextPage,
 } from '../../store/slices/flightFilterSlice';
+import LoadingTicket from './LoadingTicket';
+import SearchResultEmpty from './SearchResultEmpety';
 
 const DetailsTicket = () => {
   const navigate = useNavigate();
@@ -88,6 +90,7 @@ const DetailsTicket = () => {
 
   return (
     <div className="w-full px-4 pb-4 space-y-4">
+      {!isLoading && filteredFlights.length === 0 && <SearchResultEmpty />}
       {filteredFlights.map((flight, index) => (
         <div
           key={flight.plane_id}
@@ -313,11 +316,7 @@ const DetailsTicket = () => {
           )}
         </div>
       ))}
-      {isLoading && (
-        <div className="w-full text-center py-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
-        </div>
-      )}
+      {isLoading && <LoadingTicket />}
     </div>
   );
 };

@@ -1,6 +1,11 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { flightManagementAndBookingService } from '../../services/flight.service';
 
+const formatDateForComparison = (dateString) => {
+  const date = new Date(dateString);
+  return date.toISOString().split('T')[0];
+};
+
 export const fetchFilteredFlights = createAsyncThunk(
   'flightFilter/fetchFilteredFlights',
   async ({ page = 1, filters = {} }, { rejectWithValue }) => {
@@ -15,6 +20,15 @@ export const fetchFilteredFlights = createAsyncThunk(
         );
 
       let filteredFlights = response.data.outbound_flights;
+
+      if (filters.departureDate) {
+        const selectedDateStr = formatDateForComparison(filters.departureDate);
+
+        filteredFlights = filteredFlights.filter((flight) => {
+          const flightDateStr = formatDateForComparison(flight.departure_time);
+          return flightDateStr === selectedDateStr;
+        });
+      }
 
       if (filters.facilities?.length > 0) {
         filteredFlights = filteredFlights.filter((flight) => {
@@ -34,6 +48,9 @@ export const fetchFilteredFlights = createAsyncThunk(
           });
         });
       }
+
+      console.log('Selected Date:', filters.departureDate);
+      console.log('Filtered Flights:', filteredFlights);
 
       return {
         ...response,
@@ -58,7 +75,34 @@ const initialState = {
     minPrice: '',
     maxPrice: '',
     facilities: [],
+    departureDate: null,
   },
+  sortCriteria: 'price_asc',
+};
+
+const sortFlights = (flights, criteria) => {
+  return [...flights].sort((a, b) => {
+    switch (criteria) {
+      case 'price_asc':
+        return a.seats_detail[0].price - b.seats_detail[0].price;
+      case 'price_desc':
+        return b.seats_detail[0].price - a.seats_detail[0].price;
+      case 'duration_asc':
+        return a.duration - b.duration;
+      case 'duration_desc':
+        return b.duration - a.duration;
+      case 'departure_asc':
+        return new Date(a.departure_time) - new Date(b.departure_time);
+      case 'departure_desc':
+        return new Date(b.departure_time) - new Date(a.departure_time);
+      case 'arrival_asc':
+        return new Date(a.arrival_time) - new Date(b.arrival_time);
+      case 'arrival_desc':
+        return new Date(b.arrival_time) - new Date(a.arrival_time);
+      default:
+        return 0;
+    }
+  });
 };
 
 const flightFilterSlice = createSlice({
@@ -76,9 +120,17 @@ const flightFilterSlice = createSlice({
       state.filteredFlights = [];
       state.currentPageNumber = 1;
       state.hasMoreFlights = true;
+      state.sortCriteria = initialState.sortCriteria;
     },
     goToNextPage: (state) => {
       state.currentPageNumber += 1;
+    },
+    setSortCriteria: (state, action) => {
+      state.sortCriteria = action.payload;
+      state.filteredFlights = sortFlights(
+        state.filteredFlights,
+        action.payload
+      );
     },
   },
   extraReducers: (builder) => {
@@ -89,8 +141,9 @@ const flightFilterSlice = createSlice({
       })
       .addCase(fetchFilteredFlights.fulfilled, (state, action) => {
         const newFlights = action.payload.data.outbound_flights;
+
         if (state.currentPageNumber === 1) {
-          state.filteredFlights = newFlights;
+          state.filteredFlights = sortFlights(newFlights, state.sortCriteria);
         } else {
           const existingIds = new Set(
             state.filteredFlights.map((f) => f.plane_id)
@@ -98,11 +151,12 @@ const flightFilterSlice = createSlice({
           const uniqueNewFlights = newFlights.filter(
             (f) => !existingIds.has(f.plane_id)
           );
-          state.filteredFlights = [
-            ...state.filteredFlights,
-            ...uniqueNewFlights,
-          ];
+          state.filteredFlights = sortFlights(
+            [...state.filteredFlights, ...uniqueNewFlights],
+            state.sortCriteria
+          );
         }
+
         state.hasMoreFlights = action.payload.pagination.hasNextPage;
         state.isLoading = false;
       })
@@ -113,6 +167,11 @@ const flightFilterSlice = createSlice({
   },
 });
 
-export const { setActiveFilters, clearAllFilters, goToNextPage } =
-  flightFilterSlice.actions;
+export const {
+  setActiveFilters,
+  clearAllFilters,
+  goToNextPage,
+  setSortCriteria,
+} = flightFilterSlice.actions;
+
 export default flightFilterSlice.reducer;
