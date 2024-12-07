@@ -1,14 +1,26 @@
-import React, { useState } from 'react';
+import { useEffect, useCallback, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
-import { useFlightSearchAndFilterManagement } from '../../hooks/useFlightSearchAndFilterManagement';
+import {
+  fetchFilteredFlights,
+  goToNextPage,
+} from '../../store/slices/flightFilterSlice';
 
 const DetailsTicket = () => {
   const navigate = useNavigate();
-  const { flights, loading, error, hasMore, lastFlightElementRef } =
-    useFlightSearchAndFilterManagement();
+  const dispatch = useDispatch();
+  const {
+    filteredFlights,
+    isLoading,
+    error,
+    hasMoreFlights,
+    currentPageNumber,
+    activeFilters,
+  } = useSelector((state) => state.flightFilter);
 
   const [openId, setOpenId] = useState(null);
+  const isRequestInProgress = useRef(false);
 
   const toggleAccordion = (id) => {
     setOpenId(openId === id ? null : id);
@@ -18,6 +30,56 @@ const DetailsTicket = () => {
     navigate(`/checkout/${flightId}`);
   };
 
+  const observer = useRef();
+  const lastFlightElementRef = useCallback(
+    (node) => {
+      if (isLoading) return;
+
+      if (observer.current) {
+        observer.current.disconnect();
+      }
+
+      observer.current = new IntersectionObserver(
+        (entries) => {
+          if (
+            entries[0].isIntersecting &&
+            hasMoreFlights &&
+            !isRequestInProgress.current
+          ) {
+            dispatch(goToNextPage());
+          }
+        },
+        {
+          root: null,
+          rootMargin: '20px',
+          threshold: 0.1,
+        }
+      );
+
+      if (node) {
+        observer.current.observe(node);
+      }
+    },
+    [isLoading, hasMoreFlights, dispatch]
+  );
+
+  useEffect(() => {
+    if (isRequestInProgress.current) return;
+
+    const fetchData = async () => {
+      isRequestInProgress.current = true;
+      await dispatch(
+        fetchFilteredFlights({
+          page: currentPageNumber,
+          filters: activeFilters,
+        })
+      );
+      isRequestInProgress.current = false;
+    };
+
+    fetchData();
+  }, [dispatch, currentPageNumber, activeFilters]);
+
   if (error) {
     return (
       <div className="w-full px-4 py-8 text-center text-red-600">{error}</div>
@@ -26,10 +88,12 @@ const DetailsTicket = () => {
 
   return (
     <div className="w-full px-4 pb-4 space-y-4">
-      {flights.map((flight, index) => (
+      {filteredFlights.map((flight, index) => (
         <div
           key={flight.plane_id}
-          ref={index === flights.length - 1 ? lastFlightElementRef : null}
+          ref={
+            index === filteredFlights.length - 1 ? lastFlightElementRef : null
+          }
           className={`border-2 rounded-lg overflow-hidden bg-white shadow-sm transition-all duration-200 ${
             openId === flight.plane_id
               ? 'border-purple-500'
@@ -70,7 +134,10 @@ const DetailsTicket = () => {
                   <div className="text-[14px] font-bold">
                     {new Date(flight.departure_time).toLocaleTimeString(
                       'id-ID',
-                      { hour: '2-digit', minute: '2-digit' }
+                      {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      }
                     )}
                   </div>
                   <div className="text-[12px]">
@@ -80,7 +147,9 @@ const DetailsTicket = () => {
 
                 <div className="flex flex-col items-center">
                   <div className="text-[12px] text-[#8A8A8A]">
-                    {`${Math.floor(flight.duration / 60)}h ${flight.duration % 60}m`}
+                    {`${Math.floor(flight.duration / 60)}h ${
+                      flight.duration % 60
+                    }m`}
                   </div>
                   <img src="../../public/icons/Arrow.svg" alt="" />
                   <div className="text-[12px] text-[#8A8A8A]">Direct</div>
@@ -244,7 +313,7 @@ const DetailsTicket = () => {
           )}
         </div>
       ))}
-      {loading && (
+      {isLoading && (
         <div className="w-full text-center py-4">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
         </div>
