@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ArrowLeftRight } from 'lucide-react';
 import {
   MdFlightTakeoff,
@@ -17,6 +17,7 @@ import CitySelectionModal from '../Elements/Modal/CitySelectionModal';
 import DatePickerModal from '../Elements/Modal/DatePickerModal';
 import PassengerSelector from '../Elements/Modal/PassengerSelector';
 import SeatClassModal from '../Elements/Modal/SeatClassModal';
+import { useFlightSearch } from '../../hooks/useFlightSearch';
 
 const FlightSearch = () => {
   const navigate = useNavigate();
@@ -33,15 +34,13 @@ const FlightSearch = () => {
     selectedSeatClass,
   } = flightSearch;
 
-  const [isFromModalOpen, setIsFromModalOpen] = React.useState(false);
-  const [isToModalOpen, setIsToModalOpen] = React.useState(false);
+  const [isFromModalOpen, setIsFromModalOpen] = useState(false);
+  const [isToModalOpen, setIsToModalOpen] = useState(false);
   const [isDepartureDateModalOpen, setIsDepartureDateModalOpen] =
-    React.useState(false);
-  const [isReturnDateModalOpen, setIsReturnDateModalOpen] =
-    React.useState(false);
-  const [isPassengerSelectorOpen, setIsPassengerSelectorOpen] =
-    React.useState(false);
-  const [isSeatClassModalOpen, setIsSeatClassModalOpen] = React.useState(false);
+    useState(false);
+  const [isReturnDateModalOpen, setIsReturnDateModalOpen] = useState(false);
+  const [isPassengerSelectorOpen, setIsPassengerSelectorOpen] = useState(false);
+  const [isSeatClassModalOpen, setIsSeatClassModalOpen] = useState(false);
 
   const formatDate = (date) => {
     if (!date) return '';
@@ -64,31 +63,47 @@ const FlightSearch = () => {
   };
 
   const handleFromCitySelection = (city) => {
-    dispatch(updateFlightSearch({ fromCity: city }));
+    dispatch(
+      updateFlightSearch({
+        fromCity: city,
+        fromCityDisplay: city,
+      })
+    );
   };
 
   const handleToCitySelection = (city) => {
-    dispatch(updateFlightSearch({ toCity: city }));
+    dispatch(
+      updateFlightSearch({
+        toCity: city,
+        toCityDisplay: city,
+      })
+    );
   };
 
   const handleSwapCities = () => {
-    dispatch(swapCities());
+    dispatch(
+      updateFlightSearch({
+        fromCity: toCity,
+        toCity: fromCity,
+        fromCityDisplay: flightSearch.toCityDisplay || toCity,
+        toCityDisplay: flightSearch.fromCityDisplay || fromCity,
+      })
+    );
   };
+  const { isLoading, handleFlightSearch } = useFlightSearch();
 
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
 
-    if (
-      !fromCity ||
-      !toCity ||
-      !departureDate ||
-      (isRoundTrip && !returnDate)
-    ) {
-      alert('Mohon lengkapi data pencarian penerbangan');
-      return;
-    }
-
-    navigate('/flight-ticket');
+    await handleFlightSearch({
+      fromCity,
+      toCity,
+      departureDate,
+      returnDate,
+      isRoundTrip,
+      passengerCounts,
+      selectedSeatClass,
+    });
   };
 
   const getTotalPassengers = () => {
@@ -126,7 +141,7 @@ const FlightSearch = () => {
                         </div>
                         <input
                           type="text"
-                          value={fromCity}
+                          value={flightSearch.fromCityDisplay || fromCity}
                           readOnly
                           placeholder="Jakarta (JKTA)"
                           className="flex-1 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base focus:outline-none focus:border-[#7126B5] border-b cursor-pointer"
@@ -169,7 +184,7 @@ const FlightSearch = () => {
                       </div>
                       <input
                         type="text"
-                        value={toCity}
+                        value={flightSearch.toCityDisplay || toCity}
                         readOnly
                         placeholder="Bandung (BDG)"
                         className="flex-1 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base focus:outline-none focus:border-[#7126B5] border-b cursor-pointer"
@@ -293,9 +308,17 @@ const FlightSearch = () => {
 
             <button
               type="submit"
-              className="w-full bg-[#7126B5] text-white py-3 sm:py-3.5 md:py-4 text-xs sm:text-sm md:text-base rounded-b-xl sm:rounded-b-2xl font-medium hover:bg-[#7126B5] transition-colors"
+              disabled={isLoading}
+              className="w-full bg-[#7126B5] text-white py-3 sm:py-3.5 md:py-4 text-xs sm:text-sm md:text-base rounded-b-xl sm:rounded-b-2xl font-medium hover:bg-[#7126B5] transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              Cari Penerbangan
+              {isLoading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>Searching...</span>
+                </div>
+              ) : (
+                'Cari Penerbangan'
+              )}
             </button>
           </form>
         </div>
@@ -336,7 +359,10 @@ const FlightSearch = () => {
         isOpen={isReturnDateModalOpen}
         onClose={() => setIsReturnDateModalOpen(false)}
         onSelect={(date) => {
-          if (date >= departureDate) {
+          const selectedTime = new Date(date).setHours(0, 0, 0, 0);
+          const departureTime = new Date(departureDate).setHours(0, 0, 0, 0);
+
+          if (selectedTime >= departureTime) {
             dispatch(updateFlightSearch({ returnDate: date }));
             setIsReturnDateModalOpen(false);
           } else {

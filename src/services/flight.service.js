@@ -106,3 +106,27 @@ export const getFlights = async (page = 1, limit = 5) => {
     };
   }
 };
+
+export const searchFlights = async (params) => {
+  const queryParams = new URLSearchParams({
+    from: params.fromCity,
+    to: params.toCity,
+    departureDate: formatDate(params.departureDate),
+    ...(params.isRoundTrip && { returnDate: formatDate(params.returnDate) }),
+    seatClass: params.selectedSeatClass,
+    totalPassenger: getTotalPassengers(params.passengerCounts),
+  });
+
+  const response = await axiosInstance.get(`/flights?${queryParams}`);
+  return response.data;
+};
+
+const formatDate = (date) => {
+  if (!date) return '';
+  const d = new Date(date);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
+
+const getTotalPassengers = (passengerCounts) => {
+  return Object.values(passengerCounts).reduce((sum, count) => sum + count, 0);
+};

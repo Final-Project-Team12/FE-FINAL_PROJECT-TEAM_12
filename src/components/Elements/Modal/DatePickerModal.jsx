@@ -138,7 +138,17 @@ const DatePickerModal = ({
               daysOfWeek={daysOfWeek}
               isCurrentMonth={isCurrentMonth}
               isSelected={isSelected}
-              onSelect={onSelect}
+              onSelect={(date) => {
+                if (minDate) {
+                  const selectedTime = new Date(date).setHours(0, 0, 0, 0);
+                  const minTime = new Date(minDate).setHours(0, 0, 0, 0);
+                  if (selectedTime >= minTime) {
+                    onSelect(date);
+                  }
+                } else {
+                  onSelect(date);
+                }
+              }}
             />
           </div>
         </div>

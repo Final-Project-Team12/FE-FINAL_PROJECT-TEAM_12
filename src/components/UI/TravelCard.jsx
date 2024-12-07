@@ -10,7 +10,7 @@ import {
 const TravelCard = ({ travel }) => {
   const dispatch = useDispatch();
 
-  const formatDate = (dateString) => {
+  const formatDisplayDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('id-ID', {
       day: 'numeric',
@@ -19,12 +19,14 @@ const TravelCard = ({ travel }) => {
     });
   };
 
-  // Get the initial economy class details and other seat prices
+  const getApiDate = (dateString) => {
+    const date = new Date(dateString);
+    return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;
+  };
+
   const getFlightPrices = (seatsDetail) => {
-    // Membuat mapping yang benar sesuai dengan API
     const priceMap = {};
     seatsDetail.forEach((seat) => {
-      // Gunakan nama kelas yang sesuai
       if (seat.class === 'Economy Premium') {
         priceMap['Premium Economy'] = seat.price;
       } else {
@@ -44,12 +46,15 @@ const TravelCard = ({ travel }) => {
 
     if (!economyClass) return;
 
+    const apiDate = getApiDate(travel.departure_time);
+
     dispatch(setSeatPrices(seatPrices));
     dispatch(
       updateFlightSearch({
-        fromCity: `${travel.origin_airport.name} (${travel.origin_airport.airport_code})`,
-        toCity: `${travel.destination_airport.name} (${travel.destination_airport.airport_code})`,
-        departureDate: new Date(travel.departure_time),
+        fromCity: travel.origin_airport.airport_code,
+        toCity: travel.destination_airport.airport_code,
+        departureDate: apiDate,
+        departureDateDisplay: formatDisplayDate(travel.departure_time),
         selectedSeatClass: 'Economy',
         isRoundTrip: false,
         passengerCounts: {
@@ -58,6 +63,8 @@ const TravelCard = ({ travel }) => {
           infant: 0,
         },
         selectedFlight: travel,
+        fromCityDisplay: `${travel.origin_airport.name} (${travel.origin_airport.airport_code})`,
+        toCityDisplay: `${travel.destination_airport.name} (${travel.destination_airport.airport_code})`,
       })
     );
 
@@ -103,7 +110,7 @@ const TravelCard = ({ travel }) => {
 
         <div className="flex items-center gap-1 sm:gap-1.5 text-gray-600 text-xs sm:text-sm mb-2 sm:mb-3">
           <Timer className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          <span>{formatDate(travel.departure_time)}</span>
+          <span>{formatDisplayDate(travel.departure_time)}</span>
         </div>
 
         <div className="text-sm sm:text-sm">
