@@ -130,3 +130,22 @@ const formatDate = (date) => {
 const getTotalPassengers = (passengerCounts) => {
   return Object.values(passengerCounts).reduce((sum, count) => sum + count, 0);
 };
+
+export const flightManagementAndBookingService = {
+  async fetchAvailableFlightsWithFiltersAndPagination(params) {
+    const queryString = new URLSearchParams({
+      page: params.page || 1,
+      limit: params.limit || 3,
+      priceSort: params.priceSort || '',
+      departureSort: params.departureSort || '',
+      arrivalSort: params.arrivalSort || '',
+      durationSort: params.durationSort || '',
+      minPrice: params.minPrice || '',
+      maxPrice: params.maxPrice || '',
+      facilities: params.facilities?.join(',') || '',
+    }).toString();
+
+    const response = await axiosInstance.get(`/flights?${queryString}`);
+    return response.data;
+  },
+};
