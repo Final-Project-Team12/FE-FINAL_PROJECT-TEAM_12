@@ -2,7 +2,6 @@ import axiosInstance from '../api/axiosInstance';
 
 export const getFlightDetails = async (flightId) => {
   try {
-    // Simulated API response
     const flightDetails = {
       departure: {
         time: '07:00',
@@ -62,10 +61,6 @@ export const flightService = {
 
 export const saveOrderData = async (orderData) => {
   try {
-    // In a real application, you would make an API call here
-    // const response = await axiosInstance.post('/api/orders', orderData);
-
-    // Simulated API call
     return new Promise((resolve) => {
       setTimeout(() => {
         console.log('Order data saved:', orderData);
@@ -80,7 +75,6 @@ export const saveOrderData = async (orderData) => {
   }
 };
 
-// Fetch Flights Destination
 export const getFlights = async (page = 1, limit = 5) => {
   try {
     const response = await axiosInstance.get('/flights', {
@@ -131,7 +125,6 @@ const getTotalPassengers = (passengerCounts) => {
   return Object.values(passengerCounts).reduce((sum, count) => sum + count, 0);
 };
 
-// Flight Management and Booking
 export const flightManagementAndBookingService = {
   async fetchAvailableFlightsWithFiltersAndPagination(params) {
     const facilityMapping = {
@@ -148,14 +141,24 @@ export const flightManagementAndBookingService = {
       return acc;
     }, {});
 
-    const queryString = new URLSearchParams({
+    let formattedDate = params.departureDate;
+    if (formattedDate && typeof formattedDate === 'string') {
+      const date = new Date(formattedDate);
+      formattedDate = date.toISOString().split('T')[0];
+    }
+
+    const queryParams = {
       page: params.page || 1,
       limit: params.limit || 3,
       minPrice: params.minPrice || '',
       maxPrice: params.maxPrice || '',
+      departureDate: formattedDate || '',
       ...facilityParams,
-    }).toString();
+    };
 
+    console.log('Query Params:', queryParams);
+
+    const queryString = new URLSearchParams(queryParams).toString();
     const response = await axiosInstance.get(`/flights?${queryString}`);
     return response.data;
   },
