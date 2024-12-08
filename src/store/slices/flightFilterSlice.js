@@ -8,14 +8,32 @@ const formatDateForComparison = (dateString) => {
 
 export const fetchFilteredFlights = createAsyncThunk(
   'flightFilter/fetchFilteredFlights',
-  async ({ page = 1, filters = {} }, { rejectWithValue }) => {
+  async (
+    { page = 1, filters = {}, searchParams = {} },
+    { rejectWithValue }
+  ) => {
     try {
+      const formattedSearchParams = {
+        from: searchParams.from,
+        to: searchParams.to,
+        departureDate: searchParams.departureDate
+          ? formatDateForComparison(searchParams.departureDate)
+          : undefined,
+        returnDate: searchParams.returnDate
+          ? formatDateForComparison(searchParams.returnDate)
+          : undefined,
+        seatClass: searchParams.seatClass,
+        totalPassenger: searchParams.totalPassenger,
+        isRoundTrip: searchParams.isRoundTrip,
+      };
+
       const response =
         await flightManagementAndBookingService.fetchAvailableFlightsWithFiltersAndPagination(
           {
             page,
             limit: 3,
-            ...filters,
+            filters,
+            searchParams: formattedSearchParams,
           }
         );
 
@@ -23,7 +41,6 @@ export const fetchFilteredFlights = createAsyncThunk(
 
       if (filters.departureDate) {
         const selectedDateStr = formatDateForComparison(filters.departureDate);
-
         filteredFlights = filteredFlights.filter((flight) => {
           const flightDateStr = formatDateForComparison(flight.departure_time);
           return flightDateStr === selectedDateStr;
@@ -49,8 +66,21 @@ export const fetchFilteredFlights = createAsyncThunk(
         });
       }
 
-      console.log('Selected Date:', filters.departureDate);
-      console.log('Filtered Flights:', filteredFlights);
+      if (filteredFlights.length === 0) {
+        return {
+          ...response,
+          data: {
+            outbound_flights: [],
+            return_flights: [],
+          },
+          pagination: {
+            ...response.pagination,
+            totalItems: 0,
+            totalPages: 0,
+            hasNextPage: false,
+          },
+        };
+      }
 
       return {
         ...response,
@@ -76,6 +106,15 @@ const initialState = {
     maxPrice: '',
     facilities: [],
     departureDate: null,
+  },
+  searchParams: {
+    from: '',
+    to: '',
+    departureDate: '',
+    seatClass: '',
+    totalPassenger: 1,
+    returnDate: '',
+    isRoundTrip: false,
   },
   sortCriteria: 'price_asc',
 };
@@ -109,6 +148,12 @@ const flightFilterSlice = createSlice({
   name: 'flightFilter',
   initialState,
   reducers: {
+    setSearchParams: (state, action) => {
+      state.searchParams = { ...state.searchParams, ...action.payload };
+      state.filteredFlights = [];
+      state.currentPageNumber = 1;
+      state.hasMoreFlights = true;
+    },
     setActiveFilters: (state, action) => {
       state.activeFilters = { ...state.activeFilters, ...action.payload };
       state.filteredFlights = [];
@@ -117,6 +162,7 @@ const flightFilterSlice = createSlice({
     },
     clearAllFilters: (state) => {
       state.activeFilters = initialState.activeFilters;
+      state.searchParams = initialState.searchParams;
       state.filteredFlights = [];
       state.currentPageNumber = 1;
       state.hasMoreFlights = true;
@@ -168,6 +214,7 @@ const flightFilterSlice = createSlice({
 });
 
 export const {
+  setSearchParams,
   setActiveFilters,
   clearAllFilters,
   goToNextPage,

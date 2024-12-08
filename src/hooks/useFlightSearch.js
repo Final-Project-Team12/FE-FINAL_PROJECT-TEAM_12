@@ -2,11 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import Swal from 'sweetalert2';
-import { searchFlights } from '../services/flight.service';
-import {
-  updateFlightSearch,
-  setSeatPrices,
-} from '../store/slices/flightSearchSlice';
+import { setSearchParams } from '../store/slices/flightFilterSlice';
 
 export const useFlightSearch = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -19,14 +15,16 @@ export const useFlightSearch = () => {
       return date;
     }
     const d = new Date(date);
-    return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
+    return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(
+      2,
+      '0'
+    )}-${String(d.getUTCDate()).padStart(2, '0')}`;
   };
 
   const handleFlightSearch = async (searchParams) => {
     try {
       setIsLoading(true);
 
-      // Validate required fields
       if (
         !searchParams.fromCity ||
         !searchParams.toCity ||
@@ -42,7 +40,6 @@ export const useFlightSearch = () => {
         return;
       }
 
-      // Validate total passengers
       const totalPassengers = Object.values(
         searchParams.passengerCounts
       ).reduce((sum, count) => sum + count, 0);
@@ -56,42 +53,21 @@ export const useFlightSearch = () => {
         return;
       }
 
-      const response = await searchFlights({
-        ...searchParams,
+      const formattedParams = {
+        from: searchParams.fromCity,
+        to: searchParams.toCity,
         departureDate: formatApiDate(searchParams.departureDate),
         returnDate: searchParams.isRoundTrip
           ? formatApiDate(searchParams.returnDate)
           : undefined,
-      });
+        seatClass: searchParams.selectedSeatClass,
+        totalPassenger: totalPassengers,
+        isRoundTrip: searchParams.isRoundTrip,
+      };
 
-      if (response.status === 'Success') {
-        dispatch(
-          updateFlightSearch({
-            searchResults: response.data,
-            selectedFlight: null,
-          })
-        );
+      dispatch(setSearchParams(formattedParams));
 
-        if (
-          response.data.outbound_flights &&
-          response.data.outbound_flights[0]
-        ) {
-          const seatPrices =
-            response.data.outbound_flights[0].seats_detail.reduce(
-              (acc, seat) => ({
-                ...acc,
-                [seat.class]: seat.price,
-              }),
-              {}
-            );
-          dispatch(setSeatPrices(seatPrices));
-        }
-
-        // Navigate to results page
-        navigate('/flight-ticket');
-      } else {
-        throw new Error('Failed to fetch flights');
-      }
+      navigate('/flight-ticket');
     } catch (error) {
       Swal.fire({
         icon: 'error',
