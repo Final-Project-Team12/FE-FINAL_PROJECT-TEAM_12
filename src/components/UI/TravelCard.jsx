@@ -11,8 +11,9 @@ const TravelCard = ({ travel }) => {
   const dispatch = useDispatch();
 
   const formatDisplayDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('id-ID', {
+    const dateOnly = dateString.split('T')[0];
+    const localDateObj = new Date(`${dateOnly}T00:00:00Z`);
+    return localDateObj.toLocaleDateString('id-ID', {
       day: 'numeric',
       month: 'long',
       year: 'numeric',
@@ -20,19 +21,21 @@ const TravelCard = ({ travel }) => {
   };
 
   const getApiDate = (dateString) => {
-    return new Date(dateString);
+    const date = new Date(dateString);
+
+    const utcDate = new Date(
+      Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
+    );
+    return utcDate;
   };
 
   const getFlightPrices = (seatsDetail) => {
-    const priceMap = {};
-    seatsDetail.forEach((seat) => {
-      if (seat.class === 'Economy Premium') {
-        priceMap['Premium Economy'] = seat.price;
-      } else {
-        priceMap[seat.class] = seat.price;
-      }
-    });
-    return priceMap;
+    return seatsDetail.reduce((priceMap, seat) => {
+      const className =
+        seat.class === 'Economy Premium' ? 'Premium Economy' : seat.class;
+      priceMap[className] = seat.price;
+      return priceMap;
+    }, {});
   };
 
   const getEconomyClass = (seatsDetail) => {
@@ -48,6 +51,7 @@ const TravelCard = ({ travel }) => {
     const departureDate = getApiDate(travel.departure_time);
 
     dispatch(setSeatPrices(seatPrices));
+
     dispatch(
       updateFlightSearch({
         fromCity: travel.origin_airport.airport_code,

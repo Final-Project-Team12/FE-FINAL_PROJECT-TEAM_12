@@ -28,23 +28,35 @@ const HeaderTicket = () => {
     end: 5,
   });
 
-  // Format functions
-  const formatDay = (date) =>
-    new Date(date).toLocaleDateString('id-ID', { weekday: 'long' });
+  const formatDay = (date) => {
+    const days = [
+      'Minggu',
+      'Senin',
+      'Selasa',
+      'Rabu',
+      'Kamis',
+      'Jumat',
+      'Sabtu',
+    ];
+    return days[new Date(date).getDay()];
+  };
 
-  const formatDate = (date) =>
-    new Date(date).toLocaleDateString('id-ID', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    });
+  const formatDate = (date) => {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
 
   const formatAPIDate = (date) => {
     const d = new Date(date);
-    return d.toISOString().split('T')[0];
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   };
 
-  // Calculate total passengers
   const totalPassengers = useMemo(() => {
     return Object.values(passengerCounts).reduce(
       (sum, count) => sum + count,
@@ -52,7 +64,6 @@ const HeaderTicket = () => {
     );
   }, [passengerCounts]);
 
-  // Generate dates array
   const dates = useMemo(() => {
     const baseDate = departureDate ? new Date(departureDate) : new Date();
     const datesArray = [];
@@ -76,7 +87,6 @@ const HeaderTicket = () => {
     dates.findIndex((d) => d.active)
   );
 
-  // Initialize with search date
   useEffect(() => {
     if (departureDate) {
       const searchDate = formatAPIDate(new Date(departureDate));
@@ -137,10 +147,9 @@ const HeaderTicket = () => {
   const canShowPrevious = visibleDateRange.start > -30;
   const canShowNext = visibleDateRange.end < 90;
 
-  // Format display text
   const headerText = useMemo(() => {
-    const from = fromCityDisplay || fromCity || 'JKT';
-    const to = toCityDisplay || toCity || 'MLB';
+    const from = fromCityDisplay || fromCity || 'Semua Tiket';
+    const to = toCityDisplay || toCity || 'Semua Tiket';
     return `${from} > ${to} - ${totalPassengers} Penumpang - ${selectedSeatClass}`;
   }, [
     fromCity,
