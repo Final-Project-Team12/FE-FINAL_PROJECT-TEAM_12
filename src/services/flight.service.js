@@ -127,39 +127,92 @@ const getTotalPassengers = (passengerCounts) => {
 
 export const flightManagementAndBookingService = {
   async fetchAvailableFlightsWithFiltersAndPagination(params) {
-    const facilityMapping = {
-      wifi: 'wifi_available',
-      meals: 'meal_available',
-      entertainment: 'in_flight_entertainment',
-      power: 'power_outlets',
-    };
+    try {
+      const queryParams = {
+        page: params.page || 1,
+        limit: params.limit || 3,
+      };
 
-    const facilityParams = params.facilities?.reduce((acc, facility) => {
-      if (facilityMapping[facility]) {
-        acc[facilityMapping[facility]] = true;
+      if (params.searchParams) {
+        const {
+          from,
+          to,
+          departureDate,
+          seatClass,
+          totalPassenger,
+          returnDate,
+          isRoundTrip,
+        } = params.searchParams;
+
+        if (from) queryParams.from = from;
+        if (to) queryParams.to = to;
+        if (departureDate) queryParams.departureDate = departureDate;
+        if (seatClass) queryParams.seatClass = seatClass;
+        if (totalPassenger) queryParams.totalPassenger = totalPassenger;
+        if (isRoundTrip && returnDate) queryParams.returnDate = returnDate;
       }
-      return acc;
-    }, {});
 
-    let formattedDate = params.departureDate;
-    if (formattedDate && typeof formattedDate === 'string') {
-      const date = new Date(formattedDate);
-      formattedDate = date.toISOString().split('T')[0];
+      if (params.filters) {
+        const { minPrice, maxPrice, facilities } = params.filters;
+        if (minPrice) queryParams.minPrice = minPrice;
+        if (maxPrice) queryParams.maxPrice = maxPrice;
+
+        if (facilities?.length > 0) {
+          facilities.forEach((facility) => {
+            switch (facility) {
+              case 'wifi':
+                queryParams.wifi_available = true;
+                break;
+              case 'meals':
+                queryParams.meal_available = true;
+                break;
+              case 'entertainment':
+                queryParams.in_flight_entertainment = true;
+                break;
+              case 'power':
+                queryParams.power_outlets = true;
+                break;
+            }
+          });
+        }
+      }
+
+      console.log('Final Query Parameters:', queryParams);
+
+      const queryString = Object.entries(queryParams)
+        .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+        .join('&');
+
+      const response = await axiosInstance.get(`/flights?${queryString}`);
+
+      let filteredFlights = response.data.data.outbound_flights;
+
+      if (
+        params.searchParams?.seatClass &&
+        params.searchParams?.totalPassenger
+      ) {
+        filteredFlights = filteredFlights.filter((flight) => {
+          const seatInfo = flight.seats_detail.find(
+            (seat) => seat.class === params.searchParams.seatClass
+          );
+          return (
+            seatInfo &&
+            seatInfo.available_seats >=
+              parseInt(params.searchParams.totalPassenger)
+          );
+        });
+      }
+
+      return {
+        ...response.data,
+        data: {
+          ...response.data.data,
+          outbound_flights: filteredFlights,
+        },
+      };
+    } catch (error) {
+      console.error('Error fetching flights:', error);
+      throw error;
     }
-
-    const queryParams = {
-      page: params.page || 1,
-      limit: params.limit || 3,
-      minPrice: params.minPrice || '',
-      maxPrice: params.maxPrice || '',
-      departureDate: formattedDate || '',
-      ...facilityParams,
-    };
-
-    console.log('Query Params:', queryParams);
-
-    const queryString = new URLSearchParams(queryParams).toString();
-    const response = await axiosInstance.get(`/flights?${queryString}`);
-    return response.data;
   },
 };

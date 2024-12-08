@@ -10,44 +10,115 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 const HeaderTicket = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { activeFilters } = useSelector((state) => state.flightFilter);
+  const { activeFilters, searchParams } = useSelector(
+    (state) => state.flightFilter
+  );
+  const {
+    fromCity,
+    toCity,
+    fromCityDisplay,
+    toCityDisplay,
+    passengerCounts,
+    selectedSeatClass,
+    departureDate,
+  } = useSelector((state) => state.flightSearch);
 
   const [visibleDateRange, setVisibleDateRange] = useState({
     start: -1,
     end: 5,
   });
 
+  // Format functions
   const formatDay = (date) =>
-    date.toLocaleDateString('id-ID', { weekday: 'long' });
+    new Date(date).toLocaleDateString('id-ID', { weekday: 'long' });
+
   const formatDate = (date) =>
-    date.toLocaleDateString('id-ID', {
+    new Date(date).toLocaleDateString('id-ID', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
     });
-  const formatAPIDate = (date) => date.toISOString().split('T')[0];
 
+  const formatAPIDate = (date) => {
+    const d = new Date(date);
+    return d.toISOString().split('T')[0];
+  };
+
+  // Calculate total passengers
+  const totalPassengers = useMemo(() => {
+    return Object.values(passengerCounts).reduce(
+      (sum, count) => sum + count,
+      0
+    );
+  }, [passengerCounts]);
+
+  // Generate dates array
   const dates = useMemo(() => {
-    const today = new Date();
+    const baseDate = departureDate ? new Date(departureDate) : new Date();
     const datesArray = [];
 
     for (let i = visibleDateRange.start; i <= visibleDateRange.end; i++) {
-      const date = new Date(today);
-      date.setDate(today.getDate() + i);
+      const date = new Date(baseDate);
+      date.setDate(baseDate.getDate() + i);
       datesArray.push({
         day: formatDay(date),
         date: formatDate(date),
         apiDate: formatAPIDate(date),
-        active: i === 0,
+        fullDate: date,
+        active: formatAPIDate(date) === formatAPIDate(baseDate),
       });
     }
 
     return datesArray;
-  }, [visibleDateRange]);
+  }, [visibleDateRange, departureDate]);
 
   const [activeIndex, setActiveIndex] = useState(
     dates.findIndex((d) => d.active)
   );
+
+  // Initialize with search date
+  useEffect(() => {
+    if (departureDate) {
+      const searchDate = formatAPIDate(new Date(departureDate));
+      const dateIndex = dates.findIndex(
+        (d) => formatAPIDate(d.fullDate) === searchDate
+      );
+
+      if (dateIndex !== -1) {
+        setActiveIndex(dateIndex);
+        handleDateFilter(searchDate);
+      }
+    }
+  }, [departureDate, dates]);
+
+  const handleDateFilter = (selectedDate) => {
+    const updatedFilters = {
+      ...activeFilters,
+      departureDate: selectedDate,
+    };
+
+    const searchPayload = {
+      from: fromCity,
+      to: toCity,
+      departureDate: selectedDate,
+      seatClass: selectedSeatClass,
+      totalPassenger: totalPassengers,
+    };
+
+    dispatch(setActiveFilters(updatedFilters));
+    dispatch(
+      fetchFilteredFlights({
+        page: 1,
+        filters: updatedFilters,
+        searchParams: searchPayload,
+      })
+    );
+  };
+
+  const handleDateClick = (index) => {
+    setActiveIndex(index);
+    handleDateFilter(dates[index].apiDate);
+  };
 
   const handlePrevDates = () => {
     setVisibleDateRange((prev) => ({
@@ -63,43 +134,30 @@ const HeaderTicket = () => {
     }));
   };
 
-  useEffect(() => {
-    const today = new Date();
-    const initialDate = formatAPIDate(today);
-    handleDateFilter(initialDate);
-  }, []);
-
-  const handleDateFilter = (selectedDate) => {
-    dispatch(
-      setActiveFilters({
-        ...activeFilters,
-        departureDate: selectedDate,
-      })
-    );
-
-    dispatch(
-      fetchFilteredFlights({
-        page: 1,
-        filters: {
-          ...activeFilters,
-          departureDate: selectedDate,
-        },
-      })
-    );
-  };
-
-  const handleDateClick = (index) => {
-    setActiveIndex(index);
-    handleDateFilter(dates[index].apiDate);
-  };
-
   const canShowPrevious = visibleDateRange.start > -30;
   const canShowNext = visibleDateRange.end < 90;
+
+  // Format display text
+  const headerText = useMemo(() => {
+    const from = fromCityDisplay || fromCity || 'JKT';
+    const to = toCityDisplay || toCity || 'MLB';
+    return `${from} > ${to} - ${totalPassengers} Penumpang - ${selectedSeatClass}`;
+  }, [
+    fromCity,
+    toCity,
+    fromCityDisplay,
+    toCityDisplay,
+    totalPassengers,
+    selectedSeatClass,
+  ]);
 
   return (
     <div className="border-b shadow-[0px_4px_10px_rgba(0,0,0,0.1)] py-5">
       <div className="max-w-[1200px] mx-auto px-4 lg:px-8">
+        {/* Header section */}
         <h2 className="text-xl font-bold mb-6">Pilih Penerbangan</h2>
+
+        {/* Navigation buttons */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div
             className="w-full sm:w-3/4 h-[50px] rounded-[12px] bg-[#A06ECE] flex items-center cursor-pointer"
@@ -110,20 +168,19 @@ const HeaderTicket = () => {
               alt="Back"
               className="w-6 h-6 ml-4 hover:scale-125 transition-all duration-200 text-white"
             />
-            <div className="ml-3 text-white">
-              JKT {'>'} MLB - 2 Penumpang - Economy
-            </div>
+            <div className="ml-3 text-white">{headerText}</div>
           </div>
           <button
             className="w-full sm:w-1/4 h-[50px] rounded-[12px] bg-[#73CA5C] font-bold text-white hover:bg-[#65b350] transition-colors"
-            onClick={() => navigate('/search')}
+            onClick={() => navigate('/')}
           >
             Ubah Pencarian
           </button>
         </div>
 
+        {/* Date selector */}
         <div className="relative flex px-8">
-          {/* Previous dates button */}
+          {/* Previous button */}
           {canShowPrevious && (
             <button
               onClick={handlePrevDates}
@@ -168,7 +225,7 @@ const HeaderTicket = () => {
             </div>
           </div>
 
-          {/* Next dates button */}
+          {/* Next button */}
           {canShowNext && (
             <button
               onClick={handleNextDates}

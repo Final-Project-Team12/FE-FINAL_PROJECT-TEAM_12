@@ -20,8 +20,7 @@ const TravelCard = ({ travel }) => {
   };
 
   const getApiDate = (dateString) => {
-    const date = new Date(dateString);
-    return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;
+    return new Date(dateString);
   };
 
   const getFlightPrices = (seatsDetail) => {
@@ -46,14 +45,14 @@ const TravelCard = ({ travel }) => {
 
     if (!economyClass) return;
 
-    const apiDate = getApiDate(travel.departure_time);
+    const departureDate = getApiDate(travel.departure_time);
 
     dispatch(setSeatPrices(seatPrices));
     dispatch(
       updateFlightSearch({
         fromCity: travel.origin_airport.airport_code,
         toCity: travel.destination_airport.airport_code,
-        departureDate: apiDate,
+        departureDate: departureDate,
         departureDateDisplay: formatDisplayDate(travel.departure_time),
         selectedSeatClass: 'Economy',
         isRoundTrip: false,
@@ -94,9 +93,11 @@ const TravelCard = ({ travel }) => {
 
       <div className="mt-2 sm:mt-3 flex flex-col justify-between flex-1">
         <div className="flex items-center gap-1 sm:gap-1.5 text-sm sm:text-base font-semibold mb-1 sm:mb-1.5">
-          <span>{travel.origin_airport.name}</span>
+          <span className="text-sm truncate">{travel.origin_airport.name}</span>
           <FaArrowRightLong className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-          <span>{travel.destination_airport.name}</span>
+          <span className="text-sm truncate">
+            {travel.destination_airport.name}
+          </span>
         </div>
 
         <div className="flex items-center gap-1.5 text-[#7126B5] font-medium text-xs sm:text-sm mb-1 sm:mb-1.5">
@@ -113,7 +114,7 @@ const TravelCard = ({ travel }) => {
           <span>{formatDisplayDate(travel.departure_time)}</span>
         </div>
 
-        <div className="text-sm sm:text-sm">
+        <div className="text-sm sm:text-xs">
           Mulai dari{' '}
           <span className="text-red-500 font-bold">
             IDR {economyClass?.price.toLocaleString('id-ID')}

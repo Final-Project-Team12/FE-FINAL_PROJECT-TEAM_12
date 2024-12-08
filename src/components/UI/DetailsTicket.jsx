@@ -19,7 +19,16 @@ const DetailsTicket = () => {
     hasMoreFlights,
     currentPageNumber,
     activeFilters,
+    searchParams,
   } = useSelector((state) => state.flightFilter);
+
+  const {
+    fromCity,
+    toCity,
+    departureDate,
+    selectedSeatClass,
+    passengerCounts,
+  } = useSelector((state) => state.flightSearch);
 
   const [openId, setOpenId] = useState(null);
   const isRequestInProgress = useRef(false);
@@ -32,6 +41,7 @@ const DetailsTicket = () => {
     navigate(`/checkout/${flightId}`);
   };
 
+  // Initialize infinite scroll observer
   const observer = useRef();
   const lastFlightElementRef = useCallback(
     (node) => {
@@ -65,22 +75,60 @@ const DetailsTicket = () => {
     [isLoading, hasMoreFlights, dispatch]
   );
 
+  // Fetch flight data
   useEffect(() => {
     if (isRequestInProgress.current) return;
 
     const fetchData = async () => {
       isRequestInProgress.current = true;
-      await dispatch(
-        fetchFilteredFlights({
-          page: currentPageNumber,
-          filters: activeFilters,
-        })
-      );
-      isRequestInProgress.current = false;
+      try {
+        // Calculate total passengers
+        const totalPassenger = Object.values(passengerCounts).reduce(
+          (sum, count) => sum + count,
+          0
+        );
+
+        // Format the date
+        const formattedDate =
+          departureDate instanceof Date
+            ? departureDate.toISOString().split('T')[0]
+            : new Date(departureDate).toISOString().split('T')[0];
+
+        // Prepare search parameters
+        const searchPayload = {
+          from: fromCity,
+          to: toCity,
+          departureDate: formattedDate,
+          seatClass: selectedSeatClass,
+          totalPassenger,
+        };
+
+        // Dispatch the fetch action with all parameters
+        await dispatch(
+          fetchFilteredFlights({
+            page: currentPageNumber,
+            filters: activeFilters,
+            searchParams: searchPayload,
+          })
+        );
+      } catch (error) {
+        console.error('Error fetching flights:', error);
+      } finally {
+        isRequestInProgress.current = false;
+      }
     };
 
     fetchData();
-  }, [dispatch, currentPageNumber, activeFilters]);
+  }, [
+    dispatch,
+    currentPageNumber,
+    activeFilters,
+    fromCity,
+    toCity,
+    departureDate,
+    selectedSeatClass,
+    passengerCounts,
+  ]);
 
   if (error) {
     return (
@@ -115,7 +163,11 @@ const DetailsTicket = () => {
                   />
                 </div>
                 <span className="text-[12px] font-medium">
-                  {`${flight.airline.airline_name} - ${flight.seats_detail[0].class}`}
+                  {`${flight.airline.airline_name} - ${
+                    flight.seats_detail.find(
+                      (seat) => seat.class === selectedSeatClass
+                    )?.class || flight.seats_detail[0].class
+                  }`}
                 </span>
               </div>
               <button
@@ -154,7 +206,7 @@ const DetailsTicket = () => {
                       flight.duration % 60
                     }m`}
                   </div>
-                  <img src="../../public/icons/Arrow.svg" alt="" />
+                  <img src="/icons/Arrow.svg" alt="" />
                   <div className="text-[12px] text-[#8A8A8A]">Direct</div>
                 </div>
 
@@ -177,14 +229,24 @@ const DetailsTicket = () => {
                     style: 'currency',
                     currency: 'IDR',
                     minimumFractionDigits: 0,
-                  }).format(flight.seats_detail[0].price)}
+                  }).format(
+                    flight.seats_detail.find(
+                      (seat) => seat.class === selectedSeatClass
+                    )?.price || flight.seats_detail[0].price
+                  )}
                 </div>
                 <button
                   className="mt-1 px-6 py-1 bg-purple-600 text-white rounded-md text-sm hover:bg-purple-700 transition-colors duration-200"
                   onClick={() => handleToCheckOut(flight.plane_id)}
-                  disabled={flight.seats_detail[0].available_seats === 0}
+                  disabled={
+                    flight.seats_detail.find(
+                      (seat) => seat.class === selectedSeatClass
+                    )?.available_seats === 0
+                  }
                 >
-                  {flight.seats_detail[0].available_seats > 0
+                  {flight.seats_detail.find(
+                    (seat) => seat.class === selectedSeatClass
+                  )?.available_seats > 0
                     ? 'Pilih'
                     : 'Sold Out'}
                 </button>
@@ -204,6 +266,7 @@ const DetailsTicket = () => {
                   </h3>
 
                   <div className="space-y-3">
+                    {/* Departure Information */}
                     <div>
                       <div className="flex justify-between">
                         <div className="text-[16px] font-bold">
@@ -233,6 +296,7 @@ const DetailsTicket = () => {
 
                     <hr className="w-1/2 mx-auto" />
 
+                    {/* Flight Information */}
                     <div className="flex flex-row gap-3">
                       <img
                         src={flight.airline.image_url}
@@ -283,6 +347,7 @@ const DetailsTicket = () => {
 
                     <hr className="w-1/2 mx-auto" />
 
+                    {/* Arrival Information */}
                     <div>
                       <div className="flex justify-between">
                         <div className="text-[14px] font-bold">
