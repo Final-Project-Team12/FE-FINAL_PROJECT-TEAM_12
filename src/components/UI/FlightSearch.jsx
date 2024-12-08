@@ -344,7 +344,7 @@ const FlightSearch = () => {
         onClose={() => setIsDepartureDateModalOpen(false)}
         onSelect={(date) => {
           dispatch(updateFlightSearch({ departureDate: date }));
-          // Update return date if needed
+
           if (isRoundTrip && returnDate < date) {
             dispatch(updateFlightSearch({ returnDate: date }));
           }

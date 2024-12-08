@@ -183,7 +183,9 @@ export const flightManagementAndBookingService = {
         .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
         .join('&');
 
-      const response = await axiosInstance.get(`/flights?${queryString}`);
+      const response = await axiosInstance.get(
+        `/flights/search?${queryString}`
+      );
 
       let filteredFlights = response.data.data.outbound_flights;
 

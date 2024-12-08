@@ -9,6 +9,51 @@ import {
 import LoadingTicket from './LoadingTicket';
 import SearchResultEmpty from './SearchResultEmpety';
 
+const formatDate = (dateString) => {
+  const dateOnly = dateString.split('T')[0];
+  const localDateObj = new Date(`${dateOnly}T00:00:00Z`);
+  const day = localDateObj.getDate();
+  const months = [
+    'Januari',
+    'Februari',
+    'Maret',
+    'April',
+    'Mei',
+    'Juni',
+    'Juli',
+    'Agustus',
+    'September',
+    'Oktober',
+    'November',
+    'Desember',
+  ];
+  const month = months[localDateObj.getMonth()];
+  const year = localDateObj.getFullYear();
+  return `${day} ${month} ${year}`;
+};
+
+const formatTime = (dateString) => {
+  const date = new Date(dateString);
+  return date.toLocaleTimeString('id-ID', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
+
+const getUTCDate = (date) => {
+  if (!date) return '';
+  const dateObj = new Date(date);
+  return new Date(
+    Date.UTC(
+      dateObj.getUTCFullYear(),
+      dateObj.getUTCMonth(),
+      dateObj.getUTCDate()
+    )
+  )
+    .toISOString()
+    .split('T')[0];
+};
+
 const DetailsTicket = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -41,7 +86,6 @@ const DetailsTicket = () => {
     navigate(`/checkout/${flightId}`);
   };
 
-  // Initialize infinite scroll observer
   const observer = useRef();
   const lastFlightElementRef = useCallback(
     (node) => {
@@ -75,26 +119,19 @@ const DetailsTicket = () => {
     [isLoading, hasMoreFlights, dispatch]
   );
 
-  // Fetch flight data
   useEffect(() => {
     if (isRequestInProgress.current) return;
 
     const fetchData = async () => {
       isRequestInProgress.current = true;
       try {
-        // Calculate total passengers
         const totalPassenger = Object.values(passengerCounts).reduce(
           (sum, count) => sum + count,
           0
         );
 
-        // Format the date
-        const formattedDate =
-          departureDate instanceof Date
-            ? departureDate.toISOString().split('T')[0]
-            : new Date(departureDate).toISOString().split('T')[0];
+        const formattedDate = getUTCDate(departureDate);
 
-        // Prepare search parameters
         const searchPayload = {
           from: fromCity,
           to: toCity,
@@ -103,7 +140,6 @@ const DetailsTicket = () => {
           totalPassenger,
         };
 
-        // Dispatch the fetch action with all parameters
         await dispatch(
           fetchFilteredFlights({
             page: currentPageNumber,
@@ -187,13 +223,7 @@ const DetailsTicket = () => {
               <div className="flex items-center space-x-4">
                 <div className="text-left">
                   <div className="text-[14px] font-bold">
-                    {new Date(flight.departure_time).toLocaleTimeString(
-                      'id-ID',
-                      {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      }
-                    )}
+                    {formatTime(flight.departure_time)}
                   </div>
                   <div className="text-[12px]">
                     {flight.origin_airport.airport_code}
@@ -212,10 +242,7 @@ const DetailsTicket = () => {
 
                 <div className="text-left">
                   <div className="text-[14px] font-bold">
-                    {new Date(flight.arrival_time).toLocaleTimeString('id-ID', {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
+                    {formatTime(flight.arrival_time)}
                   </div>
                   <div className="text-[12px]">
                     {flight.destination_airport.airport_code}
@@ -270,24 +297,14 @@ const DetailsTicket = () => {
                     <div>
                       <div className="flex justify-between">
                         <div className="text-[16px] font-bold">
-                          {new Date(flight.departure_time).toLocaleTimeString(
-                            'id-ID',
-                            { hour: '2-digit', minute: '2-digit' }
-                          )}
+                          {formatTime(flight.departure_time)}
                         </div>
                         <p className="text-[12px] font-bold text-[#A06ECE]">
                           Keberangkatan
                         </p>
                       </div>
                       <div className="text-[14px]">
-                        {new Date(flight.departure_time).toLocaleDateString(
-                          'id-ID',
-                          {
-                            day: 'numeric',
-                            month: 'long',
-                            year: 'numeric',
-                          }
-                        )}
+                        {formatDate(flight.departure_time)}
                       </div>
                       <div className="text-[14px] font-medium">
                         {`${flight.origin_airport.name} - ${flight.departure_terminal}`}
@@ -351,24 +368,14 @@ const DetailsTicket = () => {
                     <div>
                       <div className="flex justify-between">
                         <div className="text-[14px] font-bold">
-                          {new Date(flight.arrival_time).toLocaleTimeString(
-                            'id-ID',
-                            { hour: '2-digit', minute: '2-digit' }
-                          )}
+                          {formatTime(flight.arrival_time)}
                         </div>
                         <p className="text-[12px] font-bold text-[#A06ECE]">
                           Kedatangan
                         </p>
                       </div>
                       <div className="text-[14px]">
-                        {new Date(flight.arrival_time).toLocaleDateString(
-                          'id-ID',
-                          {
-                            day: 'numeric',
-                            month: 'long',
-                            year: 'numeric',
-                          }
-                        )}
+                        {formatDate(flight.arrival_time)}
                       </div>
                       <div className="text-[14px] font-medium">
                         {flight.destination_airport.name}
