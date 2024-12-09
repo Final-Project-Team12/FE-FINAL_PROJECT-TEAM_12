@@ -43,7 +43,14 @@ function App() {
           <Route path="/otp" element={<OtpPage />} />
           <Route path="/orderhistory" element={<OrderHistoryPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
-          <Route path="/account" element={<AccountPage />} />
+          <Route
+            path="/account/:id"
+            element={
+              <ProtectedRoute>
+                <AccountPage />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/account-settings" element={<AccountSettings />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

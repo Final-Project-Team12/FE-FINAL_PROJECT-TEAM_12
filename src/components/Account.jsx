@@ -1,16 +1,16 @@
-import { useState } from "react";
-import AccountSidebar from "./UI/AccountSidebar";
-import ChangeProfile from "./UI/ChangeProfile";
-import AccountSettings from "./UI/AccountSettings";
-import HeaderAccount from "./UI/HeaderAccount";
-import NavbarLogin from "./UI/NavbarLogin";
+import { useState } from 'react';
+import AccountSidebar from './UI/AccountSidebar';
+import ChangeProfile from './UI/ChangeProfile';
+import AccountSettings from './UI/AccountSettings';
+import HeaderAccount from './UI/HeaderAccount';
+import Navbar from './UI/Navbar';
 
 const Account = () => {
-  const [activeComponent, setActiveComponent] = useState("ChangeProfile"); // Default komponen awal
+  const [activeComponent, setActiveComponent] = useState('ChangeProfile'); // Default komponen awal
 
   return (
     <>
-      <NavbarLogin />
+      <Navbar />
       <HeaderAccount />
       <div className="flex ml-[260px] mr-[212px]">
         {/* Sidebar menerima fungsi untuk mengubah komponen aktif */}
@@ -18,8 +18,8 @@ const Account = () => {
 
         {/* Render komponen sesuai dengan state */}
         <div className="w-full">
-          {activeComponent === "ChangeProfile" && <ChangeProfile />}
-          {activeComponent === "AccountSettings" && <AccountSettings />}
+          {activeComponent === 'ChangeProfile' && <ChangeProfile />}
+          {activeComponent === 'AccountSettings' && <AccountSettings />}
         </div>
       </div>
     </>

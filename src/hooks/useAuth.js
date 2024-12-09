@@ -34,7 +34,6 @@ export const useAuth = () => {
       const { user, decodedToken } = await authService.login(credentials);
       dispatch(loginSuccess({ user, decodedToken }));
 
-      // Show success alert
       await Swal.fire({
         icon: 'success',
         title: 'Login Berhasil!',
@@ -57,7 +56,6 @@ export const useAuth = () => {
   };
 
   const handleLogout = async () => {
-    // Show confirmation alert
     const result = await Swal.fire({
       title: 'Logout',
       text: 'Apakah anda yakin ingin keluar?',
@@ -81,7 +79,6 @@ export const useAuth = () => {
       authService.logout();
       dispatch(logout());
 
-      // Show success logout alert
       await Swal.fire({
         icon: 'success',
         title: 'Logout Berhasil!',

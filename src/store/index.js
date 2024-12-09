@@ -2,11 +2,26 @@ import { configureStore } from '@reduxjs/toolkit';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import authReducer from './slices/authSlice';
+import userReducer from './slices/userSlice';
 import paymentReducer from './slices/paymentSlice';
 import flightReducer from './slices/flightSlice';
 import flightSearchReducer from './slices/flightSearchSlice';
 import flightFilterReducer from './slices/flightFilterSlice';
 import registerReducer from './slices/registerSlice';
+
+const userPersistConfig = {
+  key: 'user',
+  storage,
+  whitelist: ['userData'],
+  blacklist: [
+    'loading',
+    'error',
+    'updateLoading',
+    'updateError',
+    'deleteLoading',
+    'deleteError',
+  ],
+};
 
 const flightSearchPersistConfig = {
   key: 'flightSearch',
@@ -56,6 +71,7 @@ const flightPersistConfig = {
   blacklist: ['selectedFlight', 'searchResults', 'loading', 'error'],
 };
 
+const persistedUserReducer = persistReducer(userPersistConfig, userReducer);
 const persistedPaymentReducer = persistReducer(
   paymentPersistConfig,
   paymentReducer
@@ -81,6 +97,7 @@ const dateSerializer = {
 export const store = configureStore({
   reducer: {
     auth: authReducer,
+    user: persistedUserReducer,
     payment: persistedPaymentReducer,
     flight: persistedFlightReducer,
     flightSearch: persistedFlightSearchReducer,
@@ -94,6 +111,16 @@ export const store = configureStore({
           'persist/PERSIST',
           'persist/REHYDRATE',
           'persist/REGISTER',
+
+          'user/fetchById/pending',
+          'user/fetchById/fulfilled',
+          'user/fetchById/rejected',
+          'user/updateProfile/pending',
+          'user/updateProfile/fulfilled',
+          'user/updateProfile/rejected',
+          'user/deleteAccount/pending',
+          'user/deleteAccount/fulfilled',
+          'user/deleteAccount/rejected',
 
           'flightFilter/setSortCriteria',
           'flightFilter/setActiveFilters',
@@ -112,6 +139,11 @@ export const store = configureStore({
           'flightSearch/clearSearchResults',
         ],
         ignoredActionPaths: [
+          'payload.userData',
+          'meta.arg.userData',
+          'payload.password',
+          'meta.arg.password',
+
           'payload.departureDate',
           'payload.returnDate',
           'meta.arg.departureDate',
@@ -131,6 +163,14 @@ export const store = configureStore({
           'payload.toCityDisplay',
         ],
         ignoredPaths: [
+          'user.userData',
+          'user.loading',
+          'user.error',
+          'user.updateLoading',
+          'user.updateError',
+          'user.deleteLoading',
+          'user.deleteError',
+
           'flightSearch.departureDate',
           'flightSearch.returnDate',
           'flightSearch.selectedFlight',
