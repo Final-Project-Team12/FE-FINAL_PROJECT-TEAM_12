@@ -16,20 +16,40 @@ import { useLocation, useNavigate } from 'react-router-dom';
 const useRegister = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const location = useLocation();
 
   const handleRegister = async (dataUser) => {
     dispatch(registerStart());
     try {
       const response = await registerService(dataUser);
       dispatch(registerSuccess());
-      if (registerSuccess()) {
-        navigate('/otp');
-      }
+      navigate('/otp');
+
       return response;
     } catch (error) {
-      dispatch(registerFailure(error.message || 'Registration failed'));
+      dispatch(
+        registerFailure(error.response?.data?.message || 'Registration failed')
+      );
       throw error;
     }
   };
+
+  const handleOtp = async (otpCode) => {
+    dispatch(otpStart());
+    try {
+      const response = await otpService(otpCode);
+      dispatch(otpSuccess());
+      navigate('/login');
+
+      return response;
+    } catch (error) {
+      dispatch(
+        otpFailure(error.response?.data?.message || 'OTP verification failed')
+      );
+      throw error;
+    }
+  };
+
+  return { handleRegister, handleOtp };
 };
+
+export default useRegister;
