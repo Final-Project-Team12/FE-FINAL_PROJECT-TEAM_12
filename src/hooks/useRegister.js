@@ -11,7 +11,7 @@ import {
   register as registerService,
   otp as otpService,
 } from '../services/register.service';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const useRegister = () => {
   const dispatch = useDispatch();
