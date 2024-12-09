@@ -1,25 +1,76 @@
 import React, { useState } from 'react';
 import { ArrowUpDown, X } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setSortCriteria } from '../../store/slices/flightFilterSlice';
 
 const SortTicket = () => {
+  const dispatch = useDispatch();
+  const { sortCriteria } = useSelector((state) => state.flightFilter);
   const [showModal, setShowModal] = useState(false);
-  const [selectedFilter, setSelectedFilter] = useState('termurah');
-
-  const toggleModal = () => setShowModal(!showModal);
-  const handleFilterChange = (filter) => setSelectedFilter(filter);
-  const applyFilter = () => {
-    console.log('Filter yang dipilih:', selectedFilter);
-    setShowModal(false);
-  };
+  const [selectedFilter, setSelectedFilter] = useState(() => {
+    const mapping = {
+      price_asc: 'termurah',
+      price_desc: 'termahal',
+      duration_asc: 'terpendek',
+      duration_desc: 'terpanjang',
+      departure_asc: 'awal',
+      departure_desc: 'akhir',
+      arrival_asc: 'kedatanganAwal',
+      arrival_desc: 'kedatanganAkhir',
+    };
+    return mapping[sortCriteria] || 'termurah';
+  });
 
   const filterOptions = [
-    { value: 'termurah', label: 'Harga - Termurah' },
-    { value: 'terpendek', label: 'Durasi - Terpendek' },
-    { value: 'awal', label: 'Keberangkatan - Paling Awal' },
-    { value: 'akhir', label: 'Keberangkatan - Paling Akhir' },
-    { value: 'kedatanganAwal', label: 'Kedatangan - Paling Awal' },
-    { value: 'kedatanganAkhir', label: 'Kedatangan - Paling Akhir' },
+    { value: 'termurah', label: 'Harga - Termurah', sortKey: 'price_asc' },
+    { value: 'termahal', label: 'Harga - Termahal', sortKey: 'price_desc' },
+    {
+      value: 'terpendek',
+      label: 'Durasi - Terpendek',
+      sortKey: 'duration_asc',
+    },
+    {
+      value: 'terpanjang',
+      label: 'Durasi - Terpanjang',
+      sortKey: 'duration_desc',
+    },
+    {
+      value: 'awal',
+      label: 'Keberangkatan - Paling Awal',
+      sortKey: 'departure_asc',
+    },
+    {
+      value: 'akhir',
+      label: 'Keberangkatan - Paling Akhir',
+      sortKey: 'departure_desc',
+    },
+    {
+      value: 'kedatanganAwal',
+      label: 'Kedatangan - Paling Awal',
+      sortKey: 'arrival_asc',
+    },
+    {
+      value: 'kedatanganAkhir',
+      label: 'Kedatangan - Paling Akhir',
+      sortKey: 'arrival_desc',
+    },
   ];
+
+  const toggleModal = () => setShowModal(!showModal);
+
+  const handleFilterChange = (filter) => {
+    setSelectedFilter(filter);
+  };
+
+  const applyFilter = () => {
+    const selectedOption = filterOptions.find(
+      (option) => option.value === selectedFilter
+    );
+    if (selectedOption) {
+      dispatch(setSortCriteria(selectedOption.sortKey));
+    }
+    setShowModal(false);
+  };
 
   const selectedLabel = filterOptions.find(
     (filter) => filter.value === selectedFilter
