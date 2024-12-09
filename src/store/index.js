@@ -6,6 +6,7 @@ import paymentReducer from './slices/paymentSlice';
 import flightReducer from './slices/flightSlice';
 import flightSearchReducer from './slices/flightSearchSlice';
 import flightFilterReducer from './slices/flightFilterSlice';
+import registerReducer from './slices/registerSlice';
 
 const flightSearchPersistConfig = {
   key: 'flightSearch',
@@ -84,6 +85,7 @@ export const store = configureStore({
     flight: persistedFlightReducer,
     flightSearch: persistedFlightSearchReducer,
     flightFilter: persistedFlightFilterReducer,
+    register: registerReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

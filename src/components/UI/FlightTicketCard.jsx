@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Location from '../../../public/icons/location.svg';
-import Arrow from '../../../public/icons/arrow.svg';
+import Arrow from '../../../public/icons/Arrow.svg';
 
 const FlightTicketCard = ({ flight, onCardClick, isSelected, bookingDate }) => {
   const {
