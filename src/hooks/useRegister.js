@@ -1,4 +1,6 @@
 import { useDispatch } from 'react-redux';
+import Swal from 'sweetalert2';
+
 import {
   registerStart,
   registerSuccess,
@@ -23,6 +25,19 @@ const useRegister = () => {
       const response = await registerService(dataUser);
       console.log('tesss', response);
       dispatch(registerSuccess());
+      await Swal.fire({
+        icon: 'success',
+        title: 'Yeay! Pendaftaran Sukses!',
+        text: 'Anda baru saja membuka pintu menuju pengalaman baru. Selamat datang di platform kami!',
+        showConfirmButton: false,
+        timer: 1500,
+        background: '#fff',
+        customClass: {
+          popup: 'rounded-lg shadow-lg',
+          title: 'text-xl text-gray-800 font-medium',
+          content: 'text-gray-600',
+        },
+      });
       navigate('/otp');
 
       return response;
