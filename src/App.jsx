@@ -12,6 +12,7 @@ import OrderHistoryPage from './pages/OrderHistoryPage';
 import LoginPage from './pages/LoginPage';
 import AccountPage from './pages/AccountPage';
 import AccountSettings from './components/UI/AccountSettings';
+import OtpPage from './pages/OtpPage';
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
           />
           <Route path="/animation" element={<ExamplePages />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/otp" element={<OtpPage />} />
           <Route path="/orderhistory" element={<OrderHistoryPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route

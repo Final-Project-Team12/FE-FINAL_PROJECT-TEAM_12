@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import Button from '../Elements/Buttons/Button';
+import backIcon from '../../../public/icons/fi_arrow-left-black.svg';
+import { Link } from 'react-router';
 
 const Otp = () => {
   const [otp, setOtp] = useState(Array(6).fill(''));
@@ -64,14 +66,16 @@ const Otp = () => {
   };
 
   return (
-    <div className="flex flex-col items-center h-screen bg-gray-100">
+    <div className="flex flex-col items-center h-screen bg-white">
       <div className=" p-6 rounded-lg w-1/2">
-        <h1>back</h1>
+        <Link to="/register">
+          <img src={backIcon} alt="" />
+        </Link>
         <div className="mx-[10%] mt-[24px]">
           <h2 className="text-[24px] font-bold mb-[40px]">Masukkan OTP</h2>
           <div className="flex gap-1 justify-center mb-[44px]">
             <p>Ketik 6 digit kode yang dikirimkan ke </p>
-            <p className="font-bold">j*****@gmail.com</p>
+            <p className="font-bold">.............</p>
           </div>
           <div className="flex justify-center gap-4 mb-[24px]">
             {otp.map((digit, index) => (
