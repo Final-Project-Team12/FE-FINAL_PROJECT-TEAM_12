@@ -22,7 +22,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/flight-ticket" element={<FlightTicketPage />} />
           <Route
-            path="/checkout"
+            path="/checkout/:id"
             element={
               <ProtectedRoute>
                 <PaymentPage />
@@ -30,7 +30,7 @@ function App() {
             }
           />
           <Route
-            path="/payment"
+            path="/payment/:id"
             element={
               <ProtectedRoute>
                 <PaymentLastPage />

@@ -10,42 +10,64 @@ import {
 const TravelCard = ({ travel }) => {
   const dispatch = useDispatch();
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('id-ID', {
+  const formatDisplayDate = (dateString) => {
+    const dateOnly = dateString.split('T')[0];
+    const localDateObj = new Date(`${dateOnly}T00:00:00Z`);
+    return localDateObj.toLocaleDateString('id-ID', {
       day: 'numeric',
       month: 'long',
       year: 'numeric',
     });
   };
 
-  const calculateSeatPrices = (basePrice) => {
-    return {
-      Economy: basePrice,
-      'Premium Economy': basePrice * 1.5,
-      Business: basePrice * 3.5,
-      'First Class': basePrice * 5,
-    };
+  const getApiDate = (dateString) => {
+    const date = new Date(dateString);
+
+    const utcDate = new Date(
+      Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
+    );
+    return utcDate;
+  };
+
+  const getFlightPrices = (seatsDetail) => {
+    return seatsDetail.reduce((priceMap, seat) => {
+      const className =
+        seat.class === 'Economy Premium' ? 'Premium Economy' : seat.class;
+      priceMap[className] = seat.price;
+      return priceMap;
+    }, {});
+  };
+
+  const getEconomyClass = (seatsDetail) => {
+    return seatsDetail.find((seat) => seat.class === 'Economy');
   };
 
   const handleCardClick = () => {
-    const basePrice = travel.seats_detail[0]?.price || 0;
-    const seatPrices = calculateSeatPrices(basePrice);
+    const economyClass = getEconomyClass(travel.seats_detail);
+    const seatPrices = getFlightPrices(travel.seats_detail);
+
+    if (!economyClass) return;
+
+    const departureDate = getApiDate(travel.departure_time);
 
     dispatch(setSeatPrices(seatPrices));
 
     dispatch(
       updateFlightSearch({
-        fromCity: `${travel.origin_airport.name} (${travel.origin_airport.airport_code})`,
-        toCity: `${travel.destination_airport.name} (${travel.destination_airport.airport_code})`,
-        departureDate: new Date(travel.departure_time),
-        selectedSeatClass: travel.seats_detail[0]?.class || 'Economy',
+        fromCity: travel.origin_airport.airport_code,
+        toCity: travel.destination_airport.airport_code,
+        departureDate: departureDate,
+        departureDateDisplay: formatDisplayDate(travel.departure_time),
+        selectedSeatClass: 'Economy',
         isRoundTrip: false,
         passengerCounts: {
           adult: 1,
           child: 0,
           infant: 0,
         },
+        selectedFlight: travel,
+        fromCityDisplay: `${travel.origin_airport.name} (${travel.origin_airport.airport_code})`,
+        toCityDisplay: `${travel.destination_airport.name} (${travel.destination_airport.airport_code})`,
       })
     );
 
@@ -54,6 +76,8 @@ const TravelCard = ({ travel }) => {
       behavior: 'smooth',
     });
   };
+
+  const economyClass = getEconomyClass(travel.seats_detail);
 
   return (
     <div
@@ -66,7 +90,6 @@ const TravelCard = ({ travel }) => {
           alt={`${travel.origin_airport.name} to ${travel.destination_airport.name}`}
           className="w-full h-20 sm:h-24 object-cover rounded-lg"
         />
-
         <div className="absolute top-0 right-0 px-2 sm:px-2.5 py-1 rounded-e-none rounded-s-lg text-xs font-bold text-white bg-[#7126B5]">
           {travel.offers}
         </div>
@@ -74,9 +97,11 @@ const TravelCard = ({ travel }) => {
 
       <div className="mt-2 sm:mt-3 flex flex-col justify-between flex-1">
         <div className="flex items-center gap-1 sm:gap-1.5 text-sm sm:text-base font-semibold mb-1 sm:mb-1.5">
-          <span>{travel.origin_airport.name}</span>
+          <span className="text-sm truncate">{travel.origin_airport.name}</span>
           <FaArrowRightLong className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-          <span>{travel.destination_airport.name}</span>
+          <span className="text-sm truncate">
+            {travel.destination_airport.name}
+          </span>
         </div>
 
         <div className="flex items-center gap-1.5 text-[#7126B5] font-medium text-xs sm:text-sm mb-1 sm:mb-1.5">
@@ -90,13 +115,13 @@ const TravelCard = ({ travel }) => {
 
         <div className="flex items-center gap-1 sm:gap-1.5 text-gray-600 text-xs sm:text-sm mb-2 sm:mb-3">
           <Timer className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          <span>{formatDate(travel.departure_time)}</span>
+          <span>{formatDisplayDate(travel.departure_time)}</span>
         </div>
 
-        <div className="text-sm sm:text-sm">
+        <div className="text-sm sm:text-xs">
           Mulai dari{' '}
           <span className="text-red-500 font-bold">
-            IDR {travel.seats_detail[0]?.price.toLocaleString('id-ID')}
+            IDR {economyClass?.price.toLocaleString('id-ID')}
           </span>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import FlowerLogo from '../../../public/icons/flower_icon.svg';
+import FlowerLogo from '../../../../public/icons/flower_icon.svg';
 
 const OrderDetails = ({ selectedCard }) => {
   const getStatusColor = (status) => {
@@ -78,7 +78,7 @@ const OrderDetails = ({ selectedCard }) => {
           <div className="pt-4">
             <p className="font-bold text-sm">Informasi:</p>
             {selectedCard.passengers?.map((passenger, index) => (
-              <div className="flex flex-col">
+              <div key={passenger.id || index} className="flex flex-col">
                 <div
                   key={passenger.id}
                   className="flex flex-row text-purple-800"

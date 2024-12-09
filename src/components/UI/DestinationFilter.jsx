@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useFlights } from '../../hooks/useFlight';
 
 const ITEMS_PER_PAGE = 5;
+const VISIBLE_PAGES = 5;
 
 const DestinationFilter = () => {
   const [activeContinent, setActiveContinent] = useState('all');
@@ -90,6 +91,20 @@ const DestinationFilter = () => {
     }
   };
 
+  const renderPaginationButton = (number, label = number) => (
+    <button
+      key={number}
+      onClick={() => handlePageChange(number)}
+      className={`px-3 py-1 rounded-lg ${
+        currentPage === number
+          ? 'bg-[#7126B5] text-white'
+          : 'text-gray-600 hover:bg-purple-100'
+      }`}
+    >
+      {label}
+    </button>
+  );
+
   const renderPagination = () => {
     if (
       !pagination ||
@@ -100,7 +115,28 @@ const DestinationFilter = () => {
     }
 
     const pageNumbers = [];
-    for (let i = 1; i <= pagination.totalPages; i++) {
+    let startPage, endPage;
+
+    if (pagination.totalPages <= VISIBLE_PAGES) {
+      startPage = 1;
+      endPage = pagination.totalPages;
+    } else {
+      if (currentPage <= Math.ceil(VISIBLE_PAGES / 2)) {
+        startPage = 1;
+        endPage = VISIBLE_PAGES - 1;
+      } else if (
+        currentPage + Math.floor(VISIBLE_PAGES / 2) >=
+        pagination.totalPages
+      ) {
+        startPage = pagination.totalPages - (VISIBLE_PAGES - 2);
+        endPage = pagination.totalPages;
+      } else {
+        startPage = currentPage - Math.floor(VISIBLE_PAGES / 2);
+        endPage = currentPage + Math.floor(VISIBLE_PAGES / 2);
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
       pageNumbers.push(i);
     }
 
@@ -118,19 +154,26 @@ const DestinationFilter = () => {
           <ChevronLeft className="w-5 h-5" />
         </button>
 
-        {pageNumbers.map((number) => (
-          <button
-            key={number}
-            onClick={() => handlePageChange(number)}
-            className={`px-3 py-1 rounded-lg ${
-              currentPage === number
-                ? 'bg-[#7126B5] text-white'
-                : 'text-gray-600 hover:bg-purple-100'
-            }`}
-          >
-            {number}
-          </button>
-        ))}
+        {/* First page */}
+        {startPage > 1 && (
+          <>
+            {renderPaginationButton(1)}
+            {startPage > 2 && <span className="px-2 text-gray-500">...</span>}
+          </>
+        )}
+
+        {/* Visible page numbers */}
+        {pageNumbers.map((number) => renderPaginationButton(number))}
+
+        {/* Last page */}
+        {endPage < pagination.totalPages && (
+          <>
+            {endPage < pagination.totalPages - 1 && (
+              <span className="px-2 text-gray-500">...</span>
+            )}
+            {renderPaginationButton(pagination.totalPages)}
+          </>
+        )}
 
         <button
           onClick={handleNextPage}

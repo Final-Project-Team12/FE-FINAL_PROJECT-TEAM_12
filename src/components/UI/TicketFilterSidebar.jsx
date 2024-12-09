@@ -1,19 +1,124 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Box, Heart, DollarSign } from 'lucide-react';
+import {
+  setActiveFilters,
+  clearAllFilters,
+  fetchFilteredFlights,
+} from '../../store/slices/flightFilterSlice';
 
 const TicketFilterSidebar = () => {
+  const dispatch = useDispatch();
+  const { activeFilters } = useSelector((state) => state.flightFilter);
+  const {
+    fromCity,
+    toCity,
+    departureDate,
+    returnDate,
+    selectedSeatClass,
+    passengerCounts,
+    isRoundTrip,
+  } = useSelector((state) => state.flightSearch);
+
   const [filters, setFilters] = useState({
-    transit: false,
     fasilitas: false,
     harga: false,
   });
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [priceRange, setPriceRange] = useState({ min: '', max: '' });
-  const [appliedPriceRange, setAppliedPriceRange] = useState(null);
+  const [selectedFacilities, setSelectedFacilities] = useState({
+    wifi: false,
+    meals: false,
+    power: false,
+  });
 
-  const toggleFilter = (key) => {
-    setFilters((prev) => ({ ...prev, [key]: !prev[key] }));
+  useEffect(() => {
+    if (activeFilters.facilities) {
+      setSelectedFacilities((prev) => ({
+        ...prev,
+        ...activeFilters.facilities.reduce(
+          (acc, facility) => ({
+            ...acc,
+            [facility]: true,
+          }),
+          {}
+        ),
+      }));
+    }
+
+    if (activeFilters.minPrice && activeFilters.maxPrice) {
+      setPriceRange({
+        min: activeFilters.minPrice,
+        max: activeFilters.maxPrice,
+      });
+    }
+  }, [activeFilters]);
+
+  const getUTCDate = (date) => {
+    if (!date) return '';
+    try {
+      const dateObj = new Date(date);
+      if (isNaN(dateObj.getTime())) return '';
+
+      return new Date(
+        Date.UTC(
+          dateObj.getUTCFullYear(),
+          dateObj.getUTCMonth(),
+          dateObj.getUTCDate()
+        )
+      )
+        .toISOString()
+        .split('T')[0];
+    } catch (error) {
+      console.error('Error getting UTC date:', error);
+      return '';
+    }
+  };
+
+  const applyFilters = (newFilters) => {
+    dispatch(setActiveFilters(newFilters));
+
+    const searchPayload = {
+      from: fromCity,
+      to: toCity,
+      departureDate: getUTCDate(departureDate),
+      seatClass: selectedSeatClass,
+      passengerAdult: passengerCounts.adult || 0,
+      passengerChild: passengerCounts.child || 0,
+      passengerInfant: passengerCounts.infant || 0,
+      ...(isRoundTrip &&
+        returnDate && {
+          returnDate: getUTCDate(returnDate),
+        }),
+    };
+
+    dispatch(
+      fetchFilteredFlights({
+        page: 1,
+        filters: newFilters,
+        searchParams: searchPayload,
+      })
+    );
+  };
+
+  const handleFacilityChange = (facility) => {
+    const newFacilities = {
+      ...selectedFacilities,
+      [facility]: !selectedFacilities[facility],
+    };
+    setSelectedFacilities(newFacilities);
+
+    const selectedFacilitiesArray = Object.entries(newFacilities)
+      .filter(([_, isSelected]) => isSelected)
+      .map(([key]) => key);
+
+    const newFilters = {
+      ...activeFilters,
+      facilities: selectedFacilitiesArray,
+    };
+
+    applyFilters(newFilters);
   };
 
   const handlePriceChange = (e) => {
@@ -27,11 +132,62 @@ const TicketFilterSidebar = () => {
       priceRange.max &&
       Number(priceRange.min) <= Number(priceRange.max)
     ) {
-      setAppliedPriceRange({ ...priceRange });
+      const newFilters = {
+        ...activeFilters,
+        minPrice: Number(priceRange.min),
+        maxPrice: Number(priceRange.max),
+      };
+      applyFilters(newFilters);
       setModalOpen(false);
     } else {
       alert('Masukkan rentang harga yang valid!');
     }
+  };
+
+  const handleResetFilters = () => {
+    dispatch(clearAllFilters());
+    setSelectedFacilities({
+      wifi: false,
+      meals: false,
+      power: false,
+    });
+    setPriceRange({ min: '', max: '' });
+
+    const searchPayload = {
+      from: fromCity,
+      to: toCity,
+      departureDate: getUTCDate(departureDate),
+      seatClass: selectedSeatClass,
+      passengerAdult: passengerCounts.adult || 0,
+      passengerChild: passengerCounts.child || 0,
+      passengerInfant: passengerCounts.infant || 0,
+      ...(isRoundTrip &&
+        returnDate && {
+          returnDate: getUTCDate(returnDate),
+        }),
+    };
+
+    dispatch(
+      fetchFilteredFlights({
+        page: 1,
+        filters: {},
+        searchParams: searchPayload,
+      })
+    );
+  };
+
+  const handlePriceReset = () => {
+    setPriceRange({ min: '', max: '' });
+    const newFilters = {
+      ...activeFilters,
+      minPrice: '',
+      maxPrice: '',
+    };
+    applyFilters(newFilters);
+  };
+
+  const toggleFilter = (key) => {
+    setFilters((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
   const ChevronIcon = ({ isOpen }) => (
@@ -55,51 +211,18 @@ const TicketFilterSidebar = () => {
 
   return (
     <>
-      <div className=" mb-[47px]">
+      <div className="mb-[47px]">
         <div className="w-[260px] bg-white rounded-2xl border border-slate-200 shadow-md p-6">
-          <h3 className="text-lg font-medium mb-6">Filter</h3>
-
-          {/* Transit */}
-          <div>
-            <div
-              className="flex items-center justify-between cursor-pointer"
-              onClick={() => toggleFilter('transit')}
-              aria-expanded={filters.transit}
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-lg font-medium">Filter</h3>
+            <button
+              onClick={handleResetFilters}
+              className="text-sm text-purple-600 hover:text-purple-700"
             >
-              <div className="flex items-center gap-2">
-                <Box size={24} className="text-slate-500" />
-                <span className="font-normal text-left">Transit</span>
-              </div>
-              <span className="text-gray-500">
-                <ChevronIcon isOpen={filters.transit} />
-              </span>
-            </div>
-            {filters.transit && (
-              <ul className="ml-8 mt-2 text-sm text-gray-700">
-                <li>
-                  <input type="checkbox" id="direct" />
-                  <label htmlFor="direct" className="ml-2">
-                    Langsung
-                  </label>
-                </li>
-                <li>
-                  <input type="checkbox" id="1stop" />
-                  <label htmlFor="1stop" className="ml-2">
-                    1 Transit
-                  </label>
-                </li>
-                <li>
-                  <input type="checkbox" id="2stop" />
-                  <label htmlFor="2stop" className="ml-2">
-                    2+ Transit
-                  </label>
-                </li>
-              </ul>
-            )}
+              Reset
+            </button>
           </div>
-          <hr className="my-4 bg-slate-400" />
 
-          {/* Fasilitas */}
           <div>
             <div
               className="flex items-center justify-between cursor-pointer"
@@ -116,16 +239,40 @@ const TicketFilterSidebar = () => {
             </div>
             {filters.fasilitas && (
               <ul className="ml-8 mt-2 text-sm text-gray-700">
-                <li>
-                  <input type="checkbox" id="wifi" />
-                  <label htmlFor="wifi" className="ml-2">
+                <li className="flex items-center mb-2">
+                  <input
+                    type="checkbox"
+                    id="wifi"
+                    checked={selectedFacilities.wifi}
+                    onChange={() => handleFacilityChange('wifi')}
+                    className="rounded text-purple-600"
+                  />
+                  <label htmlFor="wifi" className="ml-2 cursor-pointer">
                     Wi-Fi
                   </label>
                 </li>
-                <li>
-                  <input type="checkbox" id="meals" />
-                  <label htmlFor="meals" className="ml-2">
+                <li className="flex items-center mb-2">
+                  <input
+                    type="checkbox"
+                    id="meals"
+                    checked={selectedFacilities.meals}
+                    onChange={() => handleFacilityChange('meals')}
+                    className="rounded text-purple-600"
+                  />
+                  <label htmlFor="meals" className="ml-2 cursor-pointer">
                     Makanan
+                  </label>
+                </li>
+                <li className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="power"
+                    checked={selectedFacilities.power}
+                    onChange={() => handleFacilityChange('power')}
+                    className="rounded text-purple-600"
+                  />
+                  <label htmlFor="power" className="ml-2 cursor-pointer">
+                    Stop Kontak
                   </label>
                 </li>
               </ul>
@@ -133,48 +280,43 @@ const TicketFilterSidebar = () => {
           </div>
           <hr className="my-4 bg-slate-400" />
 
-        {/* Harga */}
-        <div>
-          <div
-            className="flex items-center justify-between cursor-pointer"
-            onClick={() => setModalOpen(true)}
-          >
-            <div className="flex items-center gap-2">
-              <DollarSign size={24} className="text-slate-500" />
-              <span className="font-normal text-left">Harga</span>
+          <div>
+            <div
+              className="flex items-center justify-between cursor-pointer"
+              onClick={() => setModalOpen(true)}
+            >
+              <div className="flex items-center gap-2">
+                <DollarSign size={24} className="text-slate-500" />
+                <span className="font-normal text-left">Harga</span>
+              </div>
+              <span className="text-gray-500">
+                <ChevronIcon isOpen={isModalOpen} />
+              </span>
             </div>
-            <span className="text-gray-500">
-              <ChevronIcon isOpen={isModalOpen} />
-            </span>
+            {activeFilters.minPrice && activeFilters.maxPrice && (
+              <div className="mt-2 ml-8 text-sm text-gray-700 flex items-center gap-2">
+                <p>
+                  Rp{Number(activeFilters.minPrice).toLocaleString()} - Rp
+                  {Number(activeFilters.maxPrice).toLocaleString()}
+                </p>
+                <button
+                  onClick={handlePriceReset}
+                  className="text-gray-500 hover:text-gray-700"
+                  aria-label="Reset rentang harga"
+                >
+                  &times;
+                </button>
+              </div>
+            )}
           </div>
-          {appliedPriceRange && (
-            <div className="mt-2 ml-8 text-sm text-gray-700 flex items-center gap-2">
-              <p>
-                Rp{appliedPriceRange.min} - Rp{appliedPriceRange.max}
-              </p>
-              <button
-                onClick={() => {
-                  setPriceRange({ min: '', max: '' });
-                  setAppliedPriceRange(null);
-                }}
-                className="text-gray-500 hover:text-gray-700"
-                aria-label="Reset rentang harga"
-              >
-                &times;
-              </button>
-            </div>
-          )}
-        </div>
-
         </div>
       </div>
 
-      {/* Modal Harga */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white w-[400px] rounded-lg shadow-lg p-6 relative">
             <button
-              className="absolute top-2 right-2 text-gray-500"
+              className="absolute top-2 right-2 text-gray-500 text-xl hover:text-gray-700"
               onClick={() => setModalOpen(false)}
             >
               &times;
@@ -213,7 +355,7 @@ const TicketFilterSidebar = () => {
               </div>
               <button
                 onClick={applyPriceFilter}
-                className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
+                className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
               >
                 Terapkan
               </button>

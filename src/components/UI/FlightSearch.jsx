@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ArrowLeftRight } from 'lucide-react';
 import {
   MdFlightTakeoff,
@@ -13,6 +13,7 @@ import {
   swapCities,
   updatePassengerCount,
 } from '../../store/slices/flightSearchSlice';
+import { setSearchParams } from '../../store/slices/flightFilterSlice';
 import CitySelectionModal from '../Elements/Modal/CitySelectionModal';
 import DatePickerModal from '../Elements/Modal/DatePickerModal';
 import PassengerSelector from '../Elements/Modal/PassengerSelector';
@@ -33,15 +34,13 @@ const FlightSearch = () => {
     selectedSeatClass,
   } = flightSearch;
 
-  const [isFromModalOpen, setIsFromModalOpen] = React.useState(false);
-  const [isToModalOpen, setIsToModalOpen] = React.useState(false);
+  const [isFromModalOpen, setIsFromModalOpen] = useState(false);
+  const [isToModalOpen, setIsToModalOpen] = useState(false);
   const [isDepartureDateModalOpen, setIsDepartureDateModalOpen] =
-    React.useState(false);
-  const [isReturnDateModalOpen, setIsReturnDateModalOpen] =
-    React.useState(false);
-  const [isPassengerSelectorOpen, setIsPassengerSelectorOpen] =
-    React.useState(false);
-  const [isSeatClassModalOpen, setIsSeatClassModalOpen] = React.useState(false);
+    useState(false);
+  const [isReturnDateModalOpen, setIsReturnDateModalOpen] = useState(false);
+  const [isPassengerSelectorOpen, setIsPassengerSelectorOpen] = useState(false);
+  const [isSeatClassModalOpen, setIsSeatClassModalOpen] = useState(false);
 
   const formatDate = (date) => {
     if (!date) return '';
@@ -64,29 +63,50 @@ const FlightSearch = () => {
   };
 
   const handleFromCitySelection = (city) => {
-    dispatch(updateFlightSearch({ fromCity: city }));
+    dispatch(
+      updateFlightSearch({
+        fromCity: city,
+        fromCityDisplay: city,
+      })
+    );
   };
 
   const handleToCitySelection = (city) => {
-    dispatch(updateFlightSearch({ toCity: city }));
+    dispatch(
+      updateFlightSearch({
+        toCity: city,
+        toCityDisplay: city,
+      })
+    );
   };
 
   const handleSwapCities = () => {
-    dispatch(swapCities());
+    dispatch(
+      updateFlightSearch({
+        fromCity: toCity,
+        toCity: fromCity,
+        fromCityDisplay: flightSearch.toCityDisplay || toCity,
+        toCityDisplay: flightSearch.fromCityDisplay || fromCity,
+      })
+    );
   };
 
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
 
-    if (
-      !fromCity ||
-      !toCity ||
-      !departureDate ||
-      (isRoundTrip && !returnDate)
-    ) {
-      alert('Mohon lengkapi data pencarian penerbangan');
-      return;
-    }
+    const searchParams = {
+      from: fromCity,
+      to: toCity,
+      departureDate,
+      seatClass: selectedSeatClass,
+      passengerAdult: passengerCounts.adult || 0,
+      passengerChild: passengerCounts.child || 0,
+      passengerInfant: passengerCounts.infant || 0,
+      isRoundTrip,
+      ...(isRoundTrip && returnDate && { returnDate }),
+    };
+
+    dispatch(setSearchParams(searchParams));
 
     navigate('/flight-ticket');
   };
@@ -97,6 +117,20 @@ const FlightSearch = () => {
       0
     );
     return `${total} Penumpang`;
+  };
+
+  const getPassengerBreakdown = () => {
+    const parts = [];
+    if (passengerCounts.adult > 0) {
+      parts.push(`${passengerCounts.adult} Dewasa`);
+    }
+    if (passengerCounts.child > 0) {
+      parts.push(`${passengerCounts.child} Anak`);
+    }
+    if (passengerCounts.infant > 0) {
+      parts.push(`${passengerCounts.infant} Bayi`);
+    }
+    return parts.join(', ');
   };
 
   return (
@@ -126,7 +160,7 @@ const FlightSearch = () => {
                         </div>
                         <input
                           type="text"
-                          value={fromCity}
+                          value={flightSearch.fromCityDisplay || fromCity}
                           readOnly
                           placeholder="Jakarta (JKTA)"
                           className="flex-1 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base focus:outline-none focus:border-[#7126B5] border-b cursor-pointer"
@@ -169,7 +203,7 @@ const FlightSearch = () => {
                       </div>
                       <input
                         type="text"
-                        value={toCity}
+                        value={flightSearch.toCityDisplay || toCity}
                         readOnly
                         placeholder="Bandung (BDG)"
                         className="flex-1 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base focus:outline-none focus:border-[#7126B5] border-b cursor-pointer"
@@ -266,6 +300,7 @@ const FlightSearch = () => {
                         <input
                           type="text"
                           value={getTotalPassengers()}
+                          title={getPassengerBreakdown()}
                           readOnly
                           className="flex-1 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base focus:outline-none focus:border-[#7126B5] border-b cursor-pointer"
                           onClick={() => setIsPassengerSelectorOpen(true)}
@@ -293,9 +328,20 @@ const FlightSearch = () => {
 
             <button
               type="submit"
-              className="w-full bg-[#7126B5] text-white py-3 sm:py-3.5 md:py-4 text-xs sm:text-sm md:text-base rounded-b-xl sm:rounded-b-2xl font-medium hover:bg-[#7126B5] transition-colors"
+              disabled={
+                !fromCity ||
+                !toCity ||
+                !departureDate ||
+                (isRoundTrip && !returnDate)
+              }
+              className="w-full bg-[#7126B5] text-white py-3 sm:py-3.5 md:py-4 text-xs sm:text-sm md:text-base rounded-b-xl sm:rounded-b-2xl font-medium hover:bg-[#7126B5] transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              Cari Penerbangan
+              {!fromCity ||
+              !toCity ||
+              !departureDate ||
+              (isRoundTrip && !returnDate)
+                ? 'Cari Penerbangan'
+                : 'Cari Penerbangan'}
             </button>
           </form>
         </div>
@@ -321,22 +367,29 @@ const FlightSearch = () => {
         onClose={() => setIsDepartureDateModalOpen(false)}
         onSelect={(date) => {
           dispatch(updateFlightSearch({ departureDate: date }));
-          // Update return date if needed
-          if (isRoundTrip && returnDate < date) {
+
+          if (
+            isRoundTrip &&
+            returnDate &&
+            new Date(returnDate) < new Date(date)
+          ) {
             dispatch(updateFlightSearch({ returnDate: date }));
           }
           setIsDepartureDateModalOpen(false);
         }}
         selectedDate={departureDate}
         title="Select Departure Date"
-        minDate={new Date()} // Prevent selecting past dates
+        minDate={new Date()}
       />
 
       <DatePickerModal
         isOpen={isReturnDateModalOpen}
         onClose={() => setIsReturnDateModalOpen(false)}
         onSelect={(date) => {
-          if (date >= departureDate) {
+          const selectedTime = new Date(date).setHours(0, 0, 0, 0);
+          const departureTime = new Date(departureDate).setHours(0, 0, 0, 0);
+
+          if (selectedTime >= departureTime) {
             dispatch(updateFlightSearch({ returnDate: date }));
             setIsReturnDateModalOpen(false);
           } else {
@@ -347,7 +400,8 @@ const FlightSearch = () => {
         }}
         selectedDate={returnDate}
         title="Select Return Date"
-        minDate={departureDate} // Prevent selecting dates before departure
+        minDate={departureDate}
+        disabled={!isRoundTrip}
       />
 
       <SeatClassModal

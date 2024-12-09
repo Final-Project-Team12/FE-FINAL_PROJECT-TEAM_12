@@ -7,6 +7,7 @@ const DatePickerModal = ({
   onSelect,
   selectedDate,
   title,
+  minDate,
 }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [nextMonthDate, setNextMonthDate] = useState(
@@ -81,6 +82,26 @@ const DatePickerModal = ({
     );
   };
 
+  const handleDateSelection = (date) => {
+    const utcDate = new Date(
+      Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+    );
+
+    if (minDate) {
+      const minUtcDate = new Date(
+        Date.UTC(minDate.getFullYear(), minDate.getMonth(), minDate.getDate())
+      );
+
+      if (utcDate >= minUtcDate) {
+        onSelect(utcDate);
+      } else {
+        alert('Tanggal kembali tidak boleh lebih awal dari tanggal berangkat');
+      }
+    } else {
+      onSelect(utcDate);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -115,7 +136,8 @@ const DatePickerModal = ({
               daysOfWeek={daysOfWeek}
               isCurrentMonth={isCurrentMonth}
               isSelected={isSelected}
-              onSelect={onSelect}
+              onSelect={handleDateSelection}
+              minDate={minDate}
             />
           </div>
 
@@ -138,7 +160,8 @@ const DatePickerModal = ({
               daysOfWeek={daysOfWeek}
               isCurrentMonth={isCurrentMonth}
               isSelected={isSelected}
-              onSelect={onSelect}
+              onSelect={handleDateSelection}
+              minDate={minDate}
             />
           </div>
         </div>
@@ -153,6 +176,7 @@ const Calendar = ({
   isCurrentMonth,
   isSelected,
   onSelect,
+  minDate,
 }) => (
   <div className="grid grid-cols-7 gap-1">
     {daysOfWeek.map((day) => (
@@ -163,19 +187,23 @@ const Calendar = ({
         {day}
       </div>
     ))}
-    {days.map((date, index) => (
-      <div
-        key={index}
-        className={`h-8 flex items-center justify-center rounded-md text-xs
-          ${date ? 'cursor-pointer hover:bg-purple-50' : ''}
-          ${isSelected(date) ? 'bg-purple-600 text-white hover:bg-purple-700' : ''}
-          ${!isSelected(date) && date ? 'text-gray-700' : 'text-gray-300'}
-        `}
-        onClick={() => date && onSelect(date)}
-      >
-        {date ? date.getDate() : ''}
-      </div>
-    ))}
+    {days.map((date, index) => {
+      const isDisabled = minDate && date && date < minDate;
+      return (
+        <div
+          key={index}
+          className={`h-8 flex items-center justify-center rounded-md text-xs
+            ${date ? 'cursor-pointer hover:bg-purple-50' : ''}
+            ${isSelected(date) ? 'bg-purple-600 text-white hover:bg-purple-700' : ''}
+            ${!isSelected(date) && date ? 'text-gray-700' : 'text-gray-300'}
+            ${isDisabled ? 'opacity-50 cursor-not-allowed hover:bg-transparent' : ''}
+          `}
+          onClick={() => date && !isDisabled && onSelect(date)}
+        >
+          {date ? date.getDate() : ''}
+        </div>
+      );
+    })}
   </div>
 );
 
