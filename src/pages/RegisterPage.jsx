@@ -7,7 +7,7 @@ const RegisterPage = () => {
       <div className="w-1/2">
         <AuthBanner />
       </div>
-      <div className="w-1/2">
+      <div className="w-1/2 flex items-center justify-center">
         <RegisterForm />
       </div>
     </div>
