@@ -3,12 +3,12 @@ import AuthBanner from '../components/Elements/Banner/AuthBanner';
 
 const RegisterPage = () => {
   return (
-    <div className="flex">
-      <div className="w-1/2">
-        <AuthBanner />
-      </div>
-      <div className="w-1/2 flex items-center justify-center">
-        <RegisterForm />
+    <div className="grid grid-cols-2 min-h-screen">
+      <AuthBanner />
+      <div className="flex items-center justify-center">
+        <div className="w-2/3">
+          <RegisterForm />
+        </div>
       </div>
     </div>
   );

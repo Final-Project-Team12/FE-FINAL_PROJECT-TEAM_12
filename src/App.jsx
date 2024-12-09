@@ -38,7 +38,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/animation" element={<ExamplePages />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/otp" element={<OtpPage />} />
           <Route

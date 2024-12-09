@@ -34,7 +34,7 @@ const RegisterForm = () => {
 
   return (
     <div>
-      <div className="w-full">
+      <div className="">
         <h2 className="text-[24px] font-bold mb-4">Daftar</h2>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-5">
@@ -86,7 +86,7 @@ const RegisterForm = () => {
             <InputField
               label="Alamat"
               type="text"
-              placeholder="Desa Sukamulya, Kab Bekasi"
+              placeholder="Contoh: Desa Sukamulya, Kab Bekasi"
               error={errors.address}
               {...register('address', {
                 required: 'Alamat wajib diisi',
