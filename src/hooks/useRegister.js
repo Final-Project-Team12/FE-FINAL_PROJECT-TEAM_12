@@ -21,6 +21,7 @@ const useRegister = () => {
     dispatch(registerStart());
     try {
       const response = await registerService(dataUser);
+      console.log('tesss', response);
       dispatch(registerSuccess());
       navigate('/otp');
 
