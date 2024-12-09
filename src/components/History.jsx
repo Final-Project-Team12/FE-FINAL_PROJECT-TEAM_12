@@ -4,7 +4,7 @@ import HeaderHistory from '../components/UI/HeaderHistory';
 import FlightList from './UI/History/FlightList';
 import OrderDetailsPanel from './UI/History/OrderDetailsPanel';
 import { useWindowDimensions } from '../hooks/useWindowDimensions';
-import { flightData } from '.././data/mockFlightData';
+import { flightData } from '../data/mockFlightdata';
 import {
   sortFlightsByDate,
   filterFlightsByDateRange,
