@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import useRegister from '../../hooks/useRegister';
 
 import InputField from '../Elements/InputField/InputField';
 import Button from '../Elements/Buttons/Button';
@@ -11,7 +12,9 @@ const RegisterForm = () => {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (dataUser) => {
+  const { handleRegister } = useRegister();
+
+  const onSubmit = async (dataUser) => {
     const transformedData = {
       ...dataUser,
       gender:
@@ -21,7 +24,12 @@ const RegisterForm = () => {
             ? 'female'
             : dataUser.gender,
     };
-    console.log('Transformed Data:', transformedData);
+
+    try {
+      await handleRegister(transformedData);
+    } catch (error) {
+      console.error('Registration failed', error);
+    }
   };
 
   return (
@@ -62,7 +70,7 @@ const RegisterForm = () => {
           <div className="mb-5">
             <InputField
               label="Nomor Telepon"
-              type="tel"
+              type="text"
               placeholder="Contoh: 085818890911"
               error={errors.telephone_number}
               {...register('telephone_number', {
@@ -101,6 +109,21 @@ const RegisterForm = () => {
                   value: /^(laki-laki|perempuan)$/i,
                   message:
                     'Jenis kelamin hanya boleh "laki-laki" atau "perempuan"',
+                },
+              })}
+            />
+          </div>
+          <div className="mb-5">
+            <InputField
+              label="Umur"
+              type="text"
+              placeholder="minimal 17 tahun"
+              error={errors.age}
+              {...register('age', {
+                required: 'Umur wajib diisi',
+                pattern: {
+                  value: /^(1[7-9]|[2-9][0-9])$/,
+                  message: 'Umur harus lebih dari 17 tahun',
                 },
               })}
             />
