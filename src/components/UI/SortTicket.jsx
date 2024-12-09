@@ -1,11 +1,27 @@
 import React, { useState } from 'react';
 import { ArrowUpDown, X } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setSortCriteria } from '../../store/slices/flightFilterSlice';
+import {
+  setSortCriteria,
+  fetchFilteredFlights,
+} from '../../store/slices/flightFilterSlice';
 
 const SortTicket = () => {
   const dispatch = useDispatch();
-  const { sortCriteria } = useSelector((state) => state.flightFilter);
+  const { sortCriteria, activeFilters } = useSelector(
+    (state) => state.flightFilter
+  );
+  const {
+    fromCity,
+    toCity,
+    departureDate,
+    returnDate,
+    selectedSeatClass,
+    passengerCounts,
+    isRoundTrip,
+    selectedDepartureFlight,
+  } = useSelector((state) => state.flightSearch);
+
   const [showModal, setShowModal] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState(() => {
     const mapping = {
@@ -62,12 +78,59 @@ const SortTicket = () => {
     setSelectedFilter(filter);
   };
 
+  const getUTCDate = (date) => {
+    if (!date) return '';
+    try {
+      const dateObj = new Date(date);
+      if (isNaN(dateObj.getTime())) return '';
+
+      return new Date(
+        Date.UTC(
+          dateObj.getUTCFullYear(),
+          dateObj.getUTCMonth(),
+          dateObj.getUTCDate()
+        )
+      )
+        .toISOString()
+        .split('T')[0];
+    } catch (error) {
+      console.error('Error getting UTC date:', error);
+      return '';
+    }
+  };
+
+  const applySort = (sortKey) => {
+    dispatch(setSortCriteria(sortKey));
+
+    const searchPayload = {
+      from: fromCity,
+      to: toCity,
+      departureDate: getUTCDate(departureDate),
+      seatClass: selectedSeatClass,
+      passengerAdult: passengerCounts.adult || 0,
+      passengerChild: passengerCounts.child || 0,
+      passengerInfant: passengerCounts.infant || 0,
+      ...(selectedDepartureFlight &&
+        returnDate && {
+          returnDate: getUTCDate(returnDate),
+        }),
+    };
+
+    dispatch(
+      fetchFilteredFlights({
+        page: 1,
+        filters: activeFilters,
+        searchParams: searchPayload,
+      })
+    );
+  };
+
   const applyFilter = () => {
     const selectedOption = filterOptions.find(
       (option) => option.value === selectedFilter
     );
     if (selectedOption) {
-      dispatch(setSortCriteria(selectedOption.sortKey));
+      applySort(selectedOption.sortKey);
     }
     setShowModal(false);
   };
