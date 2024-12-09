@@ -138,46 +138,47 @@ export const flightManagementAndBookingService = {
           from,
           to,
           departureDate,
-          seatClass,
-          totalPassenger,
           returnDate,
-          isRoundTrip,
+          seatClass,
+          passengerAdult,
+          passengerChild,
+          passengerInfant,
         } = params.searchParams;
 
         if (from) queryParams.from = from;
         if (to) queryParams.to = to;
         if (departureDate) queryParams.departureDate = departureDate;
         if (seatClass) queryParams.seatClass = seatClass;
-        if (totalPassenger) queryParams.totalPassenger = totalPassenger;
-        if (isRoundTrip && returnDate) queryParams.returnDate = returnDate;
-      }
+        if (passengerAdult) queryParams.passengerAdult = passengerAdult;
+        if (passengerChild) queryParams.passengerChild = passengerChild;
+        if (passengerInfant) queryParams.passengerInfant = passengerInfant;
 
-      if (params.filters) {
-        const { minPrice, maxPrice, facilities } = params.filters;
-        if (minPrice) queryParams.minPrice = minPrice;
-        if (maxPrice) queryParams.maxPrice = maxPrice;
-
-        if (facilities?.length > 0) {
-          facilities.forEach((facility) => {
-            switch (facility) {
-              case 'wifi':
-                queryParams.wifi_available = true;
-                break;
-              case 'meals':
-                queryParams.meal_available = true;
-                break;
-              case 'entertainment':
-                queryParams.in_flight_entertainment = true;
-                break;
-              case 'power':
-                queryParams.power_outlets = true;
-                break;
-            }
-          });
+        if (returnDate) {
+          queryParams.returnDate = returnDate;
         }
       }
 
-      console.log('Final Query Parameters:', queryParams);
+      if (params.filters?.facilities?.length > 0) {
+        const facilityMapping = {
+          meals: 'mealAvailable',
+          wifi: 'wifiAvailable',
+          power: 'powerOutlets',
+        };
+
+        const selectedFacilities = params.filters.facilities
+          .map((facility) => facilityMapping[facility])
+          .filter(Boolean);
+
+        if (selectedFacilities.length > 0) {
+          queryParams.facilities = selectedFacilities.join(',');
+        }
+      }
+
+      if (params.filters) {
+        const { minPrice, maxPrice } = params.filters;
+        if (minPrice) queryParams.minPrice = minPrice;
+        if (maxPrice) queryParams.maxPrice = maxPrice;
+      }
 
       const queryString = Object.entries(queryParams)
         .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
@@ -187,29 +188,33 @@ export const flightManagementAndBookingService = {
         `/flights/search?${queryString}`
       );
 
-      let filteredFlights = response.data.data.outbound_flights;
-
-      if (
-        params.searchParams?.seatClass &&
-        params.searchParams?.totalPassenger
-      ) {
-        filteredFlights = filteredFlights.filter((flight) => {
+      const filterFlightsBySeatClass = (flights) =>
+        flights.filter((flight) => {
           const seatInfo = flight.seats_detail.find(
             (seat) => seat.class === params.searchParams.seatClass
           );
           return (
             seatInfo &&
             seatInfo.available_seats >=
-              parseInt(params.searchParams.totalPassenger)
+              (params.searchParams.passengerAdult || 0) +
+                (params.searchParams.passengerChild || 0) +
+                (params.searchParams.passengerInfant || 0)
           );
         });
-      }
+
+      let filteredOutboundFlights = filterFlightsBySeatClass(
+        response.data.data.outbound_flights
+      );
+
+      let filteredReturnFlights = response.data.data.return_flights
+        ? filterFlightsBySeatClass(response.data.data.return_flights)
+        : [];
 
       return {
         ...response.data,
         data: {
-          ...response.data.data,
-          outbound_flights: filteredFlights,
+          outbound_flights: filteredOutboundFlights,
+          return_flights: filteredReturnFlights,
         },
       };
     } catch (error) {

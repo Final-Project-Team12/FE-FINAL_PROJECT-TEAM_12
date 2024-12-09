@@ -13,11 +13,11 @@ import {
   swapCities,
   updatePassengerCount,
 } from '../../store/slices/flightSearchSlice';
+import { setSearchParams } from '../../store/slices/flightFilterSlice';
 import CitySelectionModal from '../Elements/Modal/CitySelectionModal';
 import DatePickerModal from '../Elements/Modal/DatePickerModal';
 import PassengerSelector from '../Elements/Modal/PassengerSelector';
 import SeatClassModal from '../Elements/Modal/SeatClassModal';
-import { useFlightSearch } from '../../hooks/useFlightSearch';
 
 const FlightSearch = () => {
   const navigate = useNavigate();
@@ -90,20 +90,25 @@ const FlightSearch = () => {
       })
     );
   };
-  const { isLoading, handleFlightSearch } = useFlightSearch();
 
   const handleSearch = async (e) => {
     e.preventDefault();
 
-    await handleFlightSearch({
-      fromCity,
-      toCity,
+    const searchParams = {
+      from: fromCity,
+      to: toCity,
       departureDate,
-      returnDate,
+      seatClass: selectedSeatClass,
+      passengerAdult: passengerCounts.adult || 0,
+      passengerChild: passengerCounts.child || 0,
+      passengerInfant: passengerCounts.infant || 0,
       isRoundTrip,
-      passengerCounts,
-      selectedSeatClass,
-    });
+      ...(isRoundTrip && returnDate && { returnDate }),
+    };
+
+    dispatch(setSearchParams(searchParams));
+
+    navigate('/flight-ticket');
   };
 
   const getTotalPassengers = () => {
@@ -112,6 +117,20 @@ const FlightSearch = () => {
       0
     );
     return `${total} Penumpang`;
+  };
+
+  const getPassengerBreakdown = () => {
+    const parts = [];
+    if (passengerCounts.adult > 0) {
+      parts.push(`${passengerCounts.adult} Dewasa`);
+    }
+    if (passengerCounts.child > 0) {
+      parts.push(`${passengerCounts.child} Anak`);
+    }
+    if (passengerCounts.infant > 0) {
+      parts.push(`${passengerCounts.infant} Bayi`);
+    }
+    return parts.join(', ');
   };
 
   return (
@@ -281,6 +300,7 @@ const FlightSearch = () => {
                         <input
                           type="text"
                           value={getTotalPassengers()}
+                          title={getPassengerBreakdown()}
                           readOnly
                           className="flex-1 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base focus:outline-none focus:border-[#7126B5] border-b cursor-pointer"
                           onClick={() => setIsPassengerSelectorOpen(true)}
@@ -308,17 +328,20 @@ const FlightSearch = () => {
 
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={
+                !fromCity ||
+                !toCity ||
+                !departureDate ||
+                (isRoundTrip && !returnDate)
+              }
               className="w-full bg-[#7126B5] text-white py-3 sm:py-3.5 md:py-4 text-xs sm:text-sm md:text-base rounded-b-xl sm:rounded-b-2xl font-medium hover:bg-[#7126B5] transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              {isLoading ? (
-                <div className="flex items-center justify-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>Searching...</span>
-                </div>
-              ) : (
-                'Cari Penerbangan'
-              )}
+              {!fromCity ||
+              !toCity ||
+              !departureDate ||
+              (isRoundTrip && !returnDate)
+                ? 'Cari Penerbangan'
+                : 'Cari Penerbangan'}
             </button>
           </form>
         </div>
@@ -345,7 +368,11 @@ const FlightSearch = () => {
         onSelect={(date) => {
           dispatch(updateFlightSearch({ departureDate: date }));
 
-          if (isRoundTrip && returnDate < date) {
+          if (
+            isRoundTrip &&
+            returnDate &&
+            new Date(returnDate) < new Date(date)
+          ) {
             dispatch(updateFlightSearch({ returnDate: date }));
           }
           setIsDepartureDateModalOpen(false);
@@ -374,6 +401,7 @@ const FlightSearch = () => {
         selectedDate={returnDate}
         title="Select Return Date"
         minDate={departureDate}
+        disabled={!isRoundTrip}
       />
 
       <SeatClassModal

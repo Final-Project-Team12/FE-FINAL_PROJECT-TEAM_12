@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useRef, useState } from 'react';
+import { useEffect, useCallback, useRef, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
@@ -6,57 +6,14 @@ import {
   fetchFilteredFlights,
   goToNextPage,
 } from '../../store/slices/flightFilterSlice';
+import { updateFlightSearch } from '../../store/slices/flightSearchSlice';
 import LoadingTicket from './LoadingTicket';
 import SearchResultEmpty from './SearchResultEmpety';
-
-const formatDate = (dateString) => {
-  const dateOnly = dateString.split('T')[0];
-  const localDateObj = new Date(`${dateOnly}T00:00:00Z`);
-  const day = localDateObj.getDate();
-  const months = [
-    'Januari',
-    'Februari',
-    'Maret',
-    'April',
-    'Mei',
-    'Juni',
-    'Juli',
-    'Agustus',
-    'September',
-    'Oktober',
-    'November',
-    'Desember',
-  ];
-  const month = months[localDateObj.getMonth()];
-  const year = localDateObj.getFullYear();
-  return `${day} ${month} ${year}`;
-};
-
-const formatTime = (dateString) => {
-  const date = new Date(dateString);
-  return date.toLocaleTimeString('id-ID', {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-};
-
-const getUTCDate = (date) => {
-  if (!date) return '';
-  const dateObj = new Date(date);
-  return new Date(
-    Date.UTC(
-      dateObj.getUTCFullYear(),
-      dateObj.getUTCMonth(),
-      dateObj.getUTCDate()
-    )
-  )
-    .toISOString()
-    .split('T')[0];
-};
 
 const DetailsTicket = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   const {
     filteredFlights,
     isLoading,
@@ -64,26 +21,120 @@ const DetailsTicket = () => {
     hasMoreFlights,
     currentPageNumber,
     activeFilters,
-    searchParams,
   } = useSelector((state) => state.flightFilter);
 
   const {
     fromCity,
     toCity,
+    fromCityDisplay,
+    toCityDisplay,
     departureDate,
+    returnDate,
     selectedSeatClass,
     passengerCounts,
+    isRoundTrip,
+    selectedDepartureFlight,
   } = useSelector((state) => state.flightSearch);
 
   const [openId, setOpenId] = useState(null);
   const isRequestInProgress = useRef(false);
 
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return '';
+
+      const day = date.getDate();
+      const months = [
+        'Januari',
+        'Februari',
+        'Maret',
+        'April',
+        'Mei',
+        'Juni',
+        'Juli',
+        'Agustus',
+        'September',
+        'Oktober',
+        'November',
+        'Desember',
+      ];
+      const month = months[date.getMonth()];
+      const year = date.getFullYear();
+      return `${day} ${month} ${year}`;
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return '';
+    }
+  };
+
+  const formatTime = (dateString) => {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return '';
+
+      return date.toLocaleTimeString('id-ID', {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch (error) {
+      console.error('Error formatting time:', error);
+      return '';
+    }
+  };
+
+  const getUTCDate = (date) => {
+    if (!date) return '';
+    try {
+      const localDate = new Date(date);
+      const utcDate = new Date(
+        Date.UTC(
+          localDate.getFullYear(),
+          localDate.getMonth(),
+          localDate.getDate(),
+          21,
+          1,
+          40,
+          471
+        )
+      );
+
+      const year = utcDate.getUTCFullYear();
+      const month = String(utcDate.getUTCMonth() + 1).padStart(2, '0');
+      const day = String(utcDate.getUTCDate()).padStart(2, '0');
+      const hours = String(utcDate.getUTCHours()).padStart(2, '0');
+      const minutes = String(utcDate.getUTCMinutes()).padStart(2, '0');
+      const seconds = String(utcDate.getUTCSeconds()).padStart(2, '0');
+      const milliseconds = String(utcDate.getUTCMilliseconds()).padStart(
+        3,
+        '0'
+      );
+
+      return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}Z`;
+    } catch (error) {
+      console.error('Error getting UTC date:', error);
+      return '';
+    }
+  };
+
   const toggleAccordion = (id) => {
     setOpenId(openId === id ? null : id);
   };
 
-  const handleToCheckOut = (flightId) => {
-    navigate(`/checkout/${flightId}`);
+  const handleSelectFlight = (flight) => {
+    if (!selectedDepartureFlight) {
+      if (isRoundTrip) {
+        dispatch(updateFlightSearch({ selectedDepartureFlight: flight }));
+      } else {
+        navigate(`/checkout/${flight.plane_id}`);
+      }
+    } else {
+      navigate(
+        `/checkout/${selectedDepartureFlight.plane_id}/${flight.plane_id}`
+      );
+    }
   };
 
   const observer = useRef();
@@ -105,19 +156,19 @@ const DetailsTicket = () => {
             dispatch(goToNextPage());
           }
         },
-        {
-          root: null,
-          rootMargin: '20px',
-          threshold: 0.1,
-        }
+        { root: null, rootMargin: '20px', threshold: 0.1 }
       );
 
-      if (node) {
-        observer.current.observe(node);
-      }
+      if (node) observer.current.observe(node);
     },
     [isLoading, hasMoreFlights, dispatch]
   );
+
+  const currentFlights = useMemo(() => {
+    return selectedDepartureFlight
+      ? filteredFlights.return
+      : filteredFlights.outbound;
+  }, [selectedDepartureFlight, filteredFlights]);
 
   useEffect(() => {
     if (isRequestInProgress.current) return;
@@ -125,19 +176,18 @@ const DetailsTicket = () => {
     const fetchData = async () => {
       isRequestInProgress.current = true;
       try {
-        const totalPassenger = Object.values(passengerCounts).reduce(
-          (sum, count) => sum + count,
-          0
-        );
-
-        const formattedDate = getUTCDate(departureDate);
-
         const searchPayload = {
           from: fromCity,
           to: toCity,
-          departureDate: formattedDate,
+          departureDate: getUTCDate(departureDate),
           seatClass: selectedSeatClass,
-          totalPassenger,
+          passengerAdult: passengerCounts.adult || 0,
+          passengerChild: passengerCounts.child || 0,
+          passengerInfant: passengerCounts.infant || 0,
+          ...(selectedDepartureFlight &&
+            returnDate && {
+              returnDate: getUTCDate(returnDate),
+            }),
         };
 
         await dispatch(
@@ -162,8 +212,10 @@ const DetailsTicket = () => {
     fromCity,
     toCity,
     departureDate,
+    returnDate,
     selectedSeatClass,
     passengerCounts,
+    selectedDepartureFlight,
   ]);
 
   if (error) {
@@ -174,12 +226,15 @@ const DetailsTicket = () => {
 
   return (
     <div className="w-full px-4 pb-4 space-y-4">
-      {!isLoading && filteredFlights.length === 0 && <SearchResultEmpty />}
-      {filteredFlights.map((flight, index) => (
+      {!isLoading && (!currentFlights || currentFlights.length === 0) && (
+        <SearchResultEmpty />
+      )}
+
+      {currentFlights?.map((flight, index) => (
         <div
           key={flight.plane_id}
           ref={
-            index === filteredFlights.length - 1 ? lastFlightElementRef : null
+            index === currentFlights.length - 1 ? lastFlightElementRef : null
           }
           className={`border-2 rounded-lg overflow-hidden bg-white shadow-sm transition-all duration-200 ${
             openId === flight.plane_id
@@ -187,7 +242,6 @@ const DetailsTicket = () => {
               : 'border-gray-200 hover:border-gray-300'
           }`}
         >
-          {/* Header section */}
           <div className="p-4 hover:bg-gray-50">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
@@ -232,9 +286,7 @@ const DetailsTicket = () => {
 
                 <div className="flex flex-col items-center">
                   <div className="text-[12px] text-[#8A8A8A]">
-                    {`${Math.floor(flight.duration / 60)}h ${
-                      flight.duration % 60
-                    }m`}
+                    {`${Math.floor(flight.duration / 60)}h ${flight.duration % 60}m`}
                   </div>
                   <img src="/icons/Arrow.svg" alt="" />
                   <div className="text-[12px] text-[#8A8A8A]">Direct</div>
@@ -263,8 +315,8 @@ const DetailsTicket = () => {
                   )}
                 </div>
                 <button
-                  className="mt-1 px-6 py-1 bg-purple-600 text-white rounded-md text-sm hover:bg-purple-700 transition-colors duration-200"
-                  onClick={() => handleToCheckOut(flight.plane_id)}
+                  className="mt-1 px-6 py-1 bg-purple-600 text-white rounded-md text-sm hover:bg-purple-700 transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  onClick={() => handleSelectFlight(flight)}
                   disabled={
                     flight.seats_detail.find(
                       (seat) => seat.class === selectedSeatClass
@@ -281,19 +333,15 @@ const DetailsTicket = () => {
             </div>
           </div>
 
-          {/* Expanded content */}
           {openId === flight.plane_id && (
-            <div className="p-4 bg-white">
+            <div className="p-4 bg-white border-t">
               <div className="space-y-4">
                 <div>
                   <hr className="mb-[22px] border-[#8A8A8A]" />
-
                   <h3 className="text-[14px] font-bold text-[#4B1979] mb-2">
                     Detail Penerbangan
                   </h3>
-
                   <div className="space-y-3">
-                    {/* Departure Information */}
                     <div>
                       <div className="flex justify-between">
                         <div className="text-[16px] font-bold">
@@ -313,7 +361,6 @@ const DetailsTicket = () => {
 
                     <hr className="w-1/2 mx-auto" />
 
-                    {/* Flight Information */}
                     <div className="flex flex-row gap-3">
                       <img
                         src={flight.airline.image_url}
@@ -364,7 +411,6 @@ const DetailsTicket = () => {
 
                     <hr className="w-1/2 mx-auto" />
 
-                    {/* Arrival Information */}
                     <div>
                       <div className="flex justify-between">
                         <div className="text-[14px] font-bold">
