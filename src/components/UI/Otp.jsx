@@ -66,7 +66,7 @@ const Otp = () => {
   };
 
   return (
-    <div className="flex flex-col items-center h-screen bg-gray-100">
+    <div className="flex flex-col items-center h-screen bg-white">
       <div className=" p-6 rounded-lg w-1/2">
         <Link to="/register">
           <img src={backIcon} alt="" />

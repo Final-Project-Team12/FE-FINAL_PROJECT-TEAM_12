@@ -3,21 +3,34 @@ import { useForm } from 'react-hook-form';
 
 import InputField from '../Elements/InputField/InputField';
 import Button from '../Elements/Buttons/Button';
+import { useEffect } from 'react';
 
 const RegisterForm = () => {
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm();
+
+  const gender = watch('gender');
+
+  useEffect(() => {
+    if (gender?.toLowerCase() === 'laki-laki') {
+      setValue('gender', 'male');
+    } else if (gender?.toLowerCase() === 'perempuan') {
+      setValue('gender', 'female');
+    }
+  }, [gender, setValue]);
 
   const onSubmit = (data) => {
     console.log('Form Data:', data);
   };
 
   return (
-    <div className="h-screen flex">
-      <div className="my-auto w-full mx-[20%]">
+    <div>
+      <div className="w-full">
         <h2 className="text-[24px] font-bold mb-4">Daftar</h2>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-5">
@@ -55,12 +68,58 @@ const RegisterForm = () => {
               label="Nomor Telepon"
               type="tel"
               placeholder="Contoh: 085818890911"
-              error={errors.phone}
-              {...register('phone', {
+              error={errors.telephone_number}
+              {...register('telephone_number', {
                 required: 'Nomor telepon wajib diisi',
                 pattern: {
                   value: /^[0-9]{11,13}$/,
                   message: 'Nomor telepon harus 11-13 angka',
+                },
+              })}
+            />
+          </div>
+          <div className="mb-5">
+            <InputField
+              label="Alamat"
+              type="text"
+              placeholder="Desa Sukamulya, Kab Bekasi"
+              error={errors.address}
+              {...register('address', {
+                required: 'Alamat wajib diisi',
+                pattern: {
+                  value: /^[a-zA-Z0-9\s,./]+$/,
+                  message: 'Alamat hanya boleh berisi huruf dan angka',
+                },
+              })}
+            />
+          </div>
+          <div className="mb-5">
+            <InputField
+              label="Jenis Kelamin"
+              type="text"
+              placeholder="laki-laki/perempuan"
+              error={errors.gender}
+              {...register('gender', {
+                required: 'jenis kelamain wajib diisi',
+                pattern: {
+                  value: /^(laki-laki|perempuan)$/i,
+                  message:
+                    'Jenis kelamin hanya boleh "laki-laki" atau "perempuan"',
+                },
+              })}
+            />
+          </div>
+          <div className="mb-5">
+            <InputField
+              label="NIK"
+              type="text"
+              placeholder="3602041211870001"
+              error={errors.identity_number}
+              {...register('identity_number', {
+                required: 'NIK wajib diisi',
+                pattern: {
+                  value: /^[0-9]{16}$/,
+                  message: 'NIK harus terdiri dari 16 digit angka',
                 },
               })}
             />
