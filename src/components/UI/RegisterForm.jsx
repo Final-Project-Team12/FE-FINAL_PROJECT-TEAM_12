@@ -3,29 +3,25 @@ import { useForm } from 'react-hook-form';
 
 import InputField from '../Elements/InputField/InputField';
 import Button from '../Elements/Buttons/Button';
-import { useEffect } from 'react';
 
 const RegisterForm = () => {
   const {
     register,
     handleSubmit,
-    watch,
-    setValue,
     formState: { errors },
   } = useForm();
 
-  const gender = watch('gender');
-
-  useEffect(() => {
-    if (gender?.toLowerCase() === 'laki-laki') {
-      setValue('gender', 'male');
-    } else if (gender?.toLowerCase() === 'perempuan') {
-      setValue('gender', 'female');
-    }
-  }, [gender, setValue]);
-
-  const onSubmit = (data) => {
-    console.log('Form Data:', data);
+  const onSubmit = (dataUser) => {
+    const transformedData = {
+      ...dataUser,
+      gender:
+        dataUser.gender.toLowerCase() === 'laki-laki'
+          ? 'male'
+          : dataUser.gender.toLowerCase() === 'perempuan'
+            ? 'female'
+            : dataUser.gender,
+    };
+    console.log('Transformed Data:', transformedData);
   };
 
   return (
@@ -100,7 +96,7 @@ const RegisterForm = () => {
               placeholder="laki-laki/perempuan"
               error={errors.gender}
               {...register('gender', {
-                required: 'jenis kelamain wajib diisi',
+                required: 'Jenis kelamin wajib diisi',
                 pattern: {
                   value: /^(laki-laki|perempuan)$/i,
                   message:
