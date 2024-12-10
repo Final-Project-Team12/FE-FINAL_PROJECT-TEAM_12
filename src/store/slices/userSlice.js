@@ -8,9 +8,15 @@ export const fetchUserById = createAsyncThunk(
   async (userId, { rejectWithValue }) => {
     try {
       const response = await userService.getUserById(userId);
+      if (response.status === false) {
+        return rejectWithValue(response.message);
+      }
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.message);
+      if (error.response?.data) {
+        return rejectWithValue(error.response.data.message);
+      }
+      return rejectWithValue(error.message || 'Failed to fetch user data');
     }
   }
 );
@@ -20,12 +26,15 @@ export const updateUserProfile = createAsyncThunk(
   async ({ userId, userData }, { rejectWithValue }) => {
     try {
       const response = await userService.updateUser(userId, userData);
-      if (response.status && response.data) {
-        return response.data;
+      if (response.status === false) {
+        return rejectWithValue(response.message);
       }
-      return rejectWithValue(response.message || 'Failed to update user data');
+      return response.data;
     } catch (error) {
-      return rejectWithValue(error.message);
+      if (error.response?.data) {
+        return rejectWithValue(error.response.data.message);
+      }
+      return rejectWithValue(error.message || 'Gagal memperbarui profil');
     }
   }
 );
@@ -34,12 +43,18 @@ export const deleteUserAccount = createAsyncThunk(
   'user/deleteAccount',
   async (userId, { dispatch, rejectWithValue }) => {
     try {
-      await userService.deleteUser(userId);
+      const response = await userService.deleteUser(userId);
+      if (response.status === false) {
+        return rejectWithValue(response.message);
+      }
       authService.clearAuth();
       dispatch(logout());
-      return null;
+      return response.data;
     } catch (error) {
-      return rejectWithValue(error.message);
+      if (error.response?.data) {
+        return rejectWithValue(error.response.data.message);
+      }
+      return rejectWithValue(error.message || 'Failed to delete account');
     }
   }
 );
@@ -63,15 +78,7 @@ const userSlice = createSlice({
       state.updateError = null;
       state.deleteError = null;
     },
-    resetUserData: (state) => {
-      state.userData = null;
-      state.loading = false;
-      state.error = null;
-      state.updateLoading = false;
-      state.updateError = null;
-      state.deleteLoading = false;
-      state.deleteError = null;
-    },
+    resetUserData: () => initialState,
   },
   extraReducers: (builder) => {
     builder
@@ -82,6 +89,7 @@ const userSlice = createSlice({
       .addCase(fetchUserById.fulfilled, (state, action) => {
         state.loading = false;
         state.userData = action.payload;
+        state.error = null;
       })
       .addCase(fetchUserById.rejected, (state, action) => {
         state.loading = false;
@@ -94,6 +102,7 @@ const userSlice = createSlice({
       .addCase(updateUserProfile.fulfilled, (state, action) => {
         state.updateLoading = false;
         state.userData = action.payload;
+        state.updateError = null;
       })
       .addCase(updateUserProfile.rejected, (state, action) => {
         state.updateLoading = false;

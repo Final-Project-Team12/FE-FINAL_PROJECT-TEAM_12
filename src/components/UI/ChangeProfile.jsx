@@ -7,9 +7,8 @@ import Swal from 'sweetalert2';
 const ChangeProfile = () => {
   const dispatch = useDispatch();
   const { user } = useAuth();
-
   const userState = useSelector((state) => state.user);
-  const { userData, loading, error, updateLoading } = userState || {};
+  const { userData, loading, error, updateLoading, updateError } = userState;
 
   const [formData, setFormData] = useState({
     name: '',
@@ -43,15 +42,29 @@ const ChangeProfile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (user?.id) {
-      try {
-        await dispatch(
-          updateUserProfile({
-            userId: user.id,
-            userData: formData,
-          })
-        ).unwrap();
 
+    if (!user?.id) {
+      await Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'User ID tidak ditemukan',
+      });
+      return;
+    }
+
+    try {
+      if (!formData.name || !formData.telephone_number || !formData.address) {
+        throw new Error('Semua field harus diisi');
+      }
+
+      const result = await dispatch(
+        updateUserProfile({
+          userId: user.id,
+          userData: formData,
+        })
+      ).unwrap();
+
+      if (result) {
         await Swal.fire({
           icon: 'success',
           title: 'Success!',
@@ -59,13 +72,15 @@ const ChangeProfile = () => {
           showConfirmButton: false,
           timer: 1500,
         });
-      } catch (error) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: error.message || 'Gagal memperbarui profil',
-        });
+
+        dispatch(fetchUserById(user.id));
       }
+    } catch (error) {
+      await Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: error || 'Gagal memperbarui profil',
+      });
     }
   };
 
@@ -103,7 +118,7 @@ const ChangeProfile = () => {
                 type="text"
                 id="name"
                 className="border text-sm rounded-md focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5"
-                placeholder="Wahyu Dan Ojan Selalu Bercama"
+                placeholder="Masukkan nama lengkap"
                 value={formData.name}
                 onChange={handleChange}
                 required
@@ -122,7 +137,7 @@ const ChangeProfile = () => {
                 type="text"
                 id="telephone_number"
                 className="border text-sm rounded-md focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5"
-                placeholder="089684981540"
+                placeholder="Masukkan nomor telepon"
                 value={formData.telephone_number}
                 onChange={handleChange}
                 required
@@ -141,7 +156,7 @@ const ChangeProfile = () => {
                 type="text"
                 id="address"
                 className="border text-sm rounded-md focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5"
-                placeholder="Jalan Jalan"
+                placeholder="Masukkan alamat"
                 value={formData.address}
                 onChange={handleChange}
                 required
@@ -172,6 +187,12 @@ const ChangeProfile = () => {
         {error && (
           <div className="mt-4 text-red-600 text-sm text-center">
             Error: {error}
+          </div>
+        )}
+
+        {updateError && (
+          <div className="mt-4 text-red-600 text-sm text-center">
+            Error: {updateError}
           </div>
         )}
       </div>

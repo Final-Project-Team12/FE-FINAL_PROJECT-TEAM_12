@@ -12,7 +12,10 @@ export const userService = {
       });
       return response.data;
     } catch (error) {
-      throw error.response?.data || { message: 'Failed to fetch user data' };
+      if (error.response?.data) {
+        throw error.response.data;
+      }
+      throw { status: false, message: 'Failed to fetch user data' };
     }
   },
 
@@ -22,11 +25,15 @@ export const userService = {
       const response = await axiosInstance.put(`/user/${userId}`, userData, {
         headers: {
           Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
       });
       return response.data;
     } catch (error) {
-      throw error.response?.data || { message: 'Failed to update user data' };
+      if (error.response?.data) {
+        throw error.response.data;
+      }
+      throw { status: false, message: 'Failed to update user data' };
     }
   },
 
@@ -40,9 +47,10 @@ export const userService = {
       });
       return response.data;
     } catch (error) {
-      throw (
-        error.response?.data || { message: 'Failed to delete user account' }
-      );
+      if (error.response?.data) {
+        throw error.response.data;
+      }
+      throw { status: false, message: 'Failed to delete user account' };
     }
   },
 };

@@ -135,6 +135,7 @@ export const store = configureStore({
           'user/deleteAccount/fulfilled',
           'user/deleteAccount/rejected',
           'user/resetUserData',
+          'user/clearUserErrors',
 
           'flightFilter/setSortCriteria',
           'flightFilter/setActiveFilters',
