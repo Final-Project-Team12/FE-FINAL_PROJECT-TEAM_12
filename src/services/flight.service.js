@@ -92,6 +92,7 @@ export const getFlights = async (page = 1, limit = 5) => {
 
     throw new Error(response.data.message || 'Failed to fetch flights');
   } catch (error) {
+    console.error('Error fetching flights:', error);
     return {
       isSuccess: false,
       message: error.response?.data?.message || 'Failed to fetch flights',

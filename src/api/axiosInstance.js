@@ -3,7 +3,7 @@ import Cookies from 'js-cookie';
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URI,
-  timeout: 10000,
+  timeout: 20000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -18,6 +18,7 @@ axiosInstance.interceptors.request.use({
     return config;
   },
   error(error) {
+    console.log(error);
     return Promise.reject(error);
   },
 });
