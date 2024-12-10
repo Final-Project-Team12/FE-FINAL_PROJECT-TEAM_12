@@ -5,14 +5,13 @@ import Homepage from './pages/Homepage';
 import FlightTicketPage from './pages/FligthTicketPage';
 import PaymentPage from './pages/PaymentPage';
 import PaymentLastPage from './pages/PaymentLastPage';
-import ExamplePages from './pages/ExamplePages';
 import RegisterPage from './pages/RegisterPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import OrderHistoryPage from './pages/OrderHistoryPage';
 import LoginPage from './pages/LoginPage';
 import AccountPage from './pages/AccountPage';
-import AccountSettings from './components/UI/AccountSettings';
 import OtpPage from './pages/OtpPage';
+import OtpPasswordPage from './pages/OtpPasswordPage';
 
 function App() {
   return (
@@ -40,6 +39,7 @@ function App() {
           />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/otp" element={<OtpPage />} />
+          <Route path="/otp-password" element={<OtpPasswordPage />} />
           <Route
             path="/orderhistory"
             element={

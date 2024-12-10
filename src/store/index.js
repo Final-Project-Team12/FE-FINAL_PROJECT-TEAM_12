@@ -8,6 +8,7 @@ import flightReducer from './slices/flightSlice';
 import flightSearchReducer from './slices/flightSearchSlice';
 import flightFilterReducer from './slices/flightFilterSlice';
 import registerReducer from './slices/registerSlice';
+import resetPasswordReducer from './slices/resetPasswordSlice';
 
 const authPersistConfig = {
   key: 'auth',
@@ -111,6 +112,7 @@ export const store = configureStore({
     flightSearch: persistedFlightSearchReducer,
     flightFilter: persistedFlightFilterReducer,
     register: registerReducer,
+    resetPassword: resetPasswordReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -160,6 +162,14 @@ export const store = configureStore({
           'register/otpSuccess',
           'register/otpFailure',
           'register/resetRegisterState',
+
+          'resetPassword/resetPasswordStart',
+          'resetPassword/resetPasswordSuccess',
+          'resetPassword/resetPasswordFailure',
+          'resetPassword/resetOtpStart',
+          'resetPassword/resetOtpSuccess',
+          'resetPassword/resetOtpFailure',
+          'resetPassword/resetState',
         ],
         ignoredActionPaths: [
           'payload.user',
@@ -190,6 +200,11 @@ export const store = configureStore({
           'meta.arg.registerData',
           'payload.otpCode',
           'meta.arg.otpCode',
+
+          'payload.resetPasswordData',
+          'meta.arg.resetPasswordData',
+          'payload.resetOtpCode',
+          'meta.arg.resetOtpCode',
         ],
         ignoredPaths: [
           'auth.user',
@@ -229,6 +244,12 @@ export const store = configureStore({
           'register.error',
           'register.isRegistered',
           'register.isOtpVerified',
+
+          'resetPassword.loading',
+          'resetPassword.error',
+          'resetPassword.isOtpSent',
+          'resetPassword.isOtpVerified',
+          'resetPassword.isPasswordReset',
         ],
       },
       serializeOptions: {

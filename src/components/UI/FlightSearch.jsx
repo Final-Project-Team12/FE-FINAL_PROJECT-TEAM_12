@@ -141,7 +141,7 @@ const FlightSearch = () => {
             <div className="p-3 sm:p-4 md:p-6">
               <h2 className="text-base sm:text-lg md:text-xl font-bold mb-3 sm:mb-4 md:mb-6">
                 Pilih Jadwal Penerbangan spesial di{' '}
-                <span className="text-[#7126B5]">Tiketku!</span>
+                <span className="text-[#7126B5]">QuickFly!</span>
               </h2>
 
               {/* Form content */}
