@@ -4,6 +4,7 @@ import useRegister from '../../hooks/useRegister';
 
 import InputField from '../Elements/InputField/InputField';
 import Button from '../Elements/Buttons/Button';
+import { useSelector } from 'react-redux';
 
 const RegisterForm = () => {
   const {
@@ -13,6 +14,7 @@ const RegisterForm = () => {
   } = useForm();
 
   const { handleRegister } = useRegister();
+  const loading = useSelector((state) => state.register.loading);
 
   const onSubmit = async (dataUser) => {
     const transformedData = {
@@ -123,7 +125,7 @@ const RegisterForm = () => {
                 required: 'Umur wajib diisi',
                 pattern: {
                   value: /^(1[7-9]|[2-9][0-9])$/,
-                  message: 'Umur harus lebih dari 17 tahun',
+                  message: 'Umur harus angka dan lebih dari 17 tahun',
                 },
               })}
             />
@@ -161,7 +163,11 @@ const RegisterForm = () => {
           </div>
 
           <div className="mt-6">
-            <Button type="submit" className="h-[48px]">
+            <Button
+              type="submit"
+              className={`h-[48px] ${loading ? 'bg-[#D0B7E6]' : 'bg-[#7126B5]'}`}
+              disabled={loading}
+            >
               Daftar
             </Button>
           </div>
