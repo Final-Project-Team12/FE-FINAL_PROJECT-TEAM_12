@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CalendarFilter from '../Elements/Filter/CalendarFilter';
+import SearchButton from '../Elements/Buttons/SearchButton';
 
 const HeaderHistory = ({ onDateRangeChange }) => {
   const navigate = useNavigate();
@@ -26,7 +27,9 @@ const HeaderHistory = ({ onDateRangeChange }) => {
           <div className="w-[110px] h-[50px]">
             <CalendarFilter onDateRangeChange={handleDateRangeChange} />
           </div>
-          <div className="w-[110px]">nanti dulu</div>
+          <div className="w-[110px]">
+            <SearchButton />
+          </div>
         </div>
       </div>
     </div>
