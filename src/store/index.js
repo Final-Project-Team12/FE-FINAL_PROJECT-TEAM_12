@@ -151,6 +151,14 @@ export const store = configureStore({
           'flightSearch/updateSelectedSeatClass',
           'flightSearch/setSearchResults',
           'flightSearch/clearSearchResults',
+
+          'register/registerStart',
+          'register/registerSuccess',
+          'register/registerFailure',
+          'register/otpStart',
+          'register/otpSuccess',
+          'register/otpFailure',
+          'register/resetRegisterState',
         ],
         ignoredActionPaths: [
           'payload.user',
@@ -176,6 +184,11 @@ export const store = configureStore({
           'payload.selectedFlight',
           'payload.fromCityDisplay',
           'payload.toCityDisplay',
+
+          'payload.registerData',
+          'meta.arg.registerData',
+          'payload.otpCode',
+          'meta.arg.otpCode',
         ],
         ignoredPaths: [
           'auth.user',
@@ -210,6 +223,11 @@ export const store = configureStore({
           'payment.paymentDetails',
           'flight.selectedFlight',
           'flight.searchResults',
+
+          'register.loading',
+          'register.error',
+          'register.isRegistered',
+          'register.isOtpVerified',
         ],
       },
       serializeOptions: {
@@ -229,6 +247,10 @@ export const purgeStore = async () => {
   await persistor.purge();
   await storage.removeItem('persist:auth');
   await storage.removeItem('persist:user');
+  await storage.removeItem('persist:payment');
+  await storage.removeItem('persist:flight');
+  await storage.removeItem('persist:flightSearch');
+  await storage.removeItem('persist:flightFilter');
 };
 
 export const serializeDate = (date) => {

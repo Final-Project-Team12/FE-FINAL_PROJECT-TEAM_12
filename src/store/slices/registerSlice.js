@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   loading: false,
-  isRegister: false,
+  isRegistered: false,
   isOtpVerified: false,
   error: null,
 };
@@ -14,30 +14,31 @@ const registerSlice = createSlice({
     registerStart: (state) => {
       state.loading = true;
       state.error = null;
-      state.isRegister = false;
     },
     registerSuccess: (state) => {
-      state.loading = true;
+      state.loading = false;
+      state.isRegistered = true;
       state.error = null;
-      state.isRegister = true;
     },
     registerFailure: (state, action) => {
       state.loading = false;
       state.error = action.payload;
     },
-
     otpStart: (state) => {
       state.loading = true;
       state.error = null;
     },
     otpSuccess: (state) => {
       state.loading = false;
-      state.error = null;
       state.isOtpVerified = true;
+      state.error = null;
     },
     otpFailure: (state, action) => {
       state.loading = false;
       state.error = action.payload;
+    },
+    resetRegisterState: (state) => {
+      return initialState;
     },
   },
 });
@@ -49,5 +50,7 @@ export const {
   otpStart,
   otpSuccess,
   otpFailure,
+  resetRegisterState,
 } = registerSlice.actions;
+
 export default registerSlice.reducer;
