@@ -34,12 +34,7 @@ const RegisterForm = () => {
     setSubmissionCount((prev) => prev + 1);
     const transformedData = {
       ...dataUser,
-      gender:
-        dataUser.gender.toLowerCase() === 'laki-laki'
-          ? 'male'
-          : dataUser.gender.toLowerCase() === 'perempuan'
-            ? 'female'
-            : dataUser.gender,
+      gender: dataUser.gender === 'laki-laki' ? 'male' : 'female',
     };
 
     try {
@@ -110,19 +105,48 @@ const RegisterForm = () => {
             })}
           />
 
-          <InputField
-            label="Jenis Kelamin"
-            type="text"
-            placeholder="laki-laki/perempuan"
-            error={errors.gender}
-            {...register('gender', {
-              required: 'Jenis kelamin wajib diisi',
-              pattern: {
-                value: /^(laki-laki|perempuan)$/i,
-                message: 'Pilih "laki-laki" atau "perempuan"',
-              },
-            })}
-          />
+          <div>
+            <label className="block text-sm font-normal text-gray-900 mb-2">
+              Jenis Kelamin
+            </label>
+            <div className="relative">
+              <select
+                className={`w-full px-4 py-2.5 rounded-lg border appearance-none bg-white
+                ${errors.gender ? 'border-red-500' : 'border-gray-300'}
+                focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors`}
+                {...register('gender', {
+                  required: 'Jenis kelamin wajib diisi',
+                })}
+                defaultValue=""
+              >
+                <option value="" disabled>
+                  Pilih jenis kelamin
+                </option>
+                <option value="laki-laki">Laki-laki</option>
+                <option value="perempuan">Perempuan</option>
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                <svg
+                  className="w-5 h-5 text-gray-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </div>
+            </div>
+            {errors.gender && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.gender.message}
+              </p>
+            )}
+          </div>
 
           <InputField
             label="Umur"
@@ -184,7 +208,6 @@ const RegisterForm = () => {
           </div>
         </form>
 
-        {/* Error Toast */}
         <div
           className={`
             fixed

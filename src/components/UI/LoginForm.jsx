@@ -2,17 +2,22 @@ import { useForm } from 'react-hook-form';
 import Button from '../Elements/Buttons/Button';
 import InputField from '../Elements/InputField/InputField';
 import { useAuth } from '../../hooks/useAuth';
+import useResetPassword from '../../hooks/useResetPassword';
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import Cookies from 'js-cookie';
 
 const LoginForm = () => {
   const { login, loading, error } = useAuth();
+  const { handleForgotPassword } = useResetPassword();
   const [showError, setShowError] = useState(false);
   const [submissionCount, setSubmissionCount] = useState(0);
+  const [localError, setLocalError] = useState('');
 
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -21,8 +26,10 @@ const LoginForm = () => {
     },
   });
 
+  const emailValue = watch('email');
+
   useEffect(() => {
-    if (error && submissionCount > 0) {
+    if ((error || localError) && submissionCount > 0) {
       setShowError(true);
       const timer = setTimeout(() => {
         setShowError(false);
@@ -30,11 +37,27 @@ const LoginForm = () => {
 
       return () => clearTimeout(timer);
     }
-  }, [error, submissionCount]);
+  }, [error, localError, submissionCount]);
 
   const onSubmit = async (data) => {
     setSubmissionCount((prev) => prev + 1);
     await login(data);
+  };
+
+  const handleForgotPasswordClick = async (e) => {
+    e.preventDefault();
+    if (!emailValue) {
+      setLocalError('Masukkan email Anda terlebih dahulu');
+      setSubmissionCount((prev) => prev + 1);
+      return;
+    }
+
+    try {
+      await handleForgotPassword(emailValue);
+    } catch (error) {
+      setLocalError(error.message || 'Gagal mengirim OTP');
+      setSubmissionCount((prev) => prev + 1);
+    }
   };
 
   return (
@@ -63,12 +86,13 @@ const LoginForm = () => {
               <label className="block text-sm font-normal text-gray-900">
                 Password
               </label>
-              <a
-                href="/reset-password"
+              <Link
+                to="#"
+                onClick={handleForgotPasswordClick}
                 className="text-[#7126B5] hover:underline text-sm"
               >
                 Lupa Kata Sandi
-              </a>
+              </Link>
             </div>
 
             <InputField
@@ -114,7 +138,7 @@ const LoginForm = () => {
           `}
         >
           <div className="p-3 text-sm text-white text-center bg-red-500 font-medium rounded-lg shadow-lg">
-            {error}
+            {error || localError}
           </div>
         </div>
       </div>

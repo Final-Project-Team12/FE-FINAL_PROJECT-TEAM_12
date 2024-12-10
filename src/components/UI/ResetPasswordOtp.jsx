@@ -4,61 +4,43 @@ import Button from '../Elements/Buttons/Button';
 import backIcon from '../../../public/icons/fi_arrow-left-black.svg';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import useRegister from '../../hooks/useRegister';
+import useResetPassword from '../../hooks/useResetPassword';
 import Cookies from 'js-cookie';
+import Swal from 'sweetalert2';
 
-const Otp = () => {
+const ResetPasswordOtp = () => {
   const [otp, setOtp] = useState(Array(6).fill(''));
   const [timeLeft, setTimeLeft] = useState(60);
   const [errorMessage, setErrorMessage] = useState('');
-  const [canResend, setCanResend] = useState(false);
 
   const navigate = useNavigate();
-  const { handleOtp, handleResendOtp } = useRegister();
-  const loading = useSelector((state) => state.register.loading);
-  const email = Cookies.get('email');
+  const { handleResetOtp, handleResendResetOtp } = useResetPassword();
+  const loading = useSelector((state) => state.resetPassword.loading);
+  const email = Cookies.get('resetEmail');
 
   useEffect(() => {
-    if (!email || !Cookies.get('tempPassword')) {
-      navigate('/register');
+    if (!email) {
+      navigate('/login');
       return;
     }
 
-    const currentTime = Date.now();
-    const initialExpiryTime = localStorage.getItem('otpExpiryTime');
-
-    if (initialExpiryTime) {
+    const expiryTime = localStorage.getItem('resetOtpExpiryTime');
+    if (expiryTime) {
       const remainingTime = Math.max(
         0,
-        Math.floor((parseInt(initialExpiryTime) - currentTime) / 1000)
+        Math.floor((expiryTime - Date.now()) / 1000)
       );
       setTimeLeft(remainingTime);
-      setCanResend(remainingTime <= 0);
-    } else {
-      const newExpiryTime = currentTime + 60000;
-      localStorage.setItem('otpExpiryTime', newExpiryTime.toString());
-      setTimeLeft(60);
-      setCanResend(false);
     }
   }, [email, navigate]);
 
   useEffect(() => {
-    let timer;
     if (timeLeft > 0) {
-      timer = setInterval(() => {
-        setTimeLeft((prevTime) => {
-          const newTime = prevTime - 1;
-          if (newTime <= 0) {
-            setCanResend(true);
-          }
-          return newTime;
-        });
+      const timer = setTimeout(() => {
+        setTimeLeft(timeLeft - 1);
       }, 1000);
+      return () => clearTimeout(timer);
     }
-
-    return () => {
-      if (timer) clearInterval(timer);
-    };
   }, [timeLeft]);
 
   const handleChange = (e, index) => {
@@ -69,7 +51,7 @@ const Otp = () => {
       setOtp(newOtp);
 
       if (value && index < 5) {
-        document.getElementById(`otp-input-${index + 1}`).focus();
+        document.getElementById(`reset-otp-input-${index + 1}`).focus();
       }
     }
   };
@@ -79,7 +61,7 @@ const Otp = () => {
       const newOtp = [...otp];
       newOtp[index - 1] = '';
       setOtp(newOtp);
-      document.getElementById(`otp-input-${index - 1}`).focus();
+      document.getElementById(`reset-otp-input-${index - 1}`).focus();
     }
   };
 
@@ -92,21 +74,18 @@ const Otp = () => {
 
     try {
       setErrorMessage('');
-      await handleOtp(otpString);
+      await handleResetOtp(otpString);
     } catch (error) {
       setErrorMessage(error.message || 'Kode OTP tidak valid');
     }
   };
 
   const handleResend = async () => {
-    if (!canResend) return;
-
     try {
-      await handleResendOtp();
+      await handleResendResetOtp();
       const newExpiryTime = Date.now() + 60000;
-      localStorage.setItem('otpExpiryTime', newExpiryTime.toString());
+      localStorage.setItem('resetOtpExpiryTime', newExpiryTime);
       setTimeLeft(60);
-      setCanResend(false);
       setErrorMessage('');
     } catch (error) {
       setErrorMessage('Gagal mengirim ulang OTP');
@@ -116,7 +95,7 @@ const Otp = () => {
   return (
     <div className="w-full h-screen flex items-center justify-center p-6">
       <div className="w-full max-w-md relative">
-        <Link to="/register">
+        <Link to="/login">
           <img src={backIcon} alt="Back" className="cursor-pointer mb-6" />
         </Link>
 
@@ -131,7 +110,7 @@ const Otp = () => {
           {otp.map((digit, index) => (
             <input
               key={index}
-              id={`otp-input-${index}`}
+              id={`reset-otp-input-${index}`}
               type="text"
               value={digit}
               maxLength="1"
@@ -152,10 +131,8 @@ const Otp = () => {
           ) : (
             <button
               onClick={handleResend}
-              className={`text-red-500 font-bold ${
-                canResend ? 'hover:underline' : 'opacity-50 cursor-not-allowed'
-              }`}
-              disabled={!canResend || loading}
+              className="text-red-500 font-bold hover:underline"
+              disabled={loading}
             >
               Kirim Ulang
             </button>
@@ -183,4 +160,4 @@ const Otp = () => {
   );
 };
 
-export default Otp;
+export default ResetPasswordOtp;
