@@ -9,6 +9,13 @@ import flightSearchReducer from './slices/flightSearchSlice';
 import flightFilterReducer from './slices/flightFilterSlice';
 import registerReducer from './slices/registerSlice';
 
+const authPersistConfig = {
+  key: 'auth',
+  storage,
+  whitelist: ['user'],
+  blacklist: ['loading', 'error'],
+};
+
 const userPersistConfig = {
   key: 'user',
   storage,
@@ -71,6 +78,7 @@ const flightPersistConfig = {
   blacklist: ['selectedFlight', 'searchResults', 'loading', 'error'],
 };
 
+const persistedAuthReducer = persistReducer(authPersistConfig, authReducer);
 const persistedUserReducer = persistReducer(userPersistConfig, userReducer);
 const persistedPaymentReducer = persistReducer(
   paymentPersistConfig,
@@ -96,7 +104,7 @@ const dateSerializer = {
 
 export const store = configureStore({
   reducer: {
-    auth: authReducer,
+    auth: persistedAuthReducer,
     user: persistedUserReducer,
     payment: persistedPaymentReducer,
     flight: persistedFlightReducer,
@@ -111,6 +119,11 @@ export const store = configureStore({
           'persist/PERSIST',
           'persist/REHYDRATE',
           'persist/REGISTER',
+          'persist/PURGE',
+
+          'auth/loginSuccess',
+          'auth/loginFailure',
+          'auth/logout',
 
           'user/fetchById/pending',
           'user/fetchById/fulfilled',
@@ -121,6 +134,7 @@ export const store = configureStore({
           'user/deleteAccount/pending',
           'user/deleteAccount/fulfilled',
           'user/deleteAccount/rejected',
+          'user/resetUserData',
 
           'flightFilter/setSortCriteria',
           'flightFilter/setActiveFilters',
@@ -139,6 +153,10 @@ export const store = configureStore({
           'flightSearch/clearSearchResults',
         ],
         ignoredActionPaths: [
+          'payload.user',
+          'payload.decodedToken',
+          'meta.arg.credentials',
+
           'payload.userData',
           'meta.arg.userData',
           'payload.password',
@@ -148,21 +166,22 @@ export const store = configureStore({
           'payload.returnDate',
           'meta.arg.departureDate',
           'meta.arg.returnDate',
-
           'payload.sortCriteria',
           'payload.searchParams',
           'meta.arg.filters',
           'meta.arg.searchParams',
           'payload.filters',
-
           'payload.data.outbound_flights',
           'payload.data.return_flights',
           'payload.selectedFlight',
-
           'payload.fromCityDisplay',
           'payload.toCityDisplay',
         ],
         ignoredPaths: [
+          'auth.user',
+          'auth.loading',
+          'auth.error',
+
           'user.userData',
           'user.loading',
           'user.error',
@@ -206,8 +225,10 @@ export const store = configureStore({
 
 export const persistor = persistStore(store);
 
-export const purgeStore = () => {
-  persistor.purge();
+export const purgeStore = async () => {
+  await persistor.purge();
+  await storage.removeItem('persist:auth');
+  await storage.removeItem('persist:user');
 };
 
 export const serializeDate = (date) => {

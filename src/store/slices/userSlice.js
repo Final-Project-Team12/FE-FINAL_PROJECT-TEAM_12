@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { userService } from '../../services/user.service';
 import { logout } from './authSlice';
+import { authService } from '../../services/auth.service';
 
 export const fetchUserById = createAsyncThunk(
   'user/fetchById',
@@ -34,6 +35,7 @@ export const deleteUserAccount = createAsyncThunk(
   async (userId, { dispatch, rejectWithValue }) => {
     try {
       await userService.deleteUser(userId);
+      authService.clearAuth();
       dispatch(logout());
       return null;
     } catch (error) {
@@ -59,6 +61,15 @@ const userSlice = createSlice({
     clearUserErrors: (state) => {
       state.error = null;
       state.updateError = null;
+      state.deleteError = null;
+    },
+    resetUserData: (state) => {
+      state.userData = null;
+      state.loading = false;
+      state.error = null;
+      state.updateLoading = false;
+      state.updateError = null;
+      state.deleteLoading = false;
       state.deleteError = null;
     },
   },
@@ -103,5 +114,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { clearUserErrors } = userSlice.actions;
+export const { clearUserErrors, resetUserData } = userSlice.actions;
 export default userSlice.reducer;
