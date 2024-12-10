@@ -40,7 +40,14 @@ function App() {
           />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/otp" element={<OtpPage />} />
-          <Route path="/orderhistory" element={<OrderHistoryPage />} />
+          <Route
+            path="/orderhistory"
+            element={
+              <ProtectedRoute>
+                <OrderHistoryPage />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route
             path="/account/:id"
