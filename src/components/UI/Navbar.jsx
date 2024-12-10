@@ -18,6 +18,22 @@ const Navbar = () => {
     navigate('/login');
   };
 
+  const handleNotificationClick = () => {
+    navigate('/notification');
+  };
+
+  const handleProfileClick = () => {
+    if (user?.id) {
+      navigate(`/account/${user.id}`);
+    } else {
+      navigate('/account');
+    }
+  };
+
+  const handleOrderHistoryClick = () => {
+    navigate('/orderhistory');
+  };
+
   return (
     <nav className="sticky top-0 left-0 right-0 bg-white shadow-[0px_2px_10px_rgba(0,0,0,0.1)] z-30 overflow-x-hidden">
       <div className="container mx-auto px-4 lg:px-6">
@@ -50,17 +66,23 @@ const Navbar = () => {
           <div className="pr-2 sm:pr-4 md:pr-8 flex items-center space-x-4">
             {isAuthenticated ? (
               <>
+                <IoMenuOutline
+                  className="text-gray-600 cursor-pointer hover:text-[#7126B5] transition-colors"
+                  size={28}
+                  onClick={handleOrderHistoryClick}
+                  title="Order History"
+                />
                 <Bell
-                  className="text-gray-600 cursor-pointer hover:text-[#7126B5]"
+                  className="text-gray-600 cursor-pointer hover:text-[#7126B5] transition-colors"
                   size={24}
+                  onClick={handleNotificationClick}
+                  title="Notifications"
                 />
                 <CgProfile
-                  className="text-gray-600 cursor-pointer hover:text-[#7126B5]"
+                  className="text-gray-600 cursor-pointer hover:text-[#7126B5] transition-colors"
                   size={24}
-                />
-                <IoMenuOutline
-                  className="text-gray-600 cursor-pointer hover:text-[#7126B5]"
-                  size={28}
+                  onClick={handleProfileClick}
+                  title="Profile"
                 />
               </>
             ) : (

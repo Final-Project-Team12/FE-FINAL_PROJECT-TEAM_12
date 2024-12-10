@@ -66,7 +66,10 @@ const PaymentLastPage = () => {
             />
             <h2 className="text-2xl font-bold">Selamat!</h2>
             <p className="text-lg">Transaksi Pembayaran Tiket sukses!</p>
-            <button className="mt-4 bg-purple-600 text-white py-3 px-6 rounded-lg w-full max-w-xs">
+            <button
+              className="mt-4 bg-purple-600 text-white py-3 px-6 rounded-lg w-full max-w-xs"
+              onClick={() => navigate('/orderhistory')}
+            >
               Terbitkan Tiket
             </button>
             <button

@@ -17,10 +17,19 @@ const SeatClassModal = ({
   if (!isOpen) return null;
 
   const getPrice = (className) => {
-    if (selectedFlight) {
-      const priceKey = className;
-      return seatPrices[priceKey] || 0;
+    if (seatPrices && Object.keys(seatPrices).length > 0) {
+      return seatPrices[className] || 0;
     }
+
+    if (selectedFlight?.seats_detail) {
+      const seatDetail = selectedFlight.seats_detail.find(
+        (seat) =>
+          seat.class ===
+          (className === 'Premium Economy' ? 'Economy Premium' : className)
+      );
+      return seatDetail?.price || 0;
+    }
+
     return 0;
   };
 
@@ -38,49 +47,52 @@ const SeatClassModal = ({
         </div>
 
         <div className="px-4">
-          {SEAT_CLASSES.map((seatClass) => (
-            <div
-              key={seatClass}
-              onClick={() => onSelect(seatClass)}
-              className="cursor-pointer relative border-b border-gray-200"
-            >
+          {SEAT_CLASSES.map((seatClass) => {
+            const price = getPrice(seatClass);
+            return (
               <div
-                className={`py-3 transition-colors ${
-                  selectedClass === seatClass
-                    ? 'bg-[#4B1979] -mx-4 px-4'
-                    : 'hover:bg-purple-50'
-                }`}
+                key={seatClass}
+                onClick={() => onSelect(seatClass)}
+                className="cursor-pointer relative border-b border-gray-200"
               >
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h3
-                      className={`text-base font-semibold ${
-                        selectedClass === seatClass
-                          ? 'text-white'
-                          : 'text-black'
-                      }`}
-                    >
-                      {seatClass}
-                    </h3>
-                    <p
-                      className={`text-base ${
-                        selectedClass === seatClass
-                          ? 'text-white'
-                          : 'text-[#4B1979]'
-                      }`}
-                    >
-                      IDR {getPrice(seatClass).toLocaleString('id-ID')}
-                    </p>
-                  </div>
-                  {selectedClass === seatClass && (
-                    <div className="bg-green-400 rounded-full p-1">
-                      <Check size={16} className="text-white" />
+                <div
+                  className={`py-3 transition-colors ${
+                    selectedClass === seatClass
+                      ? 'bg-[#4B1979] -mx-4 px-4'
+                      : 'hover:bg-purple-50'
+                  }`}
+                >
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h3
+                        className={`text-base font-semibold ${
+                          selectedClass === seatClass
+                            ? 'text-white'
+                            : 'text-black'
+                        }`}
+                      >
+                        {seatClass}
+                      </h3>
+                      <p
+                        className={`text-base ${
+                          selectedClass === seatClass
+                            ? 'text-white'
+                            : 'text-[#4B1979]'
+                        }`}
+                      >
+                        IDR {price.toLocaleString('id-ID')}
+                      </p>
                     </div>
-                  )}
+                    {selectedClass === seatClass && (
+                      <div className="bg-green-400 rounded-full p-1">
+                        <Check size={16} className="text-white" />
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="p-4 flex justify-end border-t border-gray-200">

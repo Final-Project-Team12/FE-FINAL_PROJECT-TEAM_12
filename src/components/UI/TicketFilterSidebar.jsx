@@ -4,11 +4,21 @@ import { Box, Heart, DollarSign } from 'lucide-react';
 import {
   setActiveFilters,
   clearAllFilters,
+  fetchFilteredFlights,
 } from '../../store/slices/flightFilterSlice';
 
 const TicketFilterSidebar = () => {
   const dispatch = useDispatch();
   const { activeFilters } = useSelector((state) => state.flightFilter);
+  const {
+    fromCity,
+    toCity,
+    departureDate,
+    returnDate,
+    selectedSeatClass,
+    passengerCounts,
+    isRoundTrip,
+  } = useSelector((state) => state.flightSearch);
 
   const [filters, setFilters] = useState({
     fasilitas: false,
@@ -20,7 +30,6 @@ const TicketFilterSidebar = () => {
   const [selectedFacilities, setSelectedFacilities] = useState({
     wifi: false,
     meals: false,
-    entertainment: false,
     power: false,
   });
 
@@ -46,8 +55,70 @@ const TicketFilterSidebar = () => {
     }
   }, [activeFilters]);
 
-  const toggleFilter = (key) => {
-    setFilters((prev) => ({ ...prev, [key]: !prev[key] }));
+  const getUTCDate = (date) => {
+    if (!date) return '';
+    try {
+      const dateObj = new Date(date);
+      if (isNaN(dateObj.getTime())) return '';
+
+      return new Date(
+        Date.UTC(
+          dateObj.getUTCFullYear(),
+          dateObj.getUTCMonth(),
+          dateObj.getUTCDate()
+        )
+      )
+        .toISOString()
+        .split('T')[0];
+    } catch (error) {
+      console.error('Error getting UTC date:', error);
+      return '';
+    }
+  };
+
+  const applyFilters = (newFilters) => {
+    dispatch(setActiveFilters(newFilters));
+
+    const searchPayload = {
+      from: fromCity,
+      to: toCity,
+      departureDate: getUTCDate(departureDate),
+      seatClass: selectedSeatClass,
+      passengerAdult: passengerCounts.adult || 0,
+      passengerChild: passengerCounts.child || 0,
+      passengerInfant: passengerCounts.infant || 0,
+      ...(isRoundTrip &&
+        returnDate && {
+          returnDate: getUTCDate(returnDate),
+        }),
+    };
+
+    dispatch(
+      fetchFilteredFlights({
+        page: 1,
+        filters: newFilters,
+        searchParams: searchPayload,
+      })
+    );
+  };
+
+  const handleFacilityChange = (facility) => {
+    const newFacilities = {
+      ...selectedFacilities,
+      [facility]: !selectedFacilities[facility],
+    };
+    setSelectedFacilities(newFacilities);
+
+    const selectedFacilitiesArray = Object.entries(newFacilities)
+      .filter(([_, isSelected]) => isSelected)
+      .map(([key]) => key);
+
+    const newFilters = {
+      ...activeFilters,
+      facilities: selectedFacilitiesArray,
+    };
+
+    applyFilters(newFilters);
   };
 
   const handlePriceChange = (e) => {
@@ -61,32 +132,16 @@ const TicketFilterSidebar = () => {
       priceRange.max &&
       Number(priceRange.min) <= Number(priceRange.max)
     ) {
-      dispatch(
-        setActiveFilters({
-          minPrice: Number(priceRange.min),
-          maxPrice: Number(priceRange.max),
-        })
-      );
+      const newFilters = {
+        ...activeFilters,
+        minPrice: Number(priceRange.min),
+        maxPrice: Number(priceRange.max),
+      };
+      applyFilters(newFilters);
       setModalOpen(false);
     } else {
       alert('Masukkan rentang harga yang valid!');
     }
-  };
-
-  const handleFacilityChange = (facility) => {
-    const newFacilities = {
-      ...selectedFacilities,
-      [facility]: !selectedFacilities[facility],
-    };
-    setSelectedFacilities(newFacilities);
-
-    // Create array of selected facilities
-    const selectedFacilitiesArray = Object.entries(newFacilities)
-      .filter(([_, isSelected]) => isSelected)
-      .map(([key]) => key);
-
-    // Update filters in Redux
-    dispatch(setActiveFilters({ facilities: selectedFacilitiesArray }));
   };
 
   const handleResetFilters = () => {
@@ -94,15 +149,45 @@ const TicketFilterSidebar = () => {
     setSelectedFacilities({
       wifi: false,
       meals: false,
-      entertainment: false,
       power: false,
     });
     setPriceRange({ min: '', max: '' });
+
+    const searchPayload = {
+      from: fromCity,
+      to: toCity,
+      departureDate: getUTCDate(departureDate),
+      seatClass: selectedSeatClass,
+      passengerAdult: passengerCounts.adult || 0,
+      passengerChild: passengerCounts.child || 0,
+      passengerInfant: passengerCounts.infant || 0,
+      ...(isRoundTrip &&
+        returnDate && {
+          returnDate: getUTCDate(returnDate),
+        }),
+    };
+
+    dispatch(
+      fetchFilteredFlights({
+        page: 1,
+        filters: {},
+        searchParams: searchPayload,
+      })
+    );
   };
 
   const handlePriceReset = () => {
     setPriceRange({ min: '', max: '' });
-    dispatch(setActiveFilters({ minPrice: '', maxPrice: '' }));
+    const newFilters = {
+      ...activeFilters,
+      minPrice: '',
+      maxPrice: '',
+    };
+    applyFilters(newFilters);
+  };
+
+  const toggleFilter = (key) => {
+    setFilters((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
   const ChevronIcon = ({ isOpen }) => (
@@ -138,7 +223,6 @@ const TicketFilterSidebar = () => {
             </button>
           </div>
 
-          {/* Fasilitas */}
           <div>
             <div
               className="flex items-center justify-between cursor-pointer"
@@ -179,21 +263,6 @@ const TicketFilterSidebar = () => {
                     Makanan
                   </label>
                 </li>
-                <li className="flex items-center mb-2">
-                  <input
-                    type="checkbox"
-                    id="entertainment"
-                    checked={selectedFacilities.entertainment}
-                    onChange={() => handleFacilityChange('entertainment')}
-                    className="rounded text-purple-600"
-                  />
-                  <label
-                    htmlFor="entertainment"
-                    className="ml-2 cursor-pointer"
-                  >
-                    Hiburan
-                  </label>
-                </li>
                 <li className="flex items-center">
                   <input
                     type="checkbox"
@@ -211,7 +280,6 @@ const TicketFilterSidebar = () => {
           </div>
           <hr className="my-4 bg-slate-400" />
 
-          {/* Harga */}
           <div>
             <div
               className="flex items-center justify-between cursor-pointer"
@@ -244,7 +312,6 @@ const TicketFilterSidebar = () => {
         </div>
       </div>
 
-      {/* Modal Harga */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white w-[400px] rounded-lg shadow-lg p-6 relative">

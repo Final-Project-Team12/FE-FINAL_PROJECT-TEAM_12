@@ -11,6 +11,8 @@ import ResetPasswordPage from './pages/ResetPasswordPage';
 import OrderHistoryPage from './pages/OrderHistoryPage';
 import LoginPage from './pages/LoginPage';
 import AccountPage from './pages/AccountPage';
+import AccountSettings from './components/UI/AccountSettings';
+import OtpPage from './pages/OtpPage';
 
 function App() {
   return (
@@ -21,7 +23,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/flight-ticket" element={<FlightTicketPage />} />
           <Route
-            path="/checkout"
+            path="/checkout/:id"
             element={
               <ProtectedRoute>
                 <PaymentPage />
@@ -29,18 +31,32 @@ function App() {
             }
           />
           <Route
-            path="/payment"
+            path="/payment/:id"
             element={
               <ProtectedRoute>
                 <PaymentLastPage />
               </ProtectedRoute>
             }
           />
-          <Route path="/animation" element={<ExamplePages />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/orderhistory" element={<OrderHistoryPage />} />
+          <Route path="/otp" element={<OtpPage />} />
+          <Route
+            path="/orderhistory"
+            element={
+              <ProtectedRoute>
+                <OrderHistoryPage />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
-          <Route path="/account" element={<AccountPage />} />
+          <Route
+            path="/account/:id"
+            element={
+              <ProtectedRoute>
+                <AccountPage />
+              </ProtectedRoute>
+            }
+          />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </BrowserRouter>

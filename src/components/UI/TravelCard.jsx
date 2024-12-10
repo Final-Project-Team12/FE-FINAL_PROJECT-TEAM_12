@@ -11,8 +11,9 @@ const TravelCard = ({ travel }) => {
   const dispatch = useDispatch();
 
   const formatDisplayDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('id-ID', {
+    const dateOnly = dateString.split('T')[0];
+    const localDateObj = new Date(`${dateOnly}T00:00:00Z`);
+    return localDateObj.toLocaleDateString('id-ID', {
       day: 'numeric',
       month: 'long',
       year: 'numeric',
@@ -21,19 +22,20 @@ const TravelCard = ({ travel }) => {
 
   const getApiDate = (dateString) => {
     const date = new Date(dateString);
-    return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;
+
+    const utcDate = new Date(
+      Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
+    );
+    return utcDate;
   };
 
   const getFlightPrices = (seatsDetail) => {
-    const priceMap = {};
-    seatsDetail.forEach((seat) => {
-      if (seat.class === 'Economy Premium') {
-        priceMap['Premium Economy'] = seat.price;
-      } else {
-        priceMap[seat.class] = seat.price;
-      }
-    });
-    return priceMap;
+    return seatsDetail.reduce((priceMap, seat) => {
+      const className =
+        seat.class === 'Economy Premium' ? 'Premium Economy' : seat.class;
+      priceMap[className] = seat.price;
+      return priceMap;
+    }, {});
   };
 
   const getEconomyClass = (seatsDetail) => {
@@ -46,14 +48,15 @@ const TravelCard = ({ travel }) => {
 
     if (!economyClass) return;
 
-    const apiDate = getApiDate(travel.departure_time);
+    const departureDate = getApiDate(travel.departure_time);
 
     dispatch(setSeatPrices(seatPrices));
+
     dispatch(
       updateFlightSearch({
         fromCity: travel.origin_airport.airport_code,
         toCity: travel.destination_airport.airport_code,
-        departureDate: apiDate,
+        departureDate: departureDate,
         departureDateDisplay: formatDisplayDate(travel.departure_time),
         selectedSeatClass: 'Economy',
         isRoundTrip: false,
@@ -94,9 +97,11 @@ const TravelCard = ({ travel }) => {
 
       <div className="mt-2 sm:mt-3 flex flex-col justify-between flex-1">
         <div className="flex items-center gap-1 sm:gap-1.5 text-sm sm:text-base font-semibold mb-1 sm:mb-1.5">
-          <span>{travel.origin_airport.name}</span>
+          <span className="text-sm truncate">{travel.origin_airport.name}</span>
           <FaArrowRightLong className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-          <span>{travel.destination_airport.name}</span>
+          <span className="text-sm truncate">
+            {travel.destination_airport.name}
+          </span>
         </div>
 
         <div className="flex items-center gap-1.5 text-[#7126B5] font-medium text-xs sm:text-sm mb-1 sm:mb-1.5">
@@ -113,7 +118,7 @@ const TravelCard = ({ travel }) => {
           <span>{formatDisplayDate(travel.departure_time)}</span>
         </div>
 
-        <div className="text-sm sm:text-sm">
+        <div className="text-sm sm:text-xs">
           Mulai dari{' '}
           <span className="text-red-500 font-bold">
             IDR {economyClass?.price.toLocaleString('id-ID')}

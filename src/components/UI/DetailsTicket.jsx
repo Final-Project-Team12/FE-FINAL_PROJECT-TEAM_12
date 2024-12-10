@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useRef, useState } from 'react';
+import { useEffect, useCallback, useRef, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
@@ -6,12 +6,14 @@ import {
   fetchFilteredFlights,
   goToNextPage,
 } from '../../store/slices/flightFilterSlice';
+import { updateFlightSearch } from '../../store/slices/flightSearchSlice';
 import LoadingTicket from './LoadingTicket';
 import SearchResultEmpty from './SearchResultEmpety';
 
 const DetailsTicket = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   const {
     filteredFlights,
     isLoading,
@@ -21,15 +23,118 @@ const DetailsTicket = () => {
     activeFilters,
   } = useSelector((state) => state.flightFilter);
 
+  const {
+    fromCity,
+    toCity,
+    fromCityDisplay,
+    toCityDisplay,
+    departureDate,
+    returnDate,
+    selectedSeatClass,
+    passengerCounts,
+    isRoundTrip,
+    selectedDepartureFlight,
+  } = useSelector((state) => state.flightSearch);
+
   const [openId, setOpenId] = useState(null);
   const isRequestInProgress = useRef(false);
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return '';
+
+      const day = date.getDate();
+      const months = [
+        'Januari',
+        'Februari',
+        'Maret',
+        'April',
+        'Mei',
+        'Juni',
+        'Juli',
+        'Agustus',
+        'September',
+        'Oktober',
+        'November',
+        'Desember',
+      ];
+      const month = months[date.getMonth()];
+      const year = date.getFullYear();
+      return `${day} ${month} ${year}`;
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return '';
+    }
+  };
+
+  const formatTime = (dateString) => {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return '';
+
+      return date.toLocaleTimeString('id-ID', {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch (error) {
+      console.error('Error formatting time:', error);
+      return '';
+    }
+  };
+
+  const getUTCDate = (date) => {
+    if (!date) return '';
+    try {
+      const localDate = new Date(date);
+      const utcDate = new Date(
+        Date.UTC(
+          localDate.getFullYear(),
+          localDate.getMonth(),
+          localDate.getDate(),
+          21,
+          1,
+          40,
+          471
+        )
+      );
+
+      const year = utcDate.getUTCFullYear();
+      const month = String(utcDate.getUTCMonth() + 1).padStart(2, '0');
+      const day = String(utcDate.getUTCDate()).padStart(2, '0');
+      const hours = String(utcDate.getUTCHours()).padStart(2, '0');
+      const minutes = String(utcDate.getUTCMinutes()).padStart(2, '0');
+      const seconds = String(utcDate.getUTCSeconds()).padStart(2, '0');
+      const milliseconds = String(utcDate.getUTCMilliseconds()).padStart(
+        3,
+        '0'
+      );
+
+      return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}Z`;
+    } catch (error) {
+      console.error('Error getting UTC date:', error);
+      return '';
+    }
+  };
 
   const toggleAccordion = (id) => {
     setOpenId(openId === id ? null : id);
   };
 
-  const handleToCheckOut = (flightId) => {
-    navigate(`/checkout/${flightId}`);
+  const handleSelectFlight = (flight) => {
+    if (!selectedDepartureFlight) {
+      if (isRoundTrip) {
+        dispatch(updateFlightSearch({ selectedDepartureFlight: flight }));
+      } else {
+        navigate(`/checkout/${flight.plane_id}`);
+      }
+    } else {
+      navigate(
+        `/checkout/${selectedDepartureFlight.plane_id}/${flight.plane_id}`
+      );
+    }
   };
 
   const observer = useRef();
@@ -51,36 +156,67 @@ const DetailsTicket = () => {
             dispatch(goToNextPage());
           }
         },
-        {
-          root: null,
-          rootMargin: '20px',
-          threshold: 0.1,
-        }
+        { root: null, rootMargin: '20px', threshold: 0.1 }
       );
 
-      if (node) {
-        observer.current.observe(node);
-      }
+      if (node) observer.current.observe(node);
     },
     [isLoading, hasMoreFlights, dispatch]
   );
+
+  const currentFlights = useMemo(() => {
+    return selectedDepartureFlight
+      ? filteredFlights.return
+      : filteredFlights.outbound;
+  }, [selectedDepartureFlight, filteredFlights]);
 
   useEffect(() => {
     if (isRequestInProgress.current) return;
 
     const fetchData = async () => {
       isRequestInProgress.current = true;
-      await dispatch(
-        fetchFilteredFlights({
-          page: currentPageNumber,
-          filters: activeFilters,
-        })
-      );
-      isRequestInProgress.current = false;
+      try {
+        const searchPayload = {
+          from: fromCity,
+          to: toCity,
+          departureDate: getUTCDate(departureDate),
+          seatClass: selectedSeatClass,
+          passengerAdult: passengerCounts.adult || 0,
+          passengerChild: passengerCounts.child || 0,
+          passengerInfant: passengerCounts.infant || 0,
+          ...(selectedDepartureFlight &&
+            returnDate && {
+              returnDate: getUTCDate(returnDate),
+            }),
+        };
+
+        await dispatch(
+          fetchFilteredFlights({
+            page: currentPageNumber,
+            filters: activeFilters,
+            searchParams: searchPayload,
+          })
+        );
+      } catch (error) {
+        console.error('Error fetching flights:', error);
+      } finally {
+        isRequestInProgress.current = false;
+      }
     };
 
     fetchData();
-  }, [dispatch, currentPageNumber, activeFilters]);
+  }, [
+    dispatch,
+    currentPageNumber,
+    activeFilters,
+    fromCity,
+    toCity,
+    departureDate,
+    returnDate,
+    selectedSeatClass,
+    passengerCounts,
+    selectedDepartureFlight,
+  ]);
 
   if (error) {
     return (
@@ -90,12 +226,15 @@ const DetailsTicket = () => {
 
   return (
     <div className="w-full px-4 pb-4 space-y-4">
-      {!isLoading && filteredFlights.length === 0 && <SearchResultEmpty />}
-      {filteredFlights.map((flight, index) => (
+      {!isLoading && (!currentFlights || currentFlights.length === 0) && (
+        <SearchResultEmpty />
+      )}
+
+      {currentFlights?.map((flight, index) => (
         <div
           key={flight.plane_id}
           ref={
-            index === filteredFlights.length - 1 ? lastFlightElementRef : null
+            index === currentFlights.length - 1 ? lastFlightElementRef : null
           }
           className={`border-2 rounded-lg overflow-hidden bg-white shadow-sm transition-all duration-200 ${
             openId === flight.plane_id
@@ -103,7 +242,6 @@ const DetailsTicket = () => {
               : 'border-gray-200 hover:border-gray-300'
           }`}
         >
-          {/* Header section */}
           <div className="p-4 hover:bg-gray-50">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
@@ -115,7 +253,11 @@ const DetailsTicket = () => {
                   />
                 </div>
                 <span className="text-[12px] font-medium">
-                  {`${flight.airline.airline_name} - ${flight.seats_detail[0].class}`}
+                  {`${flight.airline.airline_name} - ${
+                    flight.seats_detail.find(
+                      (seat) => seat.class === selectedSeatClass
+                    )?.class || flight.seats_detail[0].class
+                  }`}
                 </span>
               </div>
               <button
@@ -135,13 +277,7 @@ const DetailsTicket = () => {
               <div className="flex items-center space-x-4">
                 <div className="text-left">
                   <div className="text-[14px] font-bold">
-                    {new Date(flight.departure_time).toLocaleTimeString(
-                      'id-ID',
-                      {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      }
-                    )}
+                    {formatTime(flight.departure_time)}
                   </div>
                   <div className="text-[12px]">
                     {flight.origin_airport.airport_code}
@@ -150,20 +286,15 @@ const DetailsTicket = () => {
 
                 <div className="flex flex-col items-center">
                   <div className="text-[12px] text-[#8A8A8A]">
-                    {`${Math.floor(flight.duration / 60)}h ${
-                      flight.duration % 60
-                    }m`}
+                    {`${Math.floor(flight.duration / 60)}h ${flight.duration % 60}m`}
                   </div>
-                  <img src="../../public/icons/Arrow.svg" alt="" />
+                  <img src="/icons/Arrow.svg" alt="" />
                   <div className="text-[12px] text-[#8A8A8A]">Direct</div>
                 </div>
 
                 <div className="text-left">
                   <div className="text-[14px] font-bold">
-                    {new Date(flight.arrival_time).toLocaleTimeString('id-ID', {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
+                    {formatTime(flight.arrival_time)}
                   </div>
                   <div className="text-[12px]">
                     {flight.destination_airport.airport_code}
@@ -177,14 +308,24 @@ const DetailsTicket = () => {
                     style: 'currency',
                     currency: 'IDR',
                     minimumFractionDigits: 0,
-                  }).format(flight.seats_detail[0].price)}
+                  }).format(
+                    flight.seats_detail.find(
+                      (seat) => seat.class === selectedSeatClass
+                    )?.price || flight.seats_detail[0].price
+                  )}
                 </div>
                 <button
-                  className="mt-1 px-6 py-1 bg-purple-600 text-white rounded-md text-sm hover:bg-purple-700 transition-colors duration-200"
-                  onClick={() => handleToCheckOut(flight.plane_id)}
-                  disabled={flight.seats_detail[0].available_seats === 0}
+                  className="mt-1 px-6 py-1 bg-purple-600 text-white rounded-md text-sm hover:bg-purple-700 transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  onClick={() => handleSelectFlight(flight)}
+                  disabled={
+                    flight.seats_detail.find(
+                      (seat) => seat.class === selectedSeatClass
+                    )?.available_seats === 0
+                  }
                 >
-                  {flight.seats_detail[0].available_seats > 0
+                  {flight.seats_detail.find(
+                    (seat) => seat.class === selectedSeatClass
+                  )?.available_seats > 0
                     ? 'Pilih'
                     : 'Sold Out'}
                 </button>
@@ -192,39 +333,26 @@ const DetailsTicket = () => {
             </div>
           </div>
 
-          {/* Expanded content */}
           {openId === flight.plane_id && (
-            <div className="p-4 bg-white">
+            <div className="p-4 bg-white border-t">
               <div className="space-y-4">
                 <div>
                   <hr className="mb-[22px] border-[#8A8A8A]" />
-
                   <h3 className="text-[14px] font-bold text-[#4B1979] mb-2">
                     Detail Penerbangan
                   </h3>
-
                   <div className="space-y-3">
                     <div>
                       <div className="flex justify-between">
                         <div className="text-[16px] font-bold">
-                          {new Date(flight.departure_time).toLocaleTimeString(
-                            'id-ID',
-                            { hour: '2-digit', minute: '2-digit' }
-                          )}
+                          {formatTime(flight.departure_time)}
                         </div>
                         <p className="text-[12px] font-bold text-[#A06ECE]">
                           Keberangkatan
                         </p>
                       </div>
                       <div className="text-[14px]">
-                        {new Date(flight.departure_time).toLocaleDateString(
-                          'id-ID',
-                          {
-                            day: 'numeric',
-                            month: 'long',
-                            year: 'numeric',
-                          }
-                        )}
+                        {formatDate(flight.departure_time)}
                       </div>
                       <div className="text-[14px] font-medium">
                         {`${flight.origin_airport.name} - ${flight.departure_terminal}`}
@@ -286,24 +414,14 @@ const DetailsTicket = () => {
                     <div>
                       <div className="flex justify-between">
                         <div className="text-[14px] font-bold">
-                          {new Date(flight.arrival_time).toLocaleTimeString(
-                            'id-ID',
-                            { hour: '2-digit', minute: '2-digit' }
-                          )}
+                          {formatTime(flight.arrival_time)}
                         </div>
                         <p className="text-[12px] font-bold text-[#A06ECE]">
                           Kedatangan
                         </p>
                       </div>
                       <div className="text-[14px]">
-                        {new Date(flight.arrival_time).toLocaleDateString(
-                          'id-ID',
-                          {
-                            day: 'numeric',
-                            month: 'long',
-                            year: 'numeric',
-                          }
-                        )}
+                        {formatDate(flight.arrival_time)}
                       </div>
                       <div className="text-[14px] font-medium">
                         {flight.destination_airport.name}
