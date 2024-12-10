@@ -12,6 +12,7 @@ import {
 import {
   register as registerService,
   verifyOtp,
+  resendOtp,
 } from '../services/register.service';
 
 const useRegister = () => {
@@ -85,12 +86,7 @@ const useRegister = () => {
 
   const handleResendOtp = async () => {
     try {
-      const email = Cookies.get('email');
-      if (!email) {
-        throw new Error('Email tidak ditemukan');
-      }
-
-      await axiosInstance.post('/user/resend', { email });
+      const response = await resendOtp();
 
       await Swal.fire({
         icon: 'success',
@@ -103,11 +99,13 @@ const useRegister = () => {
           popup: 'rounded-lg shadow-lg',
         },
       });
+
+      return response;
     } catch (error) {
       await Swal.fire({
         icon: 'error',
         title: 'Gagal Mengirim OTP',
-        text: error.message || 'Gagal mengirim ulang kode OTP',
+        text: error?.response?.data?.message || 'Gagal mengirim ulang kode OTP',
         confirmButtonColor: '#7126B5',
       });
       throw error;

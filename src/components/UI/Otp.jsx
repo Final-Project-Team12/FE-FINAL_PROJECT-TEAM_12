@@ -19,7 +19,7 @@ const Otp = () => {
   const email = Cookies.get('email');
 
   useEffect(() => {
-    if (!email) {
+    if (!email || !Cookies.get('tempPassword')) {
       navigate('/register');
       return;
     }
@@ -93,70 +93,68 @@ const Otp = () => {
   };
 
   return (
-    <div className="flex flex-col items-center h-screen bg-white">
-      <div className="p-6 rounded-lg w-1/2">
+    <div className="w-full h-screen flex items-center justify-center p-6">
+      <div className="w-full max-w-md relative">
         <Link to="/register">
-          <img src={backIcon} alt="Back" className="cursor-pointer" />
+          <img src={backIcon} alt="Back" className="cursor-pointer mb-6" />
         </Link>
 
-        <div className="mx-[10%] mt-[24px]">
-          <h2 className="text-[24px] font-bold mb-[40px]">Masukkan OTP</h2>
+        <h2 className="text-2xl font-bold mb-8">Masukkan OTP</h2>
 
-          <div className="flex gap-1 justify-center mb-[44px]">
-            <p>Ketik 6 digit kode yang dikirimkan ke </p>
-            <p className="font-bold">{email}</p>
-          </div>
+        <div className="text-center mb-8">
+          <p>Ketik 6 digit kode yang dikirimkan ke</p>
+          <p className="font-bold mt-1">{email}</p>
+        </div>
 
-          <div className="flex justify-center gap-4 mb-[24px]">
-            {otp.map((digit, index) => (
-              <input
-                key={index}
-                id={`otp-input-${index}`}
-                type="text"
-                value={digit}
-                maxLength="1"
-                onChange={(e) => handleChange(e, index)}
-                onKeyDown={(e) => handleKeyDown(e, index)}
-                className="w-12 h-12 text-center text-xl border border-gray-300 rounded-[16px] focus:outline-none focus:ring-2 focus:ring-purple-500"
-                disabled={loading}
-              />
-            ))}
-          </div>
+        <div className="flex justify-center gap-4 mb-8">
+          {otp.map((digit, index) => (
+            <input
+              key={index}
+              id={`otp-input-${index}`}
+              type="text"
+              value={digit}
+              maxLength="1"
+              onChange={(e) => handleChange(e, index)}
+              onKeyDown={(e) => handleKeyDown(e, index)}
+              className="w-12 h-12 text-center text-xl border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+              disabled={loading}
+            />
+          ))}
+        </div>
 
-          <div className="text-center mb-[105px]">
-            {timeLeft > 0 ? (
-              <p className="text-sm text-gray-500">
-                Kirim Ulang OTP dalam{' '}
-                <span className="font-bold">{timeLeft} detik</span>
-              </p>
-            ) : (
-              <button
-                onClick={handleResend}
-                className="text-red-500 font-bold hover:underline"
-                disabled={loading}
-              >
-                Kirim Ulang
-              </button>
-            )}
-          </div>
-
-          <Button
-            type="button"
-            onClick={handleSubmit}
-            className="rounded-[16px] h-[48px] w-full"
-            disabled={loading || otp.join('').length !== 6}
-          >
-            {loading ? 'Memverifikasi...' : 'Simpan'}
-          </Button>
-
-          {errorMessage && (
-            <div className="absolute bottom-[5%] left-0 w-full flex justify-center">
-              <p className="w-[273px] h-[52px] bg-red-500 text-white flex items-center justify-center py-2 rounded-[12px]">
-                {errorMessage}
-              </p>
-            </div>
+        <div className="text-center mb-8">
+          {timeLeft > 0 ? (
+            <p className="text-sm text-gray-500">
+              Kirim Ulang OTP dalam{' '}
+              <span className="font-bold">{timeLeft} detik</span>
+            </p>
+          ) : (
+            <button
+              onClick={handleResend}
+              className="text-red-500 font-bold hover:underline"
+              disabled={loading}
+            >
+              Kirim Ulang
+            </button>
           )}
         </div>
+
+        <Button
+          type="button"
+          onClick={handleSubmit}
+          className="h-12 w-full"
+          disabled={loading || otp.join('').length !== 6}
+        >
+          {loading ? 'Memverifikasi...' : 'Verifikasi'}
+        </Button>
+
+        {errorMessage && (
+          <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-full max-w-md px-4">
+            <div className="p-3 text-sm text-white text-center bg-red-500 font-medium rounded-lg shadow-lg">
+              {errorMessage}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
