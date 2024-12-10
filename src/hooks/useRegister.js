@@ -1,6 +1,6 @@
 import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-
 import {
   registerStart,
   registerSuccess,
@@ -11,9 +11,8 @@ import {
 } from '../store/slices/registerSlice';
 import {
   register as registerService,
-  otp as otpService,
+  verifyOtp,
 } from '../services/register.service';
-import { useNavigate } from 'react-router-dom';
 
 const useRegister = () => {
   const dispatch = useDispatch();
@@ -23,12 +22,12 @@ const useRegister = () => {
     dispatch(registerStart());
     try {
       const response = await registerService(dataUser);
-      console.log('tesss', response);
       dispatch(registerSuccess());
+
       await Swal.fire({
         icon: 'success',
         title: 'Yeay! Pendaftaran Sukses!',
-        text: 'Anda baru saja membuka pintu menuju pengalaman baru. Selamat datang di platform kami!',
+        text: 'Silakan cek email Anda untuk kode OTP',
         showConfirmButton: false,
         timer: 1500,
         background: '#fff',
@@ -38,13 +37,19 @@ const useRegister = () => {
           content: 'text-gray-600',
         },
       });
-      navigate('/otp');
 
+      navigate('/otp');
       return response;
     } catch (error) {
-      dispatch(
-        registerFailure(error.response?.data?.message || 'Registration failed')
-      );
+      const errorMessage = error?.response?.data?.message || 'Registrasi gagal';
+      dispatch(registerFailure(errorMessage));
+
+      await Swal.fire({
+        icon: 'error',
+        title: 'Registrasi Gagal',
+        text: errorMessage,
+        confirmButtonColor: '#7126B5',
+      });
       throw error;
     }
   };
@@ -52,20 +57,64 @@ const useRegister = () => {
   const handleOtp = async (otpCode) => {
     dispatch(otpStart());
     try {
-      const response = await otpService(otpCode);
+      const response = await verifyOtp(otpCode);
       dispatch(otpSuccess());
-      navigate('/login');
 
+      await Swal.fire({
+        icon: 'success',
+        title: 'Verifikasi Berhasil!',
+        text: 'Akun Anda telah terverifikasi',
+        showConfirmButton: false,
+        timer: 1500,
+        background: '#fff',
+        customClass: {
+          popup: 'rounded-lg shadow-lg',
+          title: 'text-xl font-medium',
+          content: 'text-gray-600',
+        },
+      });
+
+      navigate('/login');
       return response;
     } catch (error) {
-      dispatch(
-        otpFailure(error.response?.data?.message || 'OTP verification failed')
-      );
+      const errorMessage = error?.message || 'Verifikasi OTP gagal';
+      dispatch(otpFailure(errorMessage));
       throw error;
     }
   };
 
-  return { handleRegister, handleOtp };
+  const handleResendOtp = async () => {
+    try {
+      const email = Cookies.get('email');
+      if (!email) {
+        throw new Error('Email tidak ditemukan');
+      }
+
+      await axiosInstance.post('/user/resend', { email });
+
+      await Swal.fire({
+        icon: 'success',
+        title: 'OTP Terkirim!',
+        text: 'Silakan cek email Anda untuk kode OTP baru',
+        showConfirmButton: false,
+        timer: 1500,
+        background: '#fff',
+        customClass: {
+          popup: 'rounded-lg shadow-lg',
+        },
+      });
+    } catch (error) {
+      await Swal.fire({
+        icon: 'error',
+        title: 'Gagal Mengirim OTP',
+        text: error.message || 'Gagal mengirim ulang kode OTP',
+        confirmButtonColor: '#7126B5',
+      });
+      throw error;
+    }
+  };
+
+  return { handleRegister, handleOtp, handleResendOtp };
 };
 
 export default useRegister;
