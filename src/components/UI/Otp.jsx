@@ -12,6 +12,8 @@ const Otp = () => {
   const [timeLeft, setTimeLeft] = useState(60);
   const [errorMessage, setErrorMessage] = useState('');
   const [canResend, setCanResend] = useState(false);
+  const [showResendSection, setShowResendSection] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const navigate = useNavigate();
   const { handleOtp, handleResendOtp } = useRegister();
@@ -26,25 +28,39 @@ const Otp = () => {
 
     const currentTime = Date.now();
     const initialExpiryTime = localStorage.getItem('otpExpiryTime');
+    const hasStartedSession = localStorage.getItem('otpSessionStarted');
 
-    if (initialExpiryTime) {
-      const remainingTime = Math.max(
-        0,
-        Math.floor((parseInt(initialExpiryTime) - currentTime) / 1000)
-      );
-      setTimeLeft(remainingTime);
-      setCanResend(remainingTime <= 0);
-    } else {
-      const newExpiryTime = currentTime + 60000;
-      localStorage.setItem('otpExpiryTime', newExpiryTime.toString());
+    if (!hasStartedSession) {
+      localStorage.setItem('otpSessionStarted', 'true');
+      localStorage.setItem('otpExpiryTime', (currentTime + 60000).toString());
       setTimeLeft(60);
       setCanResend(false);
+      setShowResendSection(false);
+
+      const timer = setTimeout(() => {
+        setShowResendSection(true);
+        setIsInitialLoad(false);
+      }, 60000);
+
+      return () => clearTimeout(timer);
+    } else {
+      setIsInitialLoad(false);
+      setShowResendSection(true);
+
+      if (initialExpiryTime) {
+        const remainingTime = Math.max(
+          0,
+          Math.floor((parseInt(initialExpiryTime) - currentTime) / 1000)
+        );
+        setTimeLeft(remainingTime);
+        setCanResend(remainingTime <= 0);
+      }
     }
   }, [email, navigate]);
 
   useEffect(() => {
     let timer;
-    if (timeLeft > 0) {
+    if (timeLeft > 0 && !isInitialLoad) {
       timer = setInterval(() => {
         setTimeLeft((prevTime) => {
           const newTime = prevTime - 1;
@@ -59,7 +75,7 @@ const Otp = () => {
     return () => {
       if (timer) clearInterval(timer);
     };
-  }, [timeLeft]);
+  }, [timeLeft, isInitialLoad]);
 
   const handleChange = (e, index) => {
     const value = e.target.value;
@@ -143,24 +159,28 @@ const Otp = () => {
           ))}
         </div>
 
-        <div className="text-center mb-8">
-          {timeLeft > 0 ? (
-            <p className="text-sm text-gray-500">
-              Kirim Ulang OTP dalam{' '}
-              <span className="font-bold">{timeLeft} detik</span>
-            </p>
-          ) : (
-            <button
-              onClick={handleResend}
-              className={`text-red-500 font-bold ${
-                canResend ? 'hover:underline' : 'opacity-50 cursor-not-allowed'
-              }`}
-              disabled={!canResend || loading}
-            >
-              Kirim Ulang
-            </button>
-          )}
-        </div>
+        {showResendSection && (
+          <div className="text-center mb-8">
+            {timeLeft > 0 ? (
+              <p className="text-sm text-gray-500">
+                Kirim Ulang OTP dalam{' '}
+                <span className="font-bold">{timeLeft} detik</span>
+              </p>
+            ) : (
+              <button
+                onClick={handleResend}
+                className={`text-red-500 font-bold ${
+                  canResend
+                    ? 'hover:underline'
+                    : 'opacity-50 cursor-not-allowed'
+                }`}
+                disabled={!canResend || loading}
+              >
+                Kirim Ulang
+              </button>
+            )}
+          </div>
+        )}
 
         <Button
           type="button"
