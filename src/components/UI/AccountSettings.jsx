@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useAuth } from '../../hooks/useAuth';
-import { deleteUserAccount } from '../../store/slices/userSlice';
+import { deleteUserAccount, resetUserData } from '../../store/slices/userSlice';
+import { logout } from '../../store/slices/authSlice';
 import { AlertTriangle } from 'lucide-react';
 import Swal from 'sweetalert2';
 
@@ -39,6 +40,7 @@ const AccountSettings = () => {
     if (result.isConfirmed && user?.id) {
       try {
         await dispatch(deleteUserAccount(user.id)).unwrap();
+        dispatch(resetUserData());
 
         await Swal.fire({
           icon: 'success',
@@ -48,7 +50,7 @@ const AccountSettings = () => {
           timer: 1500,
         });
 
-        navigate('/login');
+        navigate('/login', { replace: true });
       } catch (error) {
         Swal.fire({
           icon: 'error',

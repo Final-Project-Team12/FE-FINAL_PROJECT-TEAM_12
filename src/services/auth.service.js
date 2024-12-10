@@ -33,6 +33,11 @@ export const authService = {
     Cookies.remove('user');
   },
 
+  clearAuth: () => {
+    Cookies.remove('token');
+    Cookies.remove('user');
+  },
+
   isAuthenticated: () => {
     const token = Cookies.get('token');
     const userStr = Cookies.get('user');
