@@ -30,7 +30,7 @@ const PaymentPage = () => {
   };
 
   const handleProceedToPayment = () => {
-    navigate('/payment');
+    navigate('/payment/1');
   };
 
   return (
