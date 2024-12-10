@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CalendarFilter from '../Elements/Filter/CalendarFilter';
 import SearchButton from '../Elements/Buttons/SearchButton';
+import iconArrowLeft from '../../../public/icons/fi_arrow-left.svg';
 
 const HeaderHistory = ({ onDateRangeChange }) => {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ const HeaderHistory = ({ onDateRangeChange }) => {
             onClick={() => navigate('/')}
           >
             <img
-              src="../../public/icons/fi_arrow-left.svg"
+              src={iconArrowLeft}
               alt=""
               className="w-6 h-6 ml-4 hover:scale-125 hover: transition-all duration-10 text-white"
             />

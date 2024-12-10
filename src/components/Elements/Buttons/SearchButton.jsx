@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { X } from 'lucide-react';
+import iconSearch from '../../../../public/icons/search.svg';
 
 const SearchButton = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -36,11 +37,7 @@ const SearchButton = () => {
         onClick={() => setIsSearchOpen(true)}
         className=" h-[50px] rounded-[12px] flex items-center justify-center hover:opacity-80"
       >
-        <img
-          src="../../../../public/icons/search.svg"
-          alt="Search"
-          className="w-6 h-6"
-        />
+        <img src={iconSearch} alt="Search" className="w-6 h-6" />
       </button>
 
       {isSearchOpen && (
