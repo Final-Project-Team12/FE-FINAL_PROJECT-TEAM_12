@@ -151,7 +151,7 @@ const RegisterForm = () => {
           <InputField
             label="Umur"
             type="text"
-            placeholder="minimal 17 tahun"
+            placeholder="Minimal 17 tahun"
             error={errors.age}
             {...register('age', {
               required: 'Umur wajib diisi',
@@ -165,7 +165,7 @@ const RegisterForm = () => {
           <InputField
             label="NIK"
             type="text"
-            placeholder="3602041211870001"
+            placeholder="Masukkan NIK 16 Digit"
             error={errors.identity_number}
             {...register('identity_number', {
               required: 'NIK wajib diisi',
