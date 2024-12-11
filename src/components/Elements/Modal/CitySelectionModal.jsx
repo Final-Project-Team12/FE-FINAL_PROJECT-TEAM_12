@@ -1,68 +1,129 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Search, X, Loader } from 'lucide-react';
+import { useFlights } from '../../../hooks/useFlight';
 
-const availableCities = [
-  'Jakarta',
-  'Bandung',
-  'Surabaya',
-  'Yogyakarta',
-  'Medan',
-  'Bali',
-  'Makassar',
-  'Palembang',
-  'Semarang',
-  'Malang',
-];
+const CACHE_KEY_PREFIX = 'airport_data_';
+const CACHE_DURATION = 24 * 60 * 60 * 1000;
 
 const CitySelectionModal = ({ isOpen, onClose, onSelect, title }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
+  const [airports, setAirports] = useState([]);
+  const [filteredAirports, setFilteredAirports] = useState([]);
   const [recentCities, setRecentCities] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const { flights, loading, error, fetchFlights } = useFlights();
+
+  const isCacheValid = (timestamp) => {
+    return Date.now() - timestamp < CACHE_DURATION;
+  };
+
+  const getCachedData = (key) => {
+    const cachedData = sessionStorage.getItem(key);
+    if (cachedData) {
+      const { data, timestamp } = JSON.parse(cachedData);
+      if (isCacheValid(timestamp)) {
+        return data;
+      }
+      sessionStorage.removeItem(key);
+    }
+    return null;
+  };
+
+  const setCacheData = (key, data) => {
+    const cacheData = {
+      data,
+      timestamp: Date.now(),
+    };
+    sessionStorage.setItem(key, JSON.stringify(cacheData));
+  };
+
+  const processAirportsData = useCallback((flightsData) => {
+    if (!flightsData?.outbound_flights) return [];
+
+    const uniqueAirports = new Map();
+
+    flightsData.outbound_flights.forEach((flight) => {
+      const { origin_airport, destination_airport } = flight;
+
+      if (!uniqueAirports.has(origin_airport.airport_id)) {
+        uniqueAirports.set(origin_airport.airport_id, {
+          id: origin_airport.airport_id,
+          name: origin_airport.name,
+          code: origin_airport.airport_code,
+          continent: origin_airport.continent.name,
+        });
+      }
+
+      if (!uniqueAirports.has(destination_airport.airport_id)) {
+        uniqueAirports.set(destination_airport.airport_id, {
+          id: destination_airport.airport_id,
+          name: destination_airport.name,
+          code: destination_airport.airport_code,
+          continent: destination_airport.continent.name,
+        });
+      }
+    });
+
+    return Array.from(uniqueAirports.values());
+  }, []);
+
+  const fetchAirportsData = useCallback(async () => {
+    const cacheKey = `${CACHE_KEY_PREFIX}all`;
+    const cachedAirports = getCachedData(cacheKey);
+
+    if (cachedAirports) {
+      setAirports(cachedAirports);
+      return;
+    }
+
+    try {
+      const response = await fetchFlights(1, 100);
+      if (response?.data) {
+        const airportsList = processAirportsData(response.data);
+        setAirports(airportsList);
+        setCacheData(cacheKey, airportsList);
+      }
+    } catch (err) {
+      console.error('Error fetching airports:', err);
+    }
+  }, [fetchFlights, processAirportsData]);
 
   useEffect(() => {
-    const savedRecentCities = localStorage.getItem('recentCities');
-    if (savedRecentCities) {
-      setRecentCities(JSON.parse(savedRecentCities));
+    if (isOpen) {
+      fetchAirportsData();
+      const savedRecentCities = localStorage.getItem('recentCities');
+      if (savedRecentCities) {
+        setRecentCities(JSON.parse(savedRecentCities));
+      }
     }
-  }, []);
+  }, [isOpen, fetchAirportsData]);
 
   useEffect(() => {
     if (searchQuery) {
-      setIsLoading(true);
-      // Simulate API delay
-      const timeoutId = setTimeout(() => {
-        const filteredCities = availableCities.filter((city) =>
-          city.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-        setSearchResults(filteredCities);
-        setIsLoading(false);
-      }, 500);
-
-      return () => clearTimeout(timeoutId);
+      const lowercaseQuery = searchQuery.toLowerCase();
+      const filtered = airports.filter(
+        (airport) =>
+          airport.name.toLowerCase().includes(lowercaseQuery) ||
+          airport.code.toLowerCase().includes(lowercaseQuery) ||
+          airport.continent.toLowerCase().includes(lowercaseQuery)
+      );
+      setFilteredAirports(filtered);
     } else {
-      setSearchResults([]);
+      setFilteredAirports([]);
     }
-  }, [searchQuery]);
+  }, [searchQuery, airports]);
 
-  const handleSelection = (city) => {
-    // Update recent cities
+  const handleSelection = (airport) => {
+    const selection = `${airport.name} (${airport.code})`;
+
     const updatedRecentCities = [
-      city,
-      ...recentCities.filter((c) => c !== city).slice(0, 4),
+      selection,
+      ...recentCities.filter((city) => city !== selection).slice(0, 4),
     ];
     setRecentCities(updatedRecentCities);
     localStorage.setItem('recentCities', JSON.stringify(updatedRecentCities));
 
-    onSelect(city);
+    onSelect(selection);
     onClose();
-  };
-
-  const handleManualEntry = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      handleSelection(searchQuery.trim());
-    }
   };
 
   const clearRecentCities = () => {
@@ -88,48 +149,57 @@ const CitySelectionModal = ({ isOpen, onClose, onSelect, title }) => {
       />
       <div className="bg-white w-full max-w-xl rounded-2xl overflow-hidden relative transform transition-all duration-300 ease-out max-h-[80vh] flex flex-col">
         <div className="p-4 flex-1 overflow-y-auto">
-          <form onSubmit={handleManualEntry}>
-            <div className="flex items-center gap-4 mb-6">
-              <div className="flex-1 flex items-center border rounded-lg p-2">
-                <Search className="text-gray-400 w-5 h-5 flex-shrink-0" />
-                <input
-                  type="text"
-                  placeholder="Masukkan Kota atau Negara"
-                  className="ml-2 flex-1 outline-none text-sm"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  autoFocus
-                />
-              </div>
-              <button type="button" onClick={onClose}>
-                <X className="w-6 h-6 text-gray-400" />
-              </button>
+          <div className="flex items-center gap-4 mb-6">
+            <div className="flex-1 flex items-center border rounded-lg p-2">
+              <Search className="text-gray-400 w-5 h-5 flex-shrink-0" />
+              <input
+                type="text"
+                placeholder="Search city, airport code, or continent"
+                className="ml-2 flex-1 outline-none text-sm"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                autoFocus
+              />
             </div>
-          </form>
+            <button type="button" onClick={onClose}>
+              <X className="w-6 h-6 text-gray-400" />
+            </button>
+          </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="text-red-500 text-center mb-4 p-3 bg-red-50 rounded-lg">
+              {error}
+            </div>
+          )}
 
           {/* Search Results */}
           {searchQuery && (
             <div className="mb-6">
-              <h3 className="font-semibold text-lg mb-4">Hasil Pencarian</h3>
+              <h3 className="font-semibold text-lg mb-4">Search Results</h3>
               <div className="space-y-2">
-                {isLoading ? (
+                {loading ? (
                   <div className="flex items-center justify-center p-4">
                     <Loader className="w-6 h-6 text-gray-400 animate-spin" />
                   </div>
-                ) : searchResults.length > 0 ? (
-                  searchResults.map((city) => (
+                ) : filteredAirports.length > 0 ? (
+                  filteredAirports.map((airport) => (
                     <div
-                      key={city}
-                      className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
-                      onClick={() => handleSelection(city)}
+                      key={airport.id}
+                      onClick={() => handleSelection(airport)}
+                      className="flex flex-col p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
                     >
-                      <span>{city}</span>
+                      <span className="font-medium">
+                        {airport.name} ({airport.code})
+                      </span>
+                      <span className="text-sm text-gray-500">
+                        {airport.continent}
+                      </span>
                     </div>
                   ))
                 ) : (
                   <div className="p-3 text-gray-500">
-                    Tidak ada hasil. Tekan Enter untuk menambahkan "
-                    {searchQuery}" sebagai kota baru.
+                    No airports found matching your search
                   </div>
                 )}
               </div>
@@ -137,15 +207,15 @@ const CitySelectionModal = ({ isOpen, onClose, onSelect, title }) => {
           )}
 
           {/* Recent Searches */}
-          {recentCities.length > 0 && (
+          {recentCities.length > 0 && !searchQuery && (
             <div>
               <div className="flex justify-between items-center mb-4">
-                <h3 className="font-semibold text-lg">Pencarian terkini</h3>
+                <h3 className="font-semibold text-lg">Recent Searches</h3>
                 <button
                   className="text-red-500 text-sm hover:text-red-600"
                   onClick={clearRecentCities}
                 >
-                  Hapus Semua
+                  Clear All
                 </button>
               </div>
               <div className="space-y-2">
@@ -153,7 +223,7 @@ const CitySelectionModal = ({ isOpen, onClose, onSelect, title }) => {
                   <div
                     key={city}
                     className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
-                    onClick={() => handleSelection(city)}
+                    onClick={() => onSelect(city)}
                   >
                     <span>{city}</span>
                     <button
