@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Search } from 'lucide-react';
 import TravelCard from './TravelCard';
 import Skeleton from 'react-loading-skeleton';
@@ -7,29 +7,62 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useFlights } from '../../hooks/useFlight';
 
 const ITEMS_PER_PAGE = 5;
-const VISIBLE_PAGES = 5;
+const CACHE_KEY = 'destination_filter_data';
 
 const DestinationFilter = () => {
   const [activeContinent, setActiveContinent] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [allFlights, setAllFlights] = useState(() => {
+    const cached = sessionStorage.getItem(CACHE_KEY);
+    return cached ? JSON.parse(cached) : [];
+  });
+
+  const { flights, loading, error, fetchFlights } = useFlights();
+  const [filteredFlights, setFilteredFlights] = useState([]);
   const [continents, setContinents] = useState([{ id: 'all', name: 'Semua' }]);
-  const { flights, loading, error, pagination, fetchFlights } = useFlights();
-  const [paginatedFlights, setPaginatedFlights] = useState([]);
-  const [lastKnownCount, setLastKnownCount] = useState(ITEMS_PER_PAGE);
+  const [totalPages, setTotalPages] = useState(1);
+  const [windowWidth, setWindowWidth] = useState(
+    typeof window !== 'undefined' ? window.innerWidth : 0
+  );
 
   useEffect(() => {
-    if (flights?.outbound_flights) {
-      const uniqueContinents = new Set();
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
 
-      flights.outbound_flights.forEach((flight) => {
-        if (flight.origin_airport?.continent) {
-          uniqueContinents.add(
-            JSON.stringify({
-              id: flight.origin_airport.continent.continent_id,
-              name: flight.origin_airport.continent.name,
-            })
-          );
-        }
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const fetchAndCacheFlights = useCallback(async () => {
+    try {
+      const cached = sessionStorage.getItem(CACHE_KEY);
+      if (cached) {
+        setAllFlights(JSON.parse(cached));
+        return;
+      }
+
+      const response = await fetchFlights(1, 100);
+      if (response?.data?.outbound_flights) {
+        setAllFlights(response.data.outbound_flights);
+        sessionStorage.setItem(
+          CACHE_KEY,
+          JSON.stringify(response.data.outbound_flights)
+        );
+      }
+    } catch (error) {
+      console.error('Error fetching all flights:', error);
+    }
+  }, [fetchFlights]);
+
+  useEffect(() => {
+    fetchAndCacheFlights();
+  }, [fetchAndCacheFlights]);
+
+  useEffect(() => {
+    if (allFlights.length > 0) {
+      const uniqueContinents = new Set();
+      allFlights.forEach((flight) => {
         if (flight.destination_airport?.continent) {
           uniqueContinents.add(
             JSON.stringify({
@@ -40,158 +73,76 @@ const DestinationFilter = () => {
         }
       });
 
-      const continentArray = Array.from(uniqueContinents).map((str) =>
-        JSON.parse(str)
-      );
+      const continentArray = Array.from(uniqueContinents)
+        .map((str) => JSON.parse(str))
+        .sort((a, b) => a.name.localeCompare(b.name));
 
-      const sortedContinents = continentArray.sort((a, b) =>
-        a.name.localeCompare(b.name)
-      );
-
-      setContinents([{ id: 'all', name: 'Semua' }, ...sortedContinents]);
+      setContinents([{ id: 'all', name: 'Semua' }, ...continentArray]);
     }
-  }, [flights]);
+  }, [allFlights]);
 
   useEffect(() => {
-    fetchFlights(currentPage, ITEMS_PER_PAGE);
-  }, [currentPage, fetchFlights]);
+    let filtered = allFlights;
 
-  useEffect(() => {
-    if (flights && flights.outbound_flights) {
-      const filtered = flights.outbound_flights.filter((flight) => {
-        if (activeContinent === 'all') return true;
-
-        return (
-          flight.destination_airport.continent.continent_id.toString() ===
+    if (activeContinent !== 'all') {
+      filtered = allFlights.filter(
+        (flight) =>
+          flight.destination_airport?.continent?.continent_id.toString() ===
           activeContinent.toString()
-        );
-      });
+      );
+    }
 
-      setPaginatedFlights(filtered);
+    setFilteredFlights(filtered);
+    setTotalPages(Math.ceil(filtered.length / ITEMS_PER_PAGE));
+    setCurrentPage(1);
+  }, [activeContinent, allFlights]);
 
-      if (!loading && filtered.length > 0) {
-        setLastKnownCount(filtered.length);
+  const getCurrentPageItems = useCallback(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return filteredFlights.slice(startIndex, endIndex);
+  }, [currentPage, filteredFlights]);
+
+  const getVisiblePages = useCallback(() => {
+    const maxVisible = windowWidth < 640 ? 3 : 5;
+    const pages = [];
+
+    if (totalPages <= maxVisible) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
       }
-    }
-  }, [flights, activeContinent, loading]);
-
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
-  const handlePrevPage = () => {
-    if (pagination?.hasPreviousPage) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const handleNextPage = () => {
-    if (pagination?.hasNextPage) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const renderPaginationButton = (number, label = number) => (
-    <button
-      key={number}
-      onClick={() => handlePageChange(number)}
-      className={`px-3 py-1 rounded-lg ${
-        currentPage === number
-          ? 'bg-[#7126B5] text-white'
-          : 'text-gray-600 hover:bg-purple-100'
-      }`}
-    >
-      {label}
-    </button>
-  );
-
-  const renderPagination = () => {
-    if (
-      !pagination ||
-      pagination.totalPages <= 1 ||
-      (activeContinent !== 'all' && paginatedFlights.length <= ITEMS_PER_PAGE)
-    ) {
-      return null;
-    }
-
-    const pageNumbers = [];
-    let startPage, endPage;
-
-    if (pagination.totalPages <= VISIBLE_PAGES) {
-      startPage = 1;
-      endPage = pagination.totalPages;
     } else {
-      if (currentPage <= Math.ceil(VISIBLE_PAGES / 2)) {
-        startPage = 1;
-        endPage = VISIBLE_PAGES - 1;
-      } else if (
-        currentPage + Math.floor(VISIBLE_PAGES / 2) >=
-        pagination.totalPages
-      ) {
-        startPage = pagination.totalPages - (VISIBLE_PAGES - 2);
-        endPage = pagination.totalPages;
-      } else {
-        startPage = currentPage - Math.floor(VISIBLE_PAGES / 2);
-        endPage = currentPage + Math.floor(VISIBLE_PAGES / 2);
+      pages.push(1);
+
+      let startPage = Math.max(2, currentPage - 1);
+      let endPage = Math.min(totalPages - 1, startPage + maxVisible - 3);
+
+      if (endPage === totalPages - 1) {
+        startPage = Math.max(2, endPage - (maxVisible - 3));
+      }
+
+      if (startPage > 2) {
+        pages.push('...');
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+
+      if (endPage < totalPages - 1) {
+        pages.push('...');
+      }
+
+      if (totalPages > 1) {
+        pages.push(totalPages);
       }
     }
 
-    for (let i = startPage; i <= endPage; i++) {
-      pageNumbers.push(i);
-    }
-
-    return (
-      <div className="flex justify-center items-center gap-2 mt-6 mb-4">
-        <button
-          onClick={handlePrevPage}
-          disabled={!pagination.hasPreviousPage}
-          className={`p-2 rounded-lg ${
-            !pagination.hasPreviousPage
-              ? 'text-gray-400 cursor-not-allowed'
-              : 'text-[#7126B5] hover:bg-purple-100'
-          }`}
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-
-        {/* First page */}
-        {startPage > 1 && (
-          <>
-            {renderPaginationButton(1)}
-            {startPage > 2 && <span className="px-2 text-gray-500">...</span>}
-          </>
-        )}
-
-        {/* Visible page numbers */}
-        {pageNumbers.map((number) => renderPaginationButton(number))}
-
-        {/* Last page */}
-        {endPage < pagination.totalPages && (
-          <>
-            {endPage < pagination.totalPages - 1 && (
-              <span className="px-2 text-gray-500">...</span>
-            )}
-            {renderPaginationButton(pagination.totalPages)}
-          </>
-        )}
-
-        <button
-          onClick={handleNextPage}
-          disabled={!pagination.hasNextPage}
-          className={`p-2 rounded-lg ${
-            !pagination.hasNextPage
-              ? 'text-gray-400 cursor-not-allowed'
-              : 'text-[#7126B5] hover:bg-purple-100'
-          }`}
-        >
-          <ChevronRight className="w-5 h-5" />
-        </button>
-      </div>
-    );
-  };
+    return pages;
+  }, [currentPage, totalPages, windowWidth]);
 
   return (
-    <div className="mt-6 sm:mt-8 max-w-6xl mx-auto px-4 sm:px-6 md:px-8 overflow-x-hidden">
+    <div className="mt-6 sm:mt-8 max-w-6xl mx-auto px-4 sm:px-6 md:px-8">
       <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
         Destinasi Favorit
       </h2>
@@ -201,47 +152,115 @@ const DestinationFilter = () => {
           {continents.map((continent) => (
             <button
               key={continent.id}
-              onClick={() => {
-                setActiveContinent(continent.id);
-                setCurrentPage(1);
-              }}
-              className={`flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full whitespace-nowrap text-sm transition-colors ${
+              onClick={() => setActiveContinent(continent.id)}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                 activeContinent === continent.id
-                  ? 'bg-[#7126B5] text-white'
+                  ? 'bg-[#7126B5] text-white shadow-md'
                   : 'bg-purple-100 text-gray-700 hover:bg-purple-200'
               }`}
             >
-              <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <Search className="w-4 h-4" />
               <span>{continent.name}</span>
             </button>
           ))}
         </div>
       </div>
 
-      {error && <div className="text-red-500 text-center my-4">{error}</div>}
+      {error && (
+        <div className="text-red-500 text-center my-4 p-3 bg-red-50 rounded-lg">
+          {error}
+        </div>
+      )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6 mt-4 sm:mt-6 py-3 sm:py-4">
-        {loading
-          ? Array.from({ length: lastKnownCount }).map((_, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-lg shadow-lg overflow-hidden p-2 sm:p-3 flex flex-col"
-              >
-                <Skeleton height={96} />
-                <div className="mt-2 sm:mt-3 flex flex-col justify-between flex-1">
-                  <Skeleton width="60%" height={16} />
-                  <Skeleton width="40%" height={12} />
-                  <Skeleton width="50%" height={12} />
-                  <Skeleton width="70%" height={16} />
-                </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6 mt-4 sm:mt-6">
+        {loading ? (
+          Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => (
+            <div
+              key={index}
+              className="bg-white rounded-xl shadow-md overflow-hidden p-3"
+            >
+              <Skeleton height={150} className="rounded-lg" />
+              <div className="mt-3 space-y-2">
+                <Skeleton width="70%" height={20} />
+                <Skeleton width="50%" height={16} />
+                <Skeleton width="60%" height={16} />
               </div>
-            ))
-          : paginatedFlights.map((flight) => (
-              <TravelCard key={flight.plane_id} travel={flight} />
-            ))}
+            </div>
+          ))
+        ) : getCurrentPageItems().length > 0 ? (
+          getCurrentPageItems().map((flight) => (
+            <TravelCard key={flight.plane_id} travel={flight} />
+          ))
+        ) : (
+          <div className="col-span-full text-center py-8 text-gray-500">
+            No flights found for the selected continent.
+          </div>
+        )}
       </div>
 
-      {!loading && renderPagination()}
+      {filteredFlights.length > ITEMS_PER_PAGE && (
+        <div className="mt-6 mb-8">
+          <div className="flex justify-center items-center">
+            <div className="inline-flex items-center bg-white rounded-lg border border-gray-300">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className={`flex items-center h-8 px-2 sm:px-3 rounded-l-lg border-r border-gray-300
+                  ${
+                    currentPage === 1
+                      ? 'text-gray-400 cursor-not-allowed'
+                      : 'text-gray-700 hover:bg-purple-100'
+                  }`}
+              >
+                <ChevronLeft className="w-4 h-4" />
+                <span className="hidden sm:inline ml-1 text-sm font-medium">
+                  Prev
+                </span>
+              </button>
+
+              <div className="flex items-center">
+                {getVisiblePages().map((page, index) => (
+                  <button
+                    key={index}
+                    onClick={() =>
+                      typeof page === 'number' && setCurrentPage(page)
+                    }
+                    disabled={page === '...'}
+                    className={`w-8 h-8 flex items-center justify-center text-sm font-medium transition-colors
+                      ${
+                        page === currentPage
+                          ? 'bg-[#7126B5] text-white'
+                          : page === '...'
+                            ? 'text-gray-500 cursor-default'
+                            : 'text-gray-700 hover:bg-purple-100'
+                      }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                disabled={currentPage === totalPages}
+                className={`flex items-center h-8 px-2 sm:px-3 rounded-r-lg border-l border-gray-300
+                  ${
+                    currentPage === totalPages
+                      ? 'text-gray-400 cursor-not-allowed'
+                      : 'text-gray-700 hover:bg-purple-100'
+                  }`}
+              >
+                <span className="hidden sm:inline mr-1 text-sm font-medium">
+                  Next
+                </span>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

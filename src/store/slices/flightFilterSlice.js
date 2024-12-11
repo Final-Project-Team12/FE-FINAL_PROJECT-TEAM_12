@@ -33,7 +33,7 @@ export const fetchFilteredFlights = createAsyncThunk(
         await flightManagementAndBookingService.fetchAvailableFlightsWithFiltersAndPagination(
           {
             page,
-            limit: 3,
+            limit: 5,
             filters,
             searchParams: formattedSearchParams,
           }

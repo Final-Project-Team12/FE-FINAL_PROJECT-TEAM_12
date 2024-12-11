@@ -1,24 +1,31 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { getFlights } from '../services/flight.service';
 
 export const useFlights = (initialPage = 1, initialLimit = 5) => {
-  const [flights, setFlights] = useState({
-    outbound_flights: [],
-    return_flights: [],
-  });
+  const [flights, setFlights] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [pagination, setPagination] = useState(null);
+  const cache = useRef(new Map());
 
   const fetchFlights = useCallback(
     async (page = initialPage, limit = initialLimit) => {
+      const cacheKey = `${page}-${limit}`;
+
+      if (cache.current.has(cacheKey)) {
+        setFlights(cache.current.get(cacheKey).data);
+        return cache.current.get(cacheKey);
+      }
+
       setLoading(true);
       setError(null);
+
       try {
         const response = await getFlights(page, limit);
         if (response.isSuccess) {
           setFlights(response.data);
-          setPagination(response.pagination);
+
+          cache.current.set(cacheKey, response);
+          return response;
         } else {
           setError(response.message);
         }
@@ -31,11 +38,21 @@ export const useFlights = (initialPage = 1, initialLimit = 5) => {
     [initialPage, initialLimit]
   );
 
+  const clearCache = useCallback(() => {
+    cache.current.clear();
+
+    Object.keys(sessionStorage).forEach((key) => {
+      if (key.startsWith('flights_')) {
+        sessionStorage.removeItem(key);
+      }
+    });
+  }, []);
+
   return {
     flights,
     loading,
     error,
-    pagination,
     fetchFlights,
+    clearCache,
   };
 };
