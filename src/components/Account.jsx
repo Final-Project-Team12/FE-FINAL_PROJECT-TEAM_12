@@ -6,17 +6,19 @@ import HeaderAccount from './UI/HeaderAccount';
 import Navbar from './UI/Navbar';
 
 const Account = () => {
-  const [activeComponent, setActiveComponent] = useState('ChangeProfile'); // Default komponen awal
+  const [activeComponent, setActiveComponent] = useState('ChangeProfile');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
     <>
       <Navbar />
-      <HeaderAccount />
-      <div className="flex ml-[260px] mr-[212px]">
-        {/* Sidebar menerima fungsi untuk mengubah komponen aktif */}
-        <AccountSidebar setActiveComponent={setActiveComponent} />
-
-        {/* Render komponen sesuai dengan state */}
+      <HeaderAccount setIsSidebarOpen={setIsSidebarOpen} />
+      <div className="flex flex-col md:flex-row px-4 md:px-8 lg:ml-[260px] lg:mr-[212px]">
+        <AccountSidebar
+          setActiveComponent={setActiveComponent}
+          isOpen={isSidebarOpen}
+          setIsOpen={setIsSidebarOpen}
+        />
         <div className="w-full">
           {activeComponent === 'ChangeProfile' && <ChangeProfile />}
           {activeComponent === 'AccountSettings' && <AccountSettings />}

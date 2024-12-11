@@ -52,7 +52,7 @@ const RegisterForm = () => {
           <InputField
             label="Nama"
             type="text"
-            placeholder="Contoh: Budi Agung"
+            placeholder="Nama Lengkap"
             error={errors.name}
             {...register('name', {
               required: 'Nama wajib diisi',
@@ -66,7 +66,7 @@ const RegisterForm = () => {
           <InputField
             label="Email"
             type="email"
-            placeholder="Contoh: budiagung@gmail.com"
+            placeholder="Contoh: quickfly@gmail.com"
             error={errors.email}
             {...register('email', {
               required: 'Email wajib diisi',
@@ -80,7 +80,7 @@ const RegisterForm = () => {
           <InputField
             label="Nomor Telepon"
             type="text"
-            placeholder="Contoh: 085818890911"
+            placeholder="Contoh: 08123456789"
             error={errors.telephone_number}
             {...register('telephone_number', {
               required: 'Nomor telepon wajib diisi',
@@ -94,7 +94,7 @@ const RegisterForm = () => {
           <InputField
             label="Alamat"
             type="text"
-            placeholder="Contoh: Desa Sukamulya, Kab Bekasi"
+            placeholder="Contoh: Jl. Raya, No. 123"
             error={errors.address}
             {...register('address', {
               required: 'Alamat wajib diisi',
@@ -179,7 +179,7 @@ const RegisterForm = () => {
           <InputField
             label="Password"
             type="password"
-            placeholder="*****"
+            placeholder="********"
             showPasswordToggle
             error={errors.password}
             {...register('password', {

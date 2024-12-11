@@ -3,11 +3,11 @@ import ResetPasswordForm from '../components/UI/ResetPasswordForm';
 
 const ResetPasswordPage = () => {
   return (
-    <div className="flex">
-      <div className="w-1/2">
+    <div className="flex min-h-screen bg-white">
+      <div className="hidden md:flex md:w-1/2">
         <AuthBanner />
       </div>
-      <div className="w-1/2">
+      <div className="w-full md:w-1/2">
         <ResetPasswordForm />
       </div>
     </div>

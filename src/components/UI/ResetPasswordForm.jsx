@@ -63,10 +63,12 @@ const ResetPasswordForm = () => {
   };
 
   return (
-    <div className="h-screen flex">
-      <div className="my-auto w-full mx-auto max-w-md px-6">
-        <h2 className="font-bold text-2xl mb-6">Reset Password</h2>
-        <form onSubmit={handleSubmit} className="space-y-5">
+    <div className="w-full min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-8">
+      <div className="w-full max-w-[90%] sm:max-w-md relative">
+        <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">
+          Reset Password
+        </h2>
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
           <div>
             <InputField
               label="Masukan Password Baru"
@@ -75,6 +77,7 @@ const ResetPasswordForm = () => {
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="Minimal 8 karakter"
               showPasswordToggle
+              className="text-sm sm:text-base"
             />
           </div>
           <div>
@@ -85,10 +88,15 @@ const ResetPasswordForm = () => {
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Masukkan password yang sama"
               showPasswordToggle
+              className="text-sm sm:text-base"
             />
           </div>
-          <div className="mt-6">
-            <Button type="submit" className="h-[48px]" disabled={loading}>
+          <div className="mt-4 sm:mt-6">
+            <Button
+              type="submit"
+              className="h-10 sm:h-12 w-full text-sm sm:text-base"
+              disabled={loading}
+            >
               {loading ? 'Menyimpan...' : 'Simpan'}
             </Button>
           </div>
@@ -101,9 +109,11 @@ const ResetPasswordForm = () => {
             bottom-4
             left-1/2
             -translate-x-1/2
-            w-full
+            w-[90%]
+            sm:w-full
             max-w-md
-            px-4
+            px-2
+            sm:px-4
             transition-all
             duration-300
             ease-in-out
@@ -111,7 +121,7 @@ const ResetPasswordForm = () => {
           `}
         >
           {error && (
-            <div className="p-3 text-sm text-white text-center bg-red-500 font-medium rounded-lg shadow-lg">
+            <div className="p-2 sm:p-3 text-xs sm:text-sm text-white text-center bg-red-500 font-medium rounded-lg shadow-lg">
               {error}
             </div>
           )}
