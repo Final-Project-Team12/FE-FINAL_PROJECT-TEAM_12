@@ -130,20 +130,30 @@ const Otp = () => {
   };
 
   return (
-    <div className="w-full h-screen flex items-center justify-center p-6">
-      <div className="w-full max-w-md relative">
-        <Link to="/register">
-          <img src={backIcon} alt="Back" className="cursor-pointer mb-6" />
+    <div className="w-full min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-8">
+      <div className="w-full max-w-[90%] sm:max-w-md relative bg-white rounded-lg shadow-sm p-4 sm:p-6 md:p-8">
+        <Link to="/register" className="inline-block">
+          <img
+            src={backIcon}
+            alt="Back"
+            className="cursor-pointer mb-4 sm:mb-6 w-6 h-6 sm:w-8 sm:h-8"
+          />
         </Link>
 
-        <h2 className="text-2xl font-bold mb-8">Masukkan OTP</h2>
+        <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-8">
+          Masukkan OTP
+        </h2>
 
-        <div className="text-center mb-8">
-          <p>Ketik 6 digit kode yang dikirimkan ke</p>
-          <p className="font-bold mt-1">{email}</p>
+        <div className="text-center mb-6 sm:mb-8">
+          <p className="text-sm sm:text-base">
+            Ketik 6 digit kode yang dikirimkan ke
+          </p>
+          <p className="font-bold mt-1 text-sm sm:text-base break-all">
+            {email}
+          </p>
         </div>
 
-        <div className="flex justify-center gap-4 mb-8">
+        <div className="flex justify-center gap-2 sm:gap-4 mb-6 sm:mb-8">
           {otp.map((digit, index) => (
             <input
               key={index}
@@ -153,23 +163,23 @@ const Otp = () => {
               maxLength="1"
               onChange={(e) => handleChange(e, index)}
               onKeyDown={(e) => handleKeyDown(e, index)}
-              className="w-12 h-12 text-center text-xl border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-8 h-8 sm:w-12 sm:h-12 text-center text-base sm:text-xl border border-gray-300 rounded-lg sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-500"
               disabled={loading}
             />
           ))}
         </div>
 
         {showResendSection && (
-          <div className="text-center mb-8">
+          <div className="text-center mb-6 sm:mb-8">
             {timeLeft > 0 ? (
-              <p className="text-sm text-gray-500">
+              <p className="text-xs sm:text-sm text-gray-500">
                 Kirim Ulang OTP dalam{' '}
                 <span className="font-bold">{timeLeft} detik</span>
               </p>
             ) : (
               <button
                 onClick={handleResend}
-                className={`text-red-500 font-bold ${
+                className={`text-red-500 font-bold text-sm sm:text-base ${
                   canResend
                     ? 'hover:underline'
                     : 'opacity-50 cursor-not-allowed'
@@ -185,15 +195,15 @@ const Otp = () => {
         <Button
           type="button"
           onClick={handleSubmit}
-          className="h-12 w-full"
+          className="h-10 sm:h-12 w-full text-sm sm:text-base"
           disabled={loading || otp.join('').length !== 6}
         >
           {loading ? 'Memverifikasi...' : 'Verifikasi'}
         </Button>
 
         {errorMessage && (
-          <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-full max-w-md px-4">
-            <div className="p-3 text-sm text-white text-center bg-red-500 font-medium rounded-lg shadow-lg">
+          <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-[90%] sm:w-full max-w-md px-2 sm:px-4">
+            <div className="p-2 sm:p-3 text-xs sm:text-sm text-white text-center bg-red-500 font-medium rounded-lg shadow-lg">
               {errorMessage}
             </div>
           </div>
