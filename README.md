@@ -4,12 +4,12 @@
 
 ## **FRONTEND TEAM**
 
-| **Name**                 | **Tasks**       |
-| ------------------------ | --------------- |
-| **Rafly Aziz Abdillah**  | Init project    |
-| **Tegar Alfa Rizzi**     | _To be defined_ |
-| **Melinda Wijaya**       | _To be defined_ |
-| **Yogi Efani Yancandra** | _To be defined_ |
+| **Name**                 | **Tasks**           |
+| ------------------------ | ------------------- |
+| **Rafly Aziz Abdillah**  | Init project, Login |
+| **Tegar Alfa Rizzi**     | _To be defined_     |
+| **Melinda Wijaya**       | _To be defined_     |
+| **Yogi Efani Yancandra** | _To be defined_     |
 
 ---
 
