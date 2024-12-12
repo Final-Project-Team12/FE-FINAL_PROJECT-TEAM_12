@@ -1,10 +1,9 @@
-AccountPage
-import Account from "../components/Account";
+import Notification from "../components/UI/Notification";
 
-const AccountPage = () => {
+const NotificationPage = () => {
   return (
-    <Account/>
+    <Notification/>
   );
 }
 
-export default AccountPage
+export default NotificationPage
