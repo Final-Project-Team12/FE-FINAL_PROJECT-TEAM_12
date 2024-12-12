@@ -11,11 +11,11 @@ const HeaderHistory = ({ onDateRangeChange }) => {
   };
   return (
     <div className="border-b py-2 -mt-2 shadow-[0px_4px_10px_rgba(0,0,0,0.1)]">
-      <div className="ml-[260px] mr-[212px] mb-5">
+      <div className="ml-4 mr-3 sm:ml-[64px] sm:mr-[48px] md:ml-[128px] md:mr-[96px] xl:ml-[260px] xl:mr-[212px] mb-5">
         <h2 className="text-xl font-bold my-[24px]">Riwayat Pemesanan</h2>
-        <div className="flex gap-3 mx-4">
+        <div className="md:flex md:flex-col md:mx-3 lg:flex lg:flex-col xl:flex xl:flex-row xl:mx-4 gap-3">
           <div
-            className="w-[700px] h-[50px] rounded-[12px] bg-[#A06ECE] flex items-center cursor-pointer"
+            className="xl:w-[700px] h-[50px] rounded-[12px] bg-[#A06ECE] flex items-center cursor-pointer"
             onClick={() => navigate('/')}
           >
             <img
@@ -25,11 +25,13 @@ const HeaderHistory = ({ onDateRangeChange }) => {
             />
             <div className="ml-3 text-white">Beranda</div>
           </div>
-          <div className="w-[110px] h-[50px]">
-            <CalendarFilter onDateRangeChange={handleDateRangeChange} />
-          </div>
-          <div className="w-[110px]">
-            <SearchButton />
+          <div className="flex justify-between gap-3 p-2 sm:flex sm:justify-between md:flex md:justify-between">
+            <div className=" h-[50px]">
+              <CalendarFilter onDateRangeChange={handleDateRangeChange} />
+            </div>
+            <div className="">
+              <SearchButton />
+            </div>
           </div>
         </div>
       </div>
