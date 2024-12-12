@@ -5,7 +5,7 @@ import styles from '../OrderDetails/OrderDetails.module.css';
 const OrderDetailsPanel = ({ selectedCard, containerHeight }) => {
   return (
     <div
-      className={styles.orderDetailsContainer}
+      className={`${styles.orderDetailsContainer} hidden lg:block`}
       style={{
         maxHeight: `${containerHeight - 20}px`,
         overflow: 'auto',

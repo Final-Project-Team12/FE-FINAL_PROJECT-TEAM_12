@@ -44,7 +44,7 @@ const History = () => {
     <>
       <Navbar />
       <HeaderHistory onDateRangeChange={handleDateRangeChange} />
-      <div className="flex flex-col lg:flex-row gap-12 px-[260px] py-4 min-h-[calc(100vh-84px)]">
+      <div className="py-4 flex sm:flex-col sm:px-[15px] md:flex-col md:px-[20px] lg:flex-row lg:px-[50px] lg:gap-5 xl:flex-row xl:gap-12 xl:px-[260px] xl:min-h-[calc(100vh-84px)]">
         <FlightList
           flights={filteredFlightData}
           selectedCardId={selectedCardId}

@@ -11,7 +11,7 @@ const HeaderHistory = ({ onDateRangeChange }) => {
   };
   return (
     <div className="border-b py-2 -mt-2 shadow-[0px_4px_10px_rgba(0,0,0,0.1)]">
-      <div className="ml-4 mr-3 sm:ml-[64px] sm:mr-[48px] md:ml-[128px] md:mr-[96px] xl:ml-[260px] xl:mr-[212px] mb-5">
+      <div className="ml-4 mr-3 sm:ml-[64px] sm:mr-[48px] md:ml-[20px] md:mr-[20px] lg:mr-[50px] lg:ml-[50px] xl:ml-[260px] xl:mr-[212px] mb-5">
         <h2 className="text-xl font-bold my-[24px]">Riwayat Pemesanan</h2>
         <div className="md:flex md:flex-col md:mx-3 lg:flex lg:flex-col xl:flex xl:flex-row xl:mx-4 gap-3">
           <div
