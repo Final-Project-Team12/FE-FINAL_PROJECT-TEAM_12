@@ -1,6 +1,5 @@
-import { Search, Bell } from 'lucide-react';
+import { Search, Bell, List } from 'lucide-react';
 import { FaArrowRightToBracket } from 'react-icons/fa6';
-import { IoMenuOutline } from 'react-icons/io5';
 import { CgProfile } from 'react-icons/cg';
 import ProductLogo from '../../../public/icons/logo.svg';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -74,7 +73,7 @@ const Navbar = () => {
           <div className="pr-2 sm:pr-4 md:pr-8 flex items-center space-x-4">
             {isAuthenticated ? (
               <>
-                <IoMenuOutline
+                <List
                   className="text-gray-600 cursor-pointer hover:text-[#7126B5] transition-colors"
                   size={28}
                   onClick={handleOrderHistoryClick}
