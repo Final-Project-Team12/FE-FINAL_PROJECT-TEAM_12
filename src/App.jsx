@@ -12,6 +12,7 @@ import LoginPage from './pages/LoginPage';
 import AccountPage from './pages/AccountPage';
 import OtpPage from './pages/OtpPage';
 import OtpPasswordPage from './pages/OtpPasswordPage';
+import NotificationPage from './pages/NotificationPage';
 
 function App() {
   return (
@@ -45,6 +46,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <OrderHistoryPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/notification"
+            element={
+              <ProtectedRoute>
+                <NotificationPage />
               </ProtectedRoute>
             }
           />
