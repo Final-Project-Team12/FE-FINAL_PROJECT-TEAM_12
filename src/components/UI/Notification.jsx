@@ -50,8 +50,9 @@ const Notification = () => {
             <h3>Dapatkan Potongan 50% Tiket!</h3>
             <p className="text-slate-500 text-sm">Syarat dan Ketentuan berlaku!</p>
           </div>
-          <hr className="my-4 bg-slate-400" />
         </div>
+        <hr className="my-4 bg-slate-400" />
+
         <div className="flex p-4 sm:p-6 space-x-4">
           <div>
             <Bell className="bg-purple-400 w-6 h-6 text-white rounded-full p-1 mt-2"/>
