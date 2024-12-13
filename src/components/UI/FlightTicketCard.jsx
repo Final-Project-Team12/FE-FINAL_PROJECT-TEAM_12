@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Location from '../../../public/icons/location.svg';
 import Arrow from '../../../public/icons/Arrow.svg';
+import Button from '../Elements/Buttons/Button';
 
 const FlightTicketCard = ({ flight, onCardClick, isSelected, bookingDate }) => {
   const {
@@ -97,6 +98,9 @@ const FlightTicketCard = ({ flight, onCardClick, isSelected, bookingDate }) => {
                 IDR {totalPrice.toLocaleString('id-ID')}
               </p>
             </div>
+          </div>
+          <div className="block mt-3 lg:hidden">
+            <Button>Details</Button>
           </div>
         </div>
       </div>
