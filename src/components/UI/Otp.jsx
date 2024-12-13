@@ -12,8 +12,7 @@ const Otp = () => {
   const [timeLeft, setTimeLeft] = useState(60);
   const [errorMessage, setErrorMessage] = useState('');
   const [canResend, setCanResend] = useState(false);
-  const [showResendSection, setShowResendSection] = useState(false);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [isTimerActive, setIsTimerActive] = useState(false);
 
   const navigate = useNavigate();
   const { handleOtp, handleResendOtp } = useRegister();
@@ -26,46 +25,52 @@ const Otp = () => {
       return;
     }
 
-    const currentTime = Date.now();
-    const initialExpiryTime = localStorage.getItem('otpExpiryTime');
-    const hasStartedSession = localStorage.getItem('otpSessionStarted');
-
-    if (!hasStartedSession) {
-      localStorage.setItem('otpSessionStarted', 'true');
-      localStorage.setItem('otpExpiryTime', (currentTime + 60000).toString());
+    const initializeTimer = () => {
       setTimeLeft(60);
       setCanResend(false);
-      setShowResendSection(false);
+      setIsTimerActive(true);
+      localStorage.setItem('otpStartTime', Date.now().toString());
+    };
 
-      const timer = setTimeout(() => {
-        setShowResendSection(true);
-        setIsInitialLoad(false);
-      }, 60000);
+    const otpStartTime = localStorage.getItem('otpStartTime');
+    const currentTime = Date.now();
 
-      return () => clearTimeout(timer);
+    if (!otpStartTime) {
+      initializeTimer();
     } else {
-      setIsInitialLoad(false);
-      setShowResendSection(true);
+      const elapsedTime = Math.floor(
+        (currentTime - parseInt(otpStartTime)) / 1000
+      );
+      const remainingTime = Math.max(0, 60 - elapsedTime);
 
-      if (initialExpiryTime) {
-        const remainingTime = Math.max(
-          0,
-          Math.floor((parseInt(initialExpiryTime) - currentTime) / 1000)
-        );
+      if (remainingTime > 0) {
         setTimeLeft(remainingTime);
-        setCanResend(remainingTime <= 0);
+        setCanResend(false);
+        setIsTimerActive(true);
+      } else {
+        setTimeLeft(0);
+        setCanResend(true);
+        setIsTimerActive(false);
       }
     }
+
+    return () => {
+      if (!canResend) {
+        localStorage.removeItem('otpStartTime');
+      }
+    };
   }, [email, navigate]);
 
   useEffect(() => {
     let timer;
-    if (timeLeft > 0 && !isInitialLoad) {
+    if (isTimerActive && timeLeft > 0) {
       timer = setInterval(() => {
         setTimeLeft((prevTime) => {
           const newTime = prevTime - 1;
           if (newTime <= 0) {
             setCanResend(true);
+            setIsTimerActive(false);
+            localStorage.removeItem('otpStartTime');
           }
           return newTime;
         });
@@ -75,7 +80,7 @@ const Otp = () => {
     return () => {
       if (timer) clearInterval(timer);
     };
-  }, [timeLeft, isInitialLoad]);
+  }, [isTimerActive, timeLeft]);
 
   const handleChange = (e, index) => {
     const value = e.target.value;
@@ -119,11 +124,11 @@ const Otp = () => {
 
     try {
       await handleResendOtp();
-      const newExpiryTime = Date.now() + 60000;
-      localStorage.setItem('otpExpiryTime', newExpiryTime.toString());
       setTimeLeft(60);
       setCanResend(false);
+      setIsTimerActive(true);
       setErrorMessage('');
+      localStorage.setItem('otpStartTime', Date.now().toString());
     } catch (error) {
       setErrorMessage('Gagal mengirim ulang OTP');
     }
@@ -169,28 +174,24 @@ const Otp = () => {
           ))}
         </div>
 
-        {showResendSection && (
-          <div className="text-center mb-6 sm:mb-8">
-            {timeLeft > 0 ? (
-              <p className="text-xs sm:text-sm text-gray-500">
-                Kirim Ulang OTP dalam{' '}
-                <span className="font-bold">{timeLeft} detik</span>
-              </p>
-            ) : (
-              <button
-                onClick={handleResend}
-                className={`text-red-500 font-bold text-sm sm:text-base ${
-                  canResend
-                    ? 'hover:underline'
-                    : 'opacity-50 cursor-not-allowed'
-                }`}
-                disabled={!canResend || loading}
-              >
-                Kirim Ulang
-              </button>
-            )}
-          </div>
-        )}
+        <div className="text-center mb-6 sm:mb-8">
+          {timeLeft > 0 ? (
+            <p className="text-xs sm:text-sm text-gray-500">
+              Kirim Ulang OTP dalam{' '}
+              <span className="font-bold">{timeLeft} detik</span>
+            </p>
+          ) : (
+            <button
+              onClick={handleResend}
+              className={`text-red-500 font-bold text-sm sm:text-base ${
+                canResend ? 'hover:underline' : 'opacity-50 cursor-not-allowed'
+              }`}
+              disabled={!canResend || loading}
+            >
+              Kirim Ulang
+            </button>
+          )}
+        </div>
 
         <Button
           type="button"
