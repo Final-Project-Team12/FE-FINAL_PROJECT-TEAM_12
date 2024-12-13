@@ -25,9 +25,9 @@ const OrderDetailsModal = ({ selectedCard, onClose }) => {
   const totalPrice = selectedCard.pricePerPerson * selectedCard.totalPassengers;
 
   return (
-    <div className="relative inset-0 z-50 flex ">
-      <div className="relative w-auto max-w-md mx-auto my-6">
-        <div className="relative flex flex-col w-full bg-white border-0 rounded-lg shadow-lg outline-none focus:outline-none mt-4 z-20">
+    <div className="absolute z-50 md:w-full">
+      <div className="relative w-auto max-w-md mx-auto">
+        <div className="relative flex flex-col w-full bg-white border-0 rounded-lg shadow-lg outline-none focus:outline-none z-20">
           {/* Close button */}
           <button
             className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 z-20"
