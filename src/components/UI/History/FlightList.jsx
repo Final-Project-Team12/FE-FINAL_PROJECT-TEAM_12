@@ -1,7 +1,7 @@
 import React from 'react';
 import FlightTicketCard from '../FlightTicketCard';
 
-const FlightList = ({ flights, selectedCardId, onCardClick }) => {
+const FlightList = ({ flights, selectedCardId, onCardClick, selectedCard }) => {
   if (flights.length === 0) {
     return (
       <div className="w-full flex justify-center items-center">
@@ -21,6 +21,7 @@ const FlightList = ({ flights, selectedCardId, onCardClick }) => {
           onCardClick={onCardClick}
           isSelected={flight.id === selectedCardId}
           bookingDate={flight.bookingDate}
+          selectedCard={selectedCard}
         />
       ))}
     </div>
