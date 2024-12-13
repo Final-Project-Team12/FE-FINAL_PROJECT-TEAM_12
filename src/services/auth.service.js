@@ -29,13 +29,13 @@ export const authService = {
   },
 
   logout: () => {
-    Cookies.remove('token');
-    Cookies.remove('user');
+    Cookies.remove('token', { path: '/' });
+    Cookies.remove('user', { path: '/' });
   },
 
   clearAuth: () => {
-    Cookies.remove('token');
-    Cookies.remove('user');
+    Cookies.remove('token', { path: '/' });
+    Cookies.remove('user', { path: '/' });
   },
 
   isAuthenticated: () => {
