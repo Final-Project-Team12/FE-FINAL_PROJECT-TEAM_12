@@ -76,28 +76,18 @@ export const saveOrderData = async (orderData) => {
 };
 
 export const getFlights = async (page = 1, limit = 5) => {
-  const cacheKey = `flights_${page}_${limit}`;
-  const cachedData = sessionStorage.getItem(cacheKey);
-
-  if (cachedData) {
-    return JSON.parse(cachedData);
-  }
-
   try {
     const response = await axiosInstance.get('/flights', {
       params: { page, limit },
     });
 
     if (response.status === 200) {
-      const result = {
+      return {
         isSuccess: true,
         data: response.data.data,
         pagination: response.data.pagination,
         message: response.data.message,
       };
-
-      sessionStorage.setItem(cacheKey, JSON.stringify(result));
-      return result;
     }
 
     throw new Error(response.data.message || 'Failed to fetch flights');

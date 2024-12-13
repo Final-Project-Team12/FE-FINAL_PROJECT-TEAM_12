@@ -1,40 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Search, X, Loader } from 'lucide-react';
-import { useFlights } from '../../../hooks/useFlight';
-
-const CACHE_KEY_PREFIX = 'airport_data_';
-const CACHE_DURATION = 24 * 60 * 60 * 1000;
+import { useFlightContext } from '../../../context/FlightContext';
 
 const CitySelectionModal = ({ isOpen, onClose, onSelect, title }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [airports, setAirports] = useState([]);
   const [filteredAirports, setFilteredAirports] = useState([]);
   const [recentCities, setRecentCities] = useState([]);
-  const { flights, loading, error, fetchFlights } = useFlights();
-
-  const isCacheValid = (timestamp) => {
-    return Date.now() - timestamp < CACHE_DURATION;
-  };
-
-  const getCachedData = (key) => {
-    const cachedData = sessionStorage.getItem(key);
-    if (cachedData) {
-      const { data, timestamp } = JSON.parse(cachedData);
-      if (isCacheValid(timestamp)) {
-        return data;
-      }
-      sessionStorage.removeItem(key);
-    }
-    return null;
-  };
-
-  const setCacheData = (key, data) => {
-    const cacheData = {
-      data,
-      timestamp: Date.now(),
-    };
-    sessionStorage.setItem(key, JSON.stringify(cacheData));
-  };
+  const { flights, loading, error, fetchFlights } = useFlightContext();
 
   const processAirportsData = useCallback((flightsData) => {
     if (!flightsData?.outbound_flights) return [];
@@ -67,20 +40,11 @@ const CitySelectionModal = ({ isOpen, onClose, onSelect, title }) => {
   }, []);
 
   const fetchAirportsData = useCallback(async () => {
-    const cacheKey = `${CACHE_KEY_PREFIX}all`;
-    const cachedAirports = getCachedData(cacheKey);
-
-    if (cachedAirports) {
-      setAirports(cachedAirports);
-      return;
-    }
-
     try {
       const response = await fetchFlights(1, 100);
       if (response?.data) {
         const airportsList = processAirportsData(response.data);
         setAirports(airportsList);
-        setCacheData(cacheKey, airportsList);
       }
     } catch (err) {
       console.error('Error fetching airports:', err);
@@ -166,14 +130,12 @@ const CitySelectionModal = ({ isOpen, onClose, onSelect, title }) => {
             </button>
           </div>
 
-          {/* Error Message */}
           {error && (
             <div className="text-red-500 text-center mb-4 p-3 bg-red-50 rounded-lg">
               {error}
             </div>
           )}
 
-          {/* Search Results */}
           {searchQuery && (
             <div className="mb-6">
               <h3 className="font-semibold text-lg mb-4">Search Results</h3>
@@ -206,7 +168,6 @@ const CitySelectionModal = ({ isOpen, onClose, onSelect, title }) => {
             </div>
           )}
 
-          {/* Recent Searches */}
           {recentCities.length > 0 && !searchQuery && (
             <div>
               <div className="flex justify-between items-center mb-4">
