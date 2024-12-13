@@ -49,6 +49,7 @@ const History = () => {
           flights={filteredFlightData}
           selectedCardId={selectedCardId}
           onCardClick={setSelectedCardId}
+          selectedCard={selectedFlight}
         />
         {filteredFlightData.length > 0 && (
           <OrderDetailsPanel
