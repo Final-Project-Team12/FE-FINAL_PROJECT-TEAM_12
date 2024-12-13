@@ -39,7 +39,7 @@ const FlightTicketCard = ({ flight, onCardClick, isSelected, bookingDate }) => {
     <div>
       <p className="font-bold mb-2">{bookingDate}</p>
       <div
-        className={`bg-white shadow-md rounded-lg overflow-hidden border-2 ${
+        className={` bg-white shadow-md rounded-lg overflow-hidden border-2 ${
           isSelected
             ? 'border-purple-500'
             : 'border-gray-200 hover:border-gray-300'
@@ -52,9 +52,9 @@ const FlightTicketCard = ({ flight, onCardClick, isSelected, bookingDate }) => {
           >
             {status}
           </span>
-          <div className="flex justify-between py-3">
+          <div className="flex justify-between py-3 gap-3">
             <div className="flex gap-2">
-              <div>
+              <div className="hidden md:flex">
                 <img src={Location} alt="Location Icon" />
               </div>
               <div>
@@ -63,14 +63,14 @@ const FlightTicketCard = ({ flight, onCardClick, isSelected, bookingDate }) => {
                 <p className="font-regular">{departure.time}</p>
               </div>
             </div>
-            <div className="flex flex-col items-center justify-center">
+            <div className="hidden md:flex md:flex-col md:items-center md:justify-center">
               <div>{duration}</div>
               <div>
                 <img src={Arrow} alt="arrow icon" />
               </div>
             </div>
-            <div className="flex gap-2">
-              <div>
+            <div>
+              <div className="hidden md:flex">
                 <img src={Location} alt="Location Icon" />
               </div>
               <div>
@@ -88,7 +88,7 @@ const FlightTicketCard = ({ flight, onCardClick, isSelected, bookingDate }) => {
               <p className="font-bold">Booking Code:</p>
               <p>{bookingCode}</p>
             </div>
-            <div className="mt-2">
+            <div className="hidden md:flex md:mt-2">
               <p className="font-bold">Class:</p>
               <p>{flightClass}</p>
             </div>
