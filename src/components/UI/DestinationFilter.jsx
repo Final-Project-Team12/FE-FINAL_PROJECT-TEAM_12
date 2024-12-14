@@ -4,20 +4,15 @@ import TravelCard from './TravelCard';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useFlights } from '../../hooks/useFlight';
+import { useFlightContext } from '../../context/FlightContext';
 
 const ITEMS_PER_PAGE = 5;
-const CACHE_KEY = 'destination_filter_data';
+const CACHE_DURATION = 5 * 60 * 1000;
 
 const DestinationFilter = () => {
+  const { flights, loading, error, fetchFlights } = useFlightContext();
   const [activeContinent, setActiveContinent] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const [allFlights, setAllFlights] = useState(() => {
-    const cached = sessionStorage.getItem(CACHE_KEY);
-    return cached ? JSON.parse(cached) : [];
-  });
-
-  const { flights, loading, error, fetchFlights } = useFlights();
   const [filteredFlights, setFilteredFlights] = useState([]);
   const [continents, setContinents] = useState([{ id: 'all', name: 'Semua' }]);
   const [totalPages, setTotalPages] = useState(1);
@@ -26,43 +21,29 @@ const DestinationFilter = () => {
   );
 
   useEffect(() => {
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-    };
-
+    const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const fetchAndCacheFlights = useCallback(async () => {
-    try {
-      const cached = sessionStorage.getItem(CACHE_KEY);
-      if (cached) {
-        setAllFlights(JSON.parse(cached));
-        return;
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await fetchFlights(1, 100);
+      } catch (error) {
+        console.error('Error fetching all flights:', error);
       }
+    };
 
-      const response = await fetchFlights(1, 100);
-      if (response?.data?.outbound_flights) {
-        setAllFlights(response.data.outbound_flights);
-        sessionStorage.setItem(
-          CACHE_KEY,
-          JSON.stringify(response.data.outbound_flights)
-        );
-      }
-    } catch (error) {
-      console.error('Error fetching all flights:', error);
-    }
+    fetchData();
+    const interval = setInterval(() => fetchData(), CACHE_DURATION / 2);
+    return () => clearInterval(interval);
   }, [fetchFlights]);
 
   useEffect(() => {
-    fetchAndCacheFlights();
-  }, [fetchAndCacheFlights]);
-
-  useEffect(() => {
-    if (allFlights.length > 0) {
+    if (flights?.outbound_flights) {
       const uniqueContinents = new Set();
-      allFlights.forEach((flight) => {
+      flights.outbound_flights.forEach((flight) => {
         if (flight.destination_airport?.continent) {
           uniqueContinents.add(
             JSON.stringify({
@@ -79,13 +60,13 @@ const DestinationFilter = () => {
 
       setContinents([{ id: 'all', name: 'Semua' }, ...continentArray]);
     }
-  }, [allFlights]);
+  }, [flights]);
 
   useEffect(() => {
-    let filtered = allFlights;
+    let filtered = flights?.outbound_flights || [];
 
     if (activeContinent !== 'all') {
-      filtered = allFlights.filter(
+      filtered = filtered.filter(
         (flight) =>
           flight.destination_airport?.continent?.continent_id.toString() ===
           activeContinent.toString()
@@ -95,7 +76,7 @@ const DestinationFilter = () => {
     setFilteredFlights(filtered);
     setTotalPages(Math.ceil(filtered.length / ITEMS_PER_PAGE));
     setCurrentPage(1);
-  }, [activeContinent, allFlights]);
+  }, [activeContinent, flights]);
 
   const getCurrentPageItems = useCallback(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;

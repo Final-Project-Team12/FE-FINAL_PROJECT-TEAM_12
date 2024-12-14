@@ -1,6 +1,4 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { persistStore, persistReducer } from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
 import authReducer from './slices/authSlice';
 import userReducer from './slices/userSlice';
 import paymentReducer from './slices/paymentSlice';
@@ -10,94 +8,6 @@ import flightFilterReducer from './slices/flightFilterSlice';
 import registerReducer from './slices/registerSlice';
 import resetPasswordReducer from './slices/resetPasswordSlice';
 
-const authPersistConfig = {
-  key: 'auth',
-  storage,
-  whitelist: ['user'],
-  blacklist: ['loading', 'error'],
-};
-
-const userPersistConfig = {
-  key: 'user',
-  storage,
-  whitelist: ['userData'],
-  blacklist: [
-    'loading',
-    'error',
-    'updateLoading',
-    'updateError',
-    'deleteLoading',
-    'deleteError',
-  ],
-};
-
-const flightSearchPersistConfig = {
-  key: 'flightSearch',
-  storage,
-  whitelist: [
-    'fromCity',
-    'toCity',
-    'isRoundTrip',
-    'passengerCounts',
-    'selectedSeatClass',
-    'seatPrices',
-  ],
-  blacklist: [
-    'departureDate',
-    'returnDate',
-    'selectedFlight',
-    'fromCityDisplay',
-    'toCityDisplay',
-    'searchResults',
-  ],
-};
-
-const flightFilterPersistConfig = {
-  key: 'flightFilter',
-  storage,
-  whitelist: ['activeFilters', 'sortCriteria'],
-  blacklist: [
-    'filteredFlights',
-    'isLoading',
-    'error',
-    'hasMoreFlights',
-    'currentPageNumber',
-    'searchParams',
-  ],
-};
-
-const paymentPersistConfig = {
-  key: 'payment',
-  storage,
-  whitelist: ['paymentMethods'],
-  blacklist: ['orderData', 'paymentDetails', 'loading', 'error'],
-};
-
-const flightPersistConfig = {
-  key: 'flight',
-  storage,
-  blacklist: ['selectedFlight', 'searchResults', 'loading', 'error'],
-};
-
-const persistedAuthReducer = persistReducer(authPersistConfig, authReducer);
-const persistedUserReducer = persistReducer(userPersistConfig, userReducer);
-const persistedPaymentReducer = persistReducer(
-  paymentPersistConfig,
-  paymentReducer
-);
-const persistedFlightReducer = persistReducer(
-  flightPersistConfig,
-  flightReducer
-);
-const persistedFlightSearchReducer = persistReducer(
-  flightSearchPersistConfig,
-  flightSearchReducer
-);
-const persistedFlightFilterReducer = persistReducer(
-  flightFilterPersistConfig,
-  flightFilterReducer
-);
-
 const dateSerializer = {
   serialize: (date) => (date instanceof Date ? date.toISOString() : date),
   deserialize: (dateString) => (dateString ? new Date(dateString) : null),
@@ -105,12 +15,12 @@ const dateSerializer = {
 
 export const store = configureStore({
   reducer: {
-    auth: persistedAuthReducer,
-    user: persistedUserReducer,
-    payment: persistedPaymentReducer,
-    flight: persistedFlightReducer,
-    flightSearch: persistedFlightSearchReducer,
-    flightFilter: persistedFlightFilterReducer,
+    auth: authReducer,
+    user: userReducer,
+    payment: paymentReducer,
+    flight: flightReducer,
+    flightSearch: flightSearchReducer,
+    flightFilter: flightFilterReducer,
     register: registerReducer,
     resetPassword: resetPasswordReducer,
   },
@@ -118,11 +28,6 @@ export const store = configureStore({
     getDefaultMiddleware({
       serializableCheck: {
         ignoredActions: [
-          'persist/PERSIST',
-          'persist/REHYDRATE',
-          'persist/REGISTER',
-          'persist/PURGE',
-
           'auth/loginSuccess',
           'auth/loginFailure',
           'auth/logout',
@@ -263,22 +168,20 @@ export const store = configureStore({
     }),
 });
 
-export const persistor = persistStore(store);
-
-export const purgeStore = async () => {
-  await persistor.purge();
-  await storage.removeItem('persist:auth');
-  await storage.removeItem('persist:user');
-  await storage.removeItem('persist:payment');
-  await storage.removeItem('persist:flight');
-  await storage.removeItem('persist:flightSearch');
-  await storage.removeItem('persist:flightFilter');
-};
-
 export const serializeDate = (date) => {
   return date instanceof Date ? date.toISOString() : date;
 };
 
 export const deserializeDate = (dateString) => {
   return dateString ? new Date(dateString) : null;
+};
+
+export const resetStore = () => {
+  store.dispatch({ type: 'auth/logout' });
+  store.dispatch({ type: 'user/resetUserData' });
+  store.dispatch({ type: 'flightSearch/resetFlightSearch' });
+  store.dispatch({ type: 'flightFilter/clearAllFilters' });
+  store.dispatch({ type: 'payment/resetPaymentState' });
+  store.dispatch({ type: 'register/resetRegisterState' });
+  store.dispatch({ type: 'resetPassword/resetState' });
 };

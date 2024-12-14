@@ -93,7 +93,7 @@ export const useAuth = () => {
         },
       });
 
-      navigate('/login');
+      navigate('/login', { replace: true });
     }
   };
 

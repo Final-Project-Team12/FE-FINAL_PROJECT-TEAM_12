@@ -2,8 +2,15 @@ import React, { useState } from 'react';
 import Location from '../../../public/icons/location.svg';
 import Arrow from '../../../public/icons/Arrow.svg';
 import Button from '../Elements/Buttons/Button';
+import OrderDetailsModal from './OrderDetails/OrderDetailsModal';
 
-const FlightTicketCard = ({ flight, onCardClick, isSelected, bookingDate }) => {
+const FlightTicketCard = ({
+  flight,
+  onCardClick,
+  isSelected,
+  bookingDate,
+  selectedCard,
+}) => {
   const {
     id,
     status,
@@ -34,6 +41,19 @@ const FlightTicketCard = ({ flight, onCardClick, isSelected, bookingDate }) => {
 
   const handleCardClick = () => {
     onCardClick(id);
+  };
+
+  // State untuk mengontrol modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Fungsi untuk membuka modal
+  const handleButton = () => {
+    setIsModalOpen(true); // Set modal terbuka
+  };
+
+  // Fungsi untuk menutup modal
+  const handleCloseModal = () => {
+    setIsModalOpen(false); // Set modal tertutup
   };
 
   return (
@@ -100,10 +120,19 @@ const FlightTicketCard = ({ flight, onCardClick, isSelected, bookingDate }) => {
             </div>
           </div>
           <div className="block mt-3 lg:hidden">
-            <Button>Details</Button>
+            <Button onClick={handleButton}>Details</Button>
           </div>
         </div>
       </div>
+
+      {/* Modal */}
+      {isModalOpen && (
+        <OrderDetailsModal
+          flight={flight} // Passing flight data to modal
+          onClose={handleCloseModal} // Passing close function to modal
+          selectedCard={selectedCard}
+        />
+      )}
     </div>
   );
 };

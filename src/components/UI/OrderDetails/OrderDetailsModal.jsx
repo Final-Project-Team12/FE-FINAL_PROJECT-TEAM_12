@@ -25,12 +25,12 @@ const OrderDetailsModal = ({ selectedCard, onClose }) => {
   const totalPrice = selectedCard.pricePerPerson * selectedCard.totalPassengers;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none">
-      <div className="relative w-auto max-w-md mx-auto my-6">
-        <div className="relative flex flex-col w-full bg-white border-0 rounded-lg shadow-lg outline-none focus:outline-none">
+    <div className="absolute z-50 md:w-full">
+      <div className="relative w-auto max-w-md mx-auto">
+        <div className="relative flex flex-col w-full bg-white border-0 rounded-lg shadow-lg outline-none focus:outline-none z-20">
           {/* Close button */}
           <button
-            className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+            className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 z-20"
             onClick={onClose}
           >
             ×
@@ -189,7 +189,7 @@ const OrderDetailsModal = ({ selectedCard, onClose }) => {
         </div>
       </div>
       {/* Overlay */}
-      <div className="fixed inset-0 z-40 bg-black opacity-25"></div>
+      <div className="fixed inset-0 z-10 bg-black opacity-25"></div>
     </div>
   );
 };
