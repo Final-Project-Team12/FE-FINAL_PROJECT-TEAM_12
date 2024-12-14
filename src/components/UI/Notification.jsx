@@ -1,3 +1,151 @@
+import React, { useState, useEffect } from 'react';
+import Navbar from './Navbar';
+import HeaderNotification from './HeaderNotification';
+import { Bell } from 'lucide-react';
+
+const notif = [
+  {
+    type: "Promosi",
+    title: "Dapatkan Potongan 50% Tiket!",
+    description: "Syarat dan Ketentuan berlaku!",
+    date: "2024-12-13",
+    time: "14:04",
+  },
+  {
+    type: "Pemberitahuan",
+    title: "Terdapat perubahan pada jadwal penerbangan kode booking 45GT6",
+    description: "",
+    date: "2024-12-13",
+    time: "14:04",
+  },
+  {
+    type: "Promosi",
+    title: "Flash Sale! Diskon 70% untuk Rute Domestik",
+    description: "Berlaku hingga tengah malam hari ini!",
+    date: "2024-12-11",
+    time: "15:30",
+  },
+  {
+    type: "Pemberitahuan",
+    title: "Check-in Online Telah Dibuka",
+    description: "Untuk penerbangan ID-789 besok pukul 08:00",
+    date: "2024-12-10",
+    time: "16:15",
+  },
+  {
+    type: "Pemberitahuan",
+    title: "Pembaruan Aplikasi Tersedia",
+    description: "Versi terbaru 2.5.0 siap diunduh",
+    date: "2024-12-09",
+    time: "16:45",
+  },
+  {
+    type: "Promosi",
+    title: "Bundling Tiket + Hotel Hemat 30%",
+    description: "Pesan sekarang untuk liburan akhir tahun!",
+    date: "2024-12-09",
+    time: "17:20",
+  },
+  {
+    type: "Pemberitahuan",
+    title: "Gate Perubahan untuk ID-456",
+    description: "Gate baru: A7 (sebelumnya A5)",
+    date: "2024-12-08",
+    time: "17:45",
+  },
+  {
+    type: "Pemberitahuan",
+    title: "Maintenance Pemberitahuan",
+    description: "Pemberitahuan akan maintenance pada 14 Dec 2024 02:00-04:00",
+    date: "2024-12-07",
+    time: "18:00",
+  },
+  {
+    type: "Promosi",
+    title: "Cashback 10% dengan Kartu Kredit BCA",
+    description: "Minimal transaksi Rp 1.000.000",
+    date: "2024-12-06",
+    time: "18:30",
+  },
+  {
+    type: "Pemberitahuan",
+    title: "Boarding Pass Digital Tersedia",
+    description: "Untuk penerbangan GA-234 besok",
+    date: "2024-12-05",
+    time: "19:00",
+  },
+  {
+    type: "Pemberitahuan",
+    title: "Verifikasi Email Berhasil",
+    description: "Akun Anda telah terverifikasi",
+    date: "2024-12-04",
+    time: "19:15",
+  },
+  {
+    type: "Promosi",
+    title: "Promo Khusus Member!",
+    description: "Extra bagasi 10kg untuk semua rute",
+    date: "2024-12-03",
+    time: "19:45",
+  },
+  {
+    type: "Pemberitahuan",
+    title: "Delay Penerbangan ID-890",
+    description: "Estimasi delay 45 menit",
+    date: "2024-12-02",
+    time: "20:00",
+  },
+  {
+    type: "Pemberitahuan",
+    title: "Pembayaran Berhasil",
+    description: "Booking ID: 78HJ9 telah dikonfirmasi",
+    date: "2024-12-01",
+    time: "20:15",
+  },
+  {
+    type: "Promosi",
+    title: "Buy 1 Get 1 Tiket Jakarta-Bali!",
+    description: "Periode terbang Jan-Mar 2025",
+    date: "2024-11-30",
+    time: "20:45",
+  },
+  {
+    type: "Pemberitahuan",
+    title: "Pengingat Check-in",
+    description: "12 jam sebelum keberangkatan ID-567",
+    date: "2024-11-29",
+    time: "21:00",
+  },
+  {
+    type: "Pemberitahuan",
+    title: "Perubahan Password Berhasil",
+    description: "Password akun Anda telah diperbarui",
+    date: "2024-11-28",
+    time: "21:30",
+  },
+  {
+    type: "Promosi",
+    title: "Diskon Akhir Tahun 40%",
+    description: "Untuk semua rute internasional",
+    date: "2024-11-28",
+    time: "22:00",
+  },
+  {
+    type: "Pemberitahuan",
+    title: "Perubahan Terminal Keberangkatan",
+    description: "ID-123 pindah ke Terminal 3",
+    date: "2024-11-27",
+    time: "22:30",
+  },
+  {
+    type: "Pemberitahuan",
+    title: "Sinkronisasi Data Selesai",
+    description: "Data perjalanan Anda telah diperbarui",
+    date: "2024-11-26",
+    time: "23:00",
+  }
+];
+
 const Notification = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredNotif, setFilteredNotif] = useState(notif);
