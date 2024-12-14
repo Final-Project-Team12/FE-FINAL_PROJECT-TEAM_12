@@ -19,9 +19,12 @@ const CalendarFilter = ({ onDateRangeChange }) => {
   };
 
   const handleSaveClick = () => {
-    onDateRangeChange(dateRange[0].startDate, dateRange[0].endDate);
+    if (dateRange[0].startDate && dateRange[0].endDate) {
+      onDateRangeChange(dateRange[0].startDate, dateRange[0].endDate);
+    }
     setShowCalendar(false);
   };
+  
 
   const handleCloseCalendar = () => {
     setShowCalendar(false);
