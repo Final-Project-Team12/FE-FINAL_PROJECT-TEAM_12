@@ -24,28 +24,22 @@ const CalendarFilter = ({ onDateRangeChange }) => {
     }
     setShowCalendar(false);
   };
-  
 
   const handleCloseCalendar = () => {
     setShowCalendar(false);
   };
 
   const handleFilterButtonClick = () => {
-    setShowCalendar(true);
-    const filterButton = document.querySelector(
-      '.w-[110px] .h-[50px].rounded-[12px].bg-[#A06ECE]'
-    );
-    filterButton.classList.add('bg-gray-300');
-    filterButton.focus();
+    setShowCalendar(!showCalendar);
   };
 
   return (
     <div className="relative">
       <button
-        className="h-[40px] px-4 mt-1 rounded-full border border-purple-500 flex items-center "
+        className="h-[40px] w-full sm:w-auto px-4 mt-1 rounded-full border border-purple-500 flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-purple-300"
         onClick={handleFilterButtonClick}
       >
-        <img className="w-6 pr-1" src={FilterIcon} alt="" /> Filter
+        <img className="w-6" src={FilterIcon} alt="Filter Icon" /> Filter
       </button>
       {showCalendar && (
         <>
@@ -53,11 +47,12 @@ const CalendarFilter = ({ onDateRangeChange }) => {
             className="fixed inset-0 bg-gray-500 bg-opacity-50 z-10"
             onClick={handleCloseCalendar}
           ></div>
-          <div className="absolute z-20 bg-white shadow-md rounded-lg p-4">
-            <div className="flex justify-end mb-2">
+          <div className="fixed sm:absolute z-20 bg-white shadow-md rounded-lg w-[95%] sm:w-auto max-w-[400px] max-h-[90vh] left-1/2 sm:left-auto right-auto sm:right-0 top-[20%] sm:top-full -translate-x-1/2 sm:translate-x-0 sm:translate-y-2 overflow-y-auto">
+            <div className="sticky top-0 flex justify-end p-2 bg-white z-30 border-b">
               <button
-                className="text-gray-500 hover:text-gray-700"
+                className="p-2 text-gray-500 hover:text-gray-700 transition duration-300"
                 onClick={handleCloseCalendar}
+                aria-label="Close calendar"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -75,19 +70,24 @@ const CalendarFilter = ({ onDateRangeChange }) => {
                 </svg>
               </button>
             </div>
-            <DateRange
-              editableDateInputs={true}
-              onChange={handleDateRangeChange}
-              moveRangeOnFirstSelection={false}
-              ranges={dateRange}
-            />
-            <div className="flex justify-end">
-              <button
-                className="mt-4 bg-purple-500 text-white px-4 py-2 rounded-lg"
-                onClick={handleSaveClick}
-              >
-                Simpan
-              </button>
+            <div className="p-4">
+              <div className="overflow-x-auto">
+                <DateRange
+                  editableDateInputs={true}
+                  onChange={handleDateRangeChange}
+                  moveRangeOnFirstSelection={false}
+                  ranges={dateRange}
+                  className="!w-full"
+                />
+              </div>
+              <div className="flex justify-end">
+                <button
+                  className="mt-4 bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition duration-300 ease-in-out"
+                  onClick={handleSaveClick}
+                >
+                  Simpan
+                </button>
+              </div>
             </div>
           </div>
         </>
