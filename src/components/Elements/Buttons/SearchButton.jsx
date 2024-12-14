@@ -41,7 +41,7 @@ const SearchButton = () => {
       </button>
 
       {isSearchOpen && (
-        <div className="absolute right-0 w-[300px] bg-white rounded-lg shadow-lg border p-4 z-20">
+        <div className="absolute right-0 w-[300px] bg-white rounded-lg shadow-lg border p-4 z-10">
           <div className="flex items-center justify-between mb-4">
             <form onSubmit={handleSearch} className="flex-1 mr-2">
               <input
