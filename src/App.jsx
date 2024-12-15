@@ -23,7 +23,15 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/flight-ticket" element={<FlightTicketPage />} />
           <Route
-            path="/checkout/:id"
+            path="/checkout/:departureId"
+            element={
+              <ProtectedRoute>
+                <PaymentPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/checkout/:departureId/:returnId"
             element={
               <ProtectedRoute>
                 <PaymentPage />

@@ -39,7 +39,7 @@ export const fetchFilteredFlights = createAsyncThunk(
           }
         );
 
-      let filteredOutboundFlights = response.data.outbound_flights;
+      let filteredOutboundFlights = response.data.outbound_flights || [];
       let filteredReturnFlights = response.data.return_flights || [];
 
       if (filters.departureDate) {
@@ -114,7 +114,6 @@ export const fetchFilteredFlights = createAsyncThunk(
       }
 
       return {
-        ...response,
         data: {
           outbound_flights: filteredOutboundFlights,
           return_flights: filteredReturnFlights,
@@ -139,8 +138,8 @@ export const fetchFilteredFlights = createAsyncThunk(
 
 const initialState = {
   filteredFlights: {
-    outbound: [],
-    return: [],
+    outbound_flights: [],
+    return_flights: [],
   },
   isLoading: false,
   error: null,
@@ -167,16 +166,21 @@ const initialState = {
 };
 
 const sortFlights = (flights, criteria) => {
+  if (!flights || !Array.isArray(flights)) return [];
   return [...flights].sort((a, b) => {
     switch (criteria) {
       case 'price_asc':
-        return a.seats_detail[0].price - b.seats_detail[0].price;
+        return (
+          (a.seats_detail[0]?.price || 0) - (b.seats_detail[0]?.price || 0)
+        );
       case 'price_desc':
-        return b.seats_detail[0].price - a.seats_detail[0].price;
+        return (
+          (b.seats_detail[0]?.price || 0) - (a.seats_detail[0]?.price || 0)
+        );
       case 'duration_asc':
-        return a.duration - b.duration;
+        return (a.duration || 0) - (b.duration || 0);
       case 'duration_desc':
-        return b.duration - a.duration;
+        return (b.duration || 0) - (a.duration || 0);
       case 'departure_asc':
         return new Date(a.departure_time) - new Date(b.departure_time);
       case 'departure_desc':
@@ -197,36 +201,38 @@ const flightFilterSlice = createSlice({
   reducers: {
     setSearchParams: (state, action) => {
       state.searchParams = { ...state.searchParams, ...action.payload };
-      state.filteredFlights = { outbound: [], return: [] };
-      state.currentPageNumber = 1;
-      state.hasMoreFlights = true;
+      if (
+        action.payload.from ||
+        action.payload.to ||
+        action.payload.departureDate
+      ) {
+        state.filteredFlights = { outbound_flights: [], return_flights: [] };
+        state.currentPageNumber = 1;
+        state.hasMoreFlights = true;
+      }
     },
     setActiveFilters: (state, action) => {
       state.activeFilters = { ...state.activeFilters, ...action.payload };
-      state.filteredFlights = { outbound: [], return: [] };
       state.currentPageNumber = 1;
-      state.hasMoreFlights = true;
     },
-    clearAllFilters: (state) => {
-      state.activeFilters = initialState.activeFilters;
-      state.searchParams = initialState.searchParams;
-      state.filteredFlights = initialState.filteredFlights;
-      state.currentPageNumber = 1;
-      state.hasMoreFlights = true;
-      state.sortCriteria = initialState.sortCriteria;
-    },
+    clearAllFilters: () => initialState,
     goToNextPage: (state) => {
       state.currentPageNumber += 1;
     },
     setSortCriteria: (state, action) => {
       state.sortCriteria = action.payload;
-      state.filteredFlights.outbound = sortFlights(
-        state.filteredFlights.outbound,
-        action.payload
-      );
-      if (state.searchParams.isRoundTrip) {
-        state.filteredFlights.return = sortFlights(
-          state.filteredFlights.return,
+      if (state.filteredFlights.outbound_flights?.length) {
+        state.filteredFlights.outbound_flights = sortFlights(
+          state.filteredFlights.outbound_flights,
+          action.payload
+        );
+      }
+      if (
+        state.searchParams.isRoundTrip &&
+        state.filteredFlights.return_flights?.length
+      ) {
+        state.filteredFlights.return_flights = sortFlights(
+          state.filteredFlights.return_flights,
           action.payload
         );
       }
@@ -240,40 +246,48 @@ const flightFilterSlice = createSlice({
       })
       .addCase(fetchFilteredFlights.fulfilled, (state, action) => {
         const { outbound_flights, return_flights } = action.payload.data;
-
         if (state.currentPageNumber === 1) {
           state.filteredFlights = {
-            outbound: sortFlights(outbound_flights, state.sortCriteria),
-            return: return_flights
+            outbound_flights: sortFlights(
+              outbound_flights || [],
+              state.sortCriteria
+            ),
+            return_flights: return_flights
               ? sortFlights(return_flights, state.sortCriteria)
               : [],
           };
         } else {
-          const existingOutboundIds = new Set(
-            state.filteredFlights.outbound.map((f) => f.plane_id)
-          );
-          const existingReturnIds = new Set(
-            state.filteredFlights.return.map((f) => f.plane_id)
+          const newOutboundFlights = (outbound_flights || []).filter(
+            (flight) =>
+              !state.filteredFlights.outbound_flights.find(
+                (f) => f.plane_id === flight.plane_id
+              )
           );
 
-          const newOutboundFlights = outbound_flights.filter(
-            (f) => !existingOutboundIds.has(f.plane_id)
+          const newReturnFlights = (return_flights || []).filter(
+            (flight) =>
+              !state.filteredFlights.return_flights.find(
+                (f) => f.plane_id === flight.plane_id
+              )
           );
-          const newReturnFlights =
-            return_flights?.filter((f) => !existingReturnIds.has(f.plane_id)) ||
-            [];
 
           state.filteredFlights = {
-            outbound: sortFlights(
-              [...state.filteredFlights.outbound, ...newOutboundFlights],
+            outbound_flights: sortFlights(
+              [
+                ...state.filteredFlights.outbound_flights,
+                ...newOutboundFlights,
+              ],
               state.sortCriteria
             ),
-            return: return_flights
+            return_flights: return_flights
               ? sortFlights(
-                  [...state.filteredFlights.return, ...newReturnFlights],
+                  [
+                    ...state.filteredFlights.return_flights,
+                    ...newReturnFlights,
+                  ],
                   state.sortCriteria
                 )
-              : [],
+              : state.filteredFlights.return_flights,
           };
         }
 
