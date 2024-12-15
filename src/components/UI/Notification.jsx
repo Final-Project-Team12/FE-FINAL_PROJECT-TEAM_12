@@ -155,6 +155,11 @@ const Notification = () => {
     return type === 'Promosi' ? 'bg-green-600' : 'bg-red-600';
   };
 
+  const formatLongDate = (dateString) => {
+    const options = { day: 'numeric', month: 'long', year: 'numeric' };
+    return new Date(dateString).toLocaleDateString('id-ID', options);
+  };
+
   useEffect(() => {
     const filtered = notif.filter((item) => {
       const searchLower = searchQuery.toLowerCase().trim();
@@ -199,7 +204,7 @@ const Notification = () => {
                     <span className="text-slate-500 text-sm">{item.type}</span>
                     <div className="flex items-center space-x-2">
                       <span className="text-slate-500 text-sm">
-                        {item.date}, {item.time}
+                        {formatLongDate(item.date)}, {item.time}
                       </span>
                       <div className={`rounded-full w-2 h-2 ${getDotColor(item.type)}`}></div>
                     </div>

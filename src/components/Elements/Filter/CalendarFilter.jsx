@@ -3,6 +3,7 @@ import { DateRange } from 'react-date-range';
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
 import FilterIcon from '../../../../public/icons/filter_icon.svg';
+import { Filter } from 'lucide-react';
 
 const CalendarFilter = ({ onDateRangeChange }) => {
   const [showCalendar, setShowCalendar] = useState(false);
@@ -83,13 +84,13 @@ const CalendarFilter = ({ onDateRangeChange }) => {
   };
 
   return (
-    <div className="relative">
+    <div className="relative group">
       <button
         ref={buttonRef}
-        className="h-10 px-4 mt-1 rounded-full border border-purple-500 flex items-center gap-2"
+        className="h-10 px-4 mt-1 rounded-full border border-purple-500 group-hover:text-white hover:bg-purple-500 transition-colors flex items-center gap-2 group"
         onClick={handleFilterButtonClick}
       >
-        <img className="w-6" src={FilterIcon} alt="Filter Icon" />
+        <Filter className="w-6 text-slate-500 group-hover:text-white transition-colors group" />
         <span>Filter</span>
       </button>
       

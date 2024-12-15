@@ -27,7 +27,7 @@ const HeaderAccount = ({ setIsSidebarOpen }) => {
             className="w-full h-[40px] sm:h-[50px] rounded-[12px] bg-[#A06ECE] flex items-center hover:bg-purple-800 transition-all duration-300 cursor-pointer"
             onClick={() => navigate('/')}
           >
-            <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 ml-3 sm:ml-4 text-white hover:scale-110 transition-transform duration-200" />
+            <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 ml-3 sm:ml-4 text-white" />
             <span className="ml-2 sm:ml-3 text-sm sm:text-base text-white">
               Beranda
             </span>
