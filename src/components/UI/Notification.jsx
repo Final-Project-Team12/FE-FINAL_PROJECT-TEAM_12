@@ -22,126 +22,126 @@ const notif = [
     type: "Promosi",
     title: "Flash Sale! Diskon 70% untuk Rute Domestik",
     description: "Berlaku hingga tengah malam hari ini!",
-    date: "2024-12-11",
+    date: "2024-12-13",
     time: "15:30",
   },
   {
     type: "Pemberitahuan",
     title: "Check-in Online Telah Dibuka",
     description: "Untuk penerbangan ID-789 besok pukul 08:00",
-    date: "2024-12-10",
+    date: "2024-12-13",
     time: "16:15",
   },
   {
     type: "Pemberitahuan",
     title: "Pembaruan Aplikasi Tersedia",
     description: "Versi terbaru 2.5.0 siap diunduh",
-    date: "2024-12-09",
+    date: "2024-12-13",
     time: "16:45",
   },
   {
     type: "Promosi",
     title: "Bundling Tiket + Hotel Hemat 30%",
     description: "Pesan sekarang untuk liburan akhir tahun!",
-    date: "2024-12-09",
+    date: "2024-12-13",
     time: "17:20",
   },
   {
     type: "Pemberitahuan",
     title: "Gate Perubahan untuk ID-456",
     description: "Gate baru: A7 (sebelumnya A5)",
-    date: "2024-12-08",
+    date: "2024-12-13",
     time: "17:45",
   },
   {
     type: "Pemberitahuan",
     title: "Maintenance Pemberitahuan",
     description: "Pemberitahuan akan maintenance pada 14 Dec 2024 02:00-04:00",
-    date: "2024-12-07",
+    date: "2024-12-13",
     time: "18:00",
   },
   {
     type: "Promosi",
     title: "Cashback 10% dengan Kartu Kredit BCA",
     description: "Minimal transaksi Rp 1.000.000",
-    date: "2024-12-06",
+    date: "2024-12-13",
     time: "18:30",
   },
   {
     type: "Pemberitahuan",
     title: "Boarding Pass Digital Tersedia",
     description: "Untuk penerbangan GA-234 besok",
-    date: "2024-12-05",
+    date: "2024-12-13",
     time: "19:00",
   },
   {
     type: "Pemberitahuan",
     title: "Verifikasi Email Berhasil",
     description: "Akun Anda telah terverifikasi",
-    date: "2024-12-04",
+    date: "2024-12-13",
     time: "19:15",
   },
   {
     type: "Promosi",
     title: "Promo Khusus Member!",
     description: "Extra bagasi 10kg untuk semua rute",
-    date: "2024-12-03",
+    date: "2024-12-13",
     time: "19:45",
   },
   {
     type: "Pemberitahuan",
     title: "Delay Penerbangan ID-890",
     description: "Estimasi delay 45 menit",
-    date: "2024-12-02",
+    date: "2024-12-13",
     time: "20:00",
   },
   {
     type: "Pemberitahuan",
     title: "Pembayaran Berhasil",
     description: "Booking ID: 78HJ9 telah dikonfirmasi",
-    date: "2024-12-01",
+    date: "2024-12-13",
     time: "20:15",
   },
   {
     type: "Promosi",
     title: "Buy 1 Get 1 Tiket Jakarta-Bali!",
     description: "Periode terbang Jan-Mar 2025",
-    date: "2024-11-30",
+    date: "2024-12-13",
     time: "20:45",
   },
   {
     type: "Pemberitahuan",
     title: "Pengingat Check-in",
     description: "12 jam sebelum keberangkatan ID-567",
-    date: "2024-11-29",
+    date: "2024-12-13",
     time: "21:00",
   },
   {
     type: "Pemberitahuan",
     title: "Perubahan Password Berhasil",
     description: "Password akun Anda telah diperbarui",
-    date: "2024-11-28",
+    date: "2024-12-13",
     time: "21:30",
   },
   {
     type: "Promosi",
     title: "Diskon Akhir Tahun 40%",
     description: "Untuk semua rute internasional",
-    date: "2024-11-28",
+    date: "2024-12-13",
     time: "22:00",
   },
   {
     type: "Pemberitahuan",
     title: "Perubahan Terminal Keberangkatan",
     description: "ID-123 pindah ke Terminal 3",
-    date: "2024-11-27",
+    date: "2024-12-13",
     time: "22:30",
   },
   {
     type: "Pemberitahuan",
     title: "Sinkronisasi Data Selesai",
     description: "Data perjalanan Anda telah diperbarui",
-    date: "2024-11-26",
+    date: "2024-12-13",
     time: "23:00",
   }
 ];
@@ -150,6 +150,7 @@ const Notification = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredNotif, setFilteredNotif] = useState(notif);
   const [dateRange, setDateRange] = useState({ startDate: null, endDate: null });
+  const [selectedNotif, setSelectedNotif] = useState(null); // State untuk modal
 
   const getDotColor = (type) => {
     return type === 'Promosi' ? 'bg-green-600' : 'bg-red-600';
@@ -187,6 +188,14 @@ const Notification = () => {
     setDateRange({ startDate, endDate });
   };
 
+  const openModal = (notif) => {
+    setSelectedNotif(notif);
+  };
+
+  const closeModal = () => {
+    setSelectedNotif(null);
+  };
+
   return (
     <>
       <Navbar />
@@ -194,7 +203,11 @@ const Notification = () => {
       <div className="w-full flex-col lg:flex-row gap-12 px-4 lg:px-[280px] py-4 min-h-[calc(100vh-84px)] mt-3">
         {filteredNotif.length > 0 ? (
           filteredNotif.map((item, index) => (
-            <div key={index}>
+            <div
+              key={index}
+              onClick={() => openModal(item)}
+              className="cursor-pointer"
+            >
               <div className="flex w-full space-x-4">
                 <div>
                   <Bell className="bg-purple-400 w-6 h-6 text-white rounded-full p-1 mt-1" />
@@ -222,6 +235,33 @@ const Notification = () => {
           </p>
         )}
       </div>
+
+      {/* Modal */}
+      {selectedNotif && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-[90%] max-w-[500px] relative">
+            <div className="flex items-start space-x-2">
+              {/* Indikator warna berdasarkan tipe */}
+              <div
+                className={`rounded-full w-3 h-3 mt-1 ${getDotColor(selectedNotif.type)}`}
+              ></div>
+              <h2 className="text-xl font-bold leading-tight">{selectedNotif.title}</h2>
+            </div>
+            <p className="text-sm text-gray-500 mt-2">
+              {formatLongDate(selectedNotif.date)}, {selectedNotif.time}
+            </p>
+            <p className="mt-4">{selectedNotif.description || 'Tidak ada deskripsi tambahan.'}</p>
+            <div className="flex justify-end space-x-4 mt-6">
+              <button
+                onClick={closeModal}
+                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+              >
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
