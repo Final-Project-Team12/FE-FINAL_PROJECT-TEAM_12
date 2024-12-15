@@ -31,7 +31,7 @@ const HeaderNotification = ({ onSearch, onDateRangeChange }) => {
                 }}
               />
             </div>
-            <div className="w-10">
+            <div className="w-10 ml-1">
               <SearchButtonNotification onSearch={onSearch} />
             </div>
           </div>

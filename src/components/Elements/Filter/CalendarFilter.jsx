@@ -14,54 +14,45 @@ const CalendarFilter = ({ onDateRangeChange }) => {
       key: 'selection',
     },
   ]);
-  const calendarRef = useRef(null);
+  const [isFiltered, setIsFiltered] = useState(false);
+  const containerRef = useRef(null);
   const buttonRef = useRef(null);
+  const [calendarPosition, setCalendarPosition] = useState({ top: 0, left: 0 });
 
   useEffect(() => {
-    if (showCalendar && calendarRef.current && buttonRef.current) {
-      const updatePosition = () => {
-        const calendar = calendarRef.current;
-        const button = buttonRef.current;
-        const buttonRect = button.getBoundingClientRect();
-        const windowHeight = window.innerHeight;
-        const windowWidth = window.innerWidth;
-        const calendarHeight = calendar.offsetHeight;
-        const calendarWidth = calendar.offsetWidth;
+    const updatePosition = () => {
+      if (showCalendar && buttonRef.current && containerRef.current) {
+        const buttonRect = buttonRef.current.getBoundingClientRect();
+        const containerRect = containerRef.current.getBoundingClientRect();
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
 
-        // Reset position to calculate true dimensions
-        calendar.style.top = '';
-        calendar.style.bottom = '';
-        calendar.style.left = '';
-        calendar.style.right = '';
+        let left = buttonRect.left;
+        let top = buttonRect.bottom + 8;
 
-        // Check vertical position
-        if (buttonRect.bottom + calendarHeight > windowHeight) {
-          // Show above the button if not enough space below
-          calendar.style.bottom = `${windowHeight - buttonRect.top}px`;
-        } else {
-          // Show below the button
-          calendar.style.top = `${buttonRect.bottom}px`;
+        if (left + containerRect.width > viewportWidth) {
+          left = Math.max(0, viewportWidth - containerRect.width - 16);
         }
 
-        // Check horizontal position
-        if (buttonRect.left + calendarWidth > windowWidth) {
-          // Align to the right if not enough space
-          calendar.style.right = '0';
-        } else {
-          // Align to the left
-          calendar.style.left = `${buttonRect.left}px`;
+        if (top + containerRect.height > viewportHeight) {
+          top = Math.max(8, buttonRect.top - containerRect.height - 8);
         }
-      };
 
-      updatePosition();
-      window.addEventListener('resize', updatePosition);
-      window.addEventListener('scroll', updatePosition);
+        setCalendarPosition({
+          top: top,
+          left: left,
+        });
+      }
+    };
 
-      return () => {
-        window.removeEventListener('resize', updatePosition);
-        window.removeEventListener('scroll', updatePosition);
-      };
-    }
+    updatePosition();
+    window.addEventListener('resize', updatePosition);
+    window.addEventListener('scroll', updatePosition);
+
+    return () => {
+      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', updatePosition);
+    };
   }, [showCalendar]);
 
   const handleDateRangeChange = (item) => {
@@ -71,6 +62,7 @@ const CalendarFilter = ({ onDateRangeChange }) => {
   const handleSaveClick = () => {
     if (dateRange[0].startDate && dateRange[0].endDate) {
       onDateRangeChange(dateRange[0].startDate, dateRange[0].endDate);
+      setIsFiltered(true);
     }
     setShowCalendar(false);
   };
@@ -83,17 +75,69 @@ const CalendarFilter = ({ onDateRangeChange }) => {
     setShowCalendar(true);
   };
 
+  const handleReset = () => {
+    setDateRange([
+      {
+        startDate: null,
+        endDate: null,
+        key: 'selection',
+      },
+    ]);
+    onDateRangeChange(null, null);
+    setIsFiltered(false);
+  };
+
+  // Format date for display
+  const formatDate = (date) => {
+    if (!date) return '';
+    return date.toLocaleDateString('id-ID', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    });
+  };
+
   return (
-    <div className="relative group">
-      <button
-        ref={buttonRef}
-        className="h-10 px-4 mt-1 rounded-full border border-purple-500 group-hover:text-white hover:bg-purple-500 transition-colors flex items-center gap-2 group"
-        onClick={handleFilterButtonClick}
-      >
-        <Filter className="w-6 text-slate-500 group-hover:text-white transition-colors group" />
-        <span>Filter</span>
-      </button>
-      
+    <div className="relative">
+      <div className="flex items-center gap-2">
+        <button
+          ref={buttonRef}
+          className={`h-10 px-4 mt-1 rounded-full border transition-colors flex items-center gap-1 ${
+            isFiltered 
+              ? 'border-purple-500 bg-purple-500 text-white'
+              : 'border-purple-500'
+          }`}
+          onClick={handleFilterButtonClick}
+        >
+          <Filter className={`w-6 ${
+            isFiltered 
+              ? 'text-white'
+              : 'text-slate-500'
+          }`}/>
+          <span>Filter</span>
+        </button>
+        {isFiltered && (
+          <button
+            onClick={handleReset}
+            className="h-6 -ml-1 -mt-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors flex "
+            title="Reset filter"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        )}
+      </div>
       {showCalendar && (
         <>
           <div
@@ -101,14 +145,20 @@ const CalendarFilter = ({ onDateRangeChange }) => {
             onClick={handleCloseCalendar}
           />
           <div
-            ref={calendarRef}
-            className="fixed z-50 bg-white shadow-lg rounded-lg p-4 w-[320px]"
+            ref={containerRef}
+            className="fixed z-50 bg-white shadow-lg rounded-lg overflow-hidden w-[320px]"
+            style={{
+              top: `${calendarPosition.top}px`,
+              left: `${calendarPosition.left}px`,
+              maxHeight: 'calc(100vh - 32px)',
+            }}
           >
-            <div className="flex justify-end mb-2">
+            {/* Header with close button */}
+            <div className="flex justify-between items-center p-3 bg-gray-50 border-b">
+              <h3 className="text-lg font-semibold text-gray-700">Pilih Rentang Tanggal</h3>
               <button
-                className="p-2 text-gray-500 hover:text-gray-700 transition-colors"
+                className="text-gray-500 hover:text-gray-700 transition-colors"
                 onClick={handleCloseCalendar}
-                aria-label="Close calendar"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -126,8 +176,9 @@ const CalendarFilter = ({ onDateRangeChange }) => {
                 </svg>
               </button>
             </div>
-            
-            <div className="w-full">
+
+            {/* Calendar */}
+            <div className="w-full overflow-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
               <DateRange
                 editableDateInputs={true}
                 onChange={handleDateRangeChange}
@@ -141,13 +192,28 @@ const CalendarFilter = ({ onDateRangeChange }) => {
                 className="w-full"
               />
             </div>
-            
-            <div className="flex justify-end mt-4">
+
+            {/* Bottom buttons */}
+            <div className="sticky bottom-0 left-0 right-0 p-3 bg-white border-t shadow-md flex gap-2">
               <button
-                className="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition-colors"
-                onClick={handleSaveClick}
+                className="flex-1 py-2 px-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                onClick={() => {
+                  handleReset();
+                  setShowCalendar(false);
+                }}
               >
-                Simpan
+                Reset
+              </button>
+              <button
+                className={`flex-1 py-2 px-4 rounded-lg transition-colors ${
+                  dateRange[0].startDate && dateRange[0].endDate
+                    ? 'bg-purple-500 hover:bg-purple-600 text-white'
+                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                }`}
+                onClick={handleSaveClick}
+                disabled={!dateRange[0].startDate || !dateRange[0].endDate}
+              >
+                Terapkan
               </button>
             </div>
           </div>
@@ -157,4 +223,103 @@ const CalendarFilter = ({ onDateRangeChange }) => {
   );
 };
 
-export default CalendarFilter;
+export default CalendarFilter;  
+
+// import { useState } from 'react';
+// import { DateRange } from 'react-date-range';
+// import 'react-date-range/dist/styles.css';
+// import 'react-date-range/dist/theme/default.css';
+// import FilterIcon from '../../../../public/icons/filter_icon.svg';
+
+// const CalendarFilter = ({ onDateRangeChange }) => {
+//   const [showCalendar, setShowCalendar] = useState(false);
+//   const [dateRange, setDateRange] = useState([
+//     {
+//       startDate: null,
+//       endDate: null,
+//       key: 'selection',
+//     },
+//   ]);
+
+//   const handleDateRangeChange = (item) => {
+//     setDateRange([item.selection]);
+//   };
+
+//   const handleSaveClick = () => {
+//     if (dateRange[0].startDate && dateRange[0].endDate) {
+//       onDateRangeChange(dateRange[0].startDate, dateRange[0].endDate);
+//     }
+//     setShowCalendar(false);
+//   };
+
+//   const handleCloseCalendar = () => {
+//     setShowCalendar(false);
+//   };
+
+//   const handleFilterButtonClick = () => {
+//     setShowCalendar(true);
+//     const filterButton = document.querySelector(
+//       '.w-[110px] .h-[50px].rounded-[12px].bg-[#A06ECE]'
+//     );
+//     filterButton.classList.add('bg-gray-300');
+//     filterButton.focus();
+//   };
+
+//   return (
+//     <div className="relative z-30">
+//       <button
+//         className="h-[40px] px-4 mt-1 rounded-full border border-purple-500 flex items-center "
+//         onClick={handleFilterButtonClick}
+//       >
+//         <img className="w-6 pr-1" src={FilterIcon} alt="" /> Filter
+//       </button>
+//       {showCalendar && (
+//         <>
+//           <div
+//             className="fixed inset-0 bg-gray-500 bg-opacity-50 z-10"
+//             onClick={handleCloseCalendar}
+//           ></div>
+//           <div className="absolute z-20 bg-white shadow-md rounded-lg p-4 w-[300px]">
+//             <div className="flex justify-end mb-2">
+//               <button
+//                 className="text-gray-500 hover:text-gray-700"
+//                 onClick={handleCloseCalendar}
+//               >
+//                 <svg
+//                   xmlns="http://www.w3.org/2000/svg"
+//                   className="h-6 w-6"
+//                   fill="none"
+//                   viewBox="0 0 24 24"
+//                   stroke="currentColor"
+//                 >
+//                   <path
+//                     strokeLinecap="round"
+//                     strokeLinejoin="round"
+//                     strokeWidth={2}
+//                     d="M6 18L18 6M6 6l12 12"
+//                   />
+//                 </svg>
+//               </button>
+//             </div>
+//             <DateRange
+//               editableDateInputs={true}
+//               onChange={handleDateRangeChange}
+//               moveRangeOnFirstSelection={false}
+//               ranges={dateRange}
+//             />
+//             <div className="flex justify-end">
+//               <button
+//                 className="mt-4 bg-purple-500 text-white px-4 py-2 rounded-lg"
+//                 onClick={handleSaveClick}
+//               >
+//                 Simpan
+//               </button>
+//             </div>
+//           </div>
+//         </>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default CalendarFilter;
