@@ -9,18 +9,13 @@ export const authService = {
       const { accessToken } = response.data;
 
       const decodedToken = jwtDecode(accessToken);
-
       Cookies.set('token', accessToken, { expires: 7 });
 
-      const user = {
-        id: decodedToken.user_id,
-        email: decodedToken.user_email,
-      };
-
-      Cookies.set('user', JSON.stringify(user), { expires: 7 });
-
       return {
-        user,
+        user: {
+          id: decodedToken.user_id,
+          email: decodedToken.user_email,
+        },
         decodedToken,
       };
     } catch (error) {
@@ -30,19 +25,15 @@ export const authService = {
 
   logout: () => {
     Cookies.remove('token', { path: '/' });
-    Cookies.remove('user', { path: '/' });
   },
 
   clearAuth: () => {
     Cookies.remove('token', { path: '/' });
-    Cookies.remove('user', { path: '/' });
   },
 
   isAuthenticated: () => {
     const token = Cookies.get('token');
-    const userStr = Cookies.get('user');
-
-    if (!token || !userStr) return false;
+    if (!token) return false;
 
     try {
       const decodedToken = jwtDecode(token);
@@ -61,8 +52,12 @@ export const authService = {
     if (!authService.isAuthenticated()) return null;
 
     try {
-      const userStr = Cookies.get('user');
-      return JSON.parse(userStr);
+      const token = Cookies.get('token');
+      const decodedToken = jwtDecode(token);
+      return {
+        id: decodedToken.user_id,
+        email: decodedToken.user_email,
+      };
     } catch {
       authService.logout();
       return null;

@@ -9,7 +9,7 @@ export const useAuth = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, loading, error } = useSelector((state) => state.auth);
+  const { user, loading } = useSelector((state) => state.auth);
 
   useEffect(() => {
     const syncAuthState = () => {
@@ -52,6 +52,20 @@ export const useAuth = () => {
       navigate(from, { replace: true });
     } catch (error) {
       dispatch(loginFailure(error.message));
+
+      await Swal.fire({
+        icon: 'error',
+        title: 'Login Gagal!',
+        text: error.message || 'Terjadi kesalahan saat login',
+        showConfirmButton: false,
+        timer: 1500,
+        background: '#fff',
+        customClass: {
+          popup: 'rounded-lg shadow-lg',
+          title: 'text-xl text-gray-800 font-medium',
+          content: 'text-gray-600',
+        },
+      });
     }
   };
 
@@ -100,7 +114,6 @@ export const useAuth = () => {
   return {
     user,
     loading,
-    error,
     login,
     logout: handleLogout,
     isAuthenticated: authService.isAuthenticated(),
