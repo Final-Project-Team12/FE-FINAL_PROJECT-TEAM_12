@@ -126,11 +126,54 @@ const DetailsTicket = () => {
   const handleSelectFlight = (flight) => {
     if (!selectedDepartureFlight) {
       if (isRoundTrip) {
-        dispatch(updateFlightSearch({ selectedDepartureFlight: flight }));
+        dispatch(
+          updateFlightSearch({
+            selectedDepartureFlight: flight,
+            departureDateDisplay: formatDate(flight.departure_time),
+          })
+        );
+
+        dispatch(
+          setSearchParams({
+            from: flight.destination_airport.airport_code,
+            to: flight.origin_airport.airport_code,
+            fromCityDisplay: `${flight.destination_airport.name} (${flight.destination_airport.airport_code})`,
+            toCityDisplay: `${flight.origin_airport.name} (${flight.origin_airport.airport_code})`,
+          })
+        );
+
+        dispatch(
+          fetchFilteredFlights({
+            page: 1,
+            filters: activeFilters,
+            searchParams: {
+              from: flight.destination_airport.airport_code,
+              to: flight.origin_airport.airport_code,
+              departureDate: getUTCDate(returnDate),
+              seatClass: selectedSeatClass,
+              passengerAdult: passengerCounts.adult || 0,
+              passengerChild: passengerCounts.child || 0,
+              passengerInfant: passengerCounts.infant || 0,
+              isRoundTrip: true,
+            },
+          })
+        );
       } else {
+        dispatch(
+          updateFlightSearch({
+            selectedDepartureFlight: flight,
+            departureDateDisplay: formatDate(flight.departure_time),
+          })
+        );
         navigate(`/checkout/${flight.plane_id}`);
       }
-    } else {
+    } else if (isRoundTrip) {
+      dispatch(
+        updateFlightSearch({
+          selectedReturnFlight: flight,
+          returnDateDisplay: formatDate(flight.departure_time),
+        })
+      );
       navigate(
         `/checkout/${selectedDepartureFlight.plane_id}/${flight.plane_id}`
       );
@@ -165,10 +208,12 @@ const DetailsTicket = () => {
   );
 
   const currentFlights = useMemo(() => {
-    return selectedDepartureFlight
-      ? filteredFlights.return
-      : filteredFlights.outbound;
-  }, [selectedDepartureFlight, filteredFlights]);
+    if (selectedDepartureFlight && isRoundTrip) {
+      return filteredFlights.return_flights || [];
+    }
+
+    return filteredFlights.outbound_flights || [];
+  }, [selectedDepartureFlight, isRoundTrip, filteredFlights]);
 
   useEffect(() => {
     if (isRequestInProgress.current) return;
@@ -179,11 +224,14 @@ const DetailsTicket = () => {
         const searchPayload = {
           from: fromCity,
           to: toCity,
-          departureDate: getUTCDate(departureDate),
+          departureDate: getUTCDate(
+            selectedDepartureFlight ? returnDate : departureDate
+          ),
           seatClass: selectedSeatClass,
           passengerAdult: passengerCounts.adult || 0,
           passengerChild: passengerCounts.child || 0,
           passengerInfant: passengerCounts.infant || 0,
+          isRoundTrip,
           ...(selectedDepartureFlight &&
             returnDate && {
               returnDate: getUTCDate(returnDate),
@@ -216,6 +264,7 @@ const DetailsTicket = () => {
     selectedSeatClass,
     passengerCounts,
     selectedDepartureFlight,
+    isRoundTrip,
   ]);
 
   if (error) {

@@ -50,9 +50,12 @@ export const store = configureStore({
           'flightFilter/fetchFilteredFlights/fulfilled',
           'flightFilter/fetchFilteredFlights/pending',
           'flightFilter/fetchFilteredFlights/rejected',
+          'flightFilter/clearAllFilters',
+          'flightFilter/goToNextPage',
 
           'flightSearch/updateFlightSearch',
           'flightSearch/resetFlightSearch',
+          'flightSearch/clearSelectedFlights',
           'flightSearch/swapCities',
           'flightSearch/updatePassengerCount',
           'flightSearch/setSeatPrices',
@@ -90,6 +93,8 @@ export const store = configureStore({
           'payload.returnDate',
           'meta.arg.departureDate',
           'meta.arg.returnDate',
+          'payload.selectedDepartureFlight',
+          'payload.selectedReturnFlight',
           'payload.sortCriteria',
           'payload.searchParams',
           'meta.arg.filters',
@@ -100,6 +105,8 @@ export const store = configureStore({
           'payload.selectedFlight',
           'payload.fromCityDisplay',
           'payload.toCityDisplay',
+          'payload.departureDateDisplay',
+          'payload.returnDateDisplay',
 
           'payload.registerData',
           'meta.arg.registerData',
@@ -126,16 +133,23 @@ export const store = configureStore({
 
           'flightSearch.departureDate',
           'flightSearch.returnDate',
-          'flightSearch.selectedFlight',
+          'flightSearch.departureDateDisplay',
+          'flightSearch.returnDateDisplay',
+          'flightSearch.selectedDepartureFlight',
+          'flightSearch.selectedReturnFlight',
           'flightSearch.fromCityDisplay',
           'flightSearch.toCityDisplay',
           'flightSearch.searchResults',
+          'flightSearch.seatPrices',
 
           'flightFilter.departureDate',
           'flightFilter.returnDate',
           'flightFilter.sortCriteria',
+          'flightFilter.activeFilters',
           'flightFilter.activeFilters.departureDate',
           'flightFilter.filteredFlights',
+          'flightFilter.filteredFlights.outbound_flights',
+          'flightFilter.filteredFlights.return_flights',
           'flightFilter.searchParams',
           'flightFilter.searchParams.departureDate',
           'flightFilter.searchParams.returnDate',
@@ -185,3 +199,5 @@ export const resetStore = () => {
   store.dispatch({ type: 'register/resetRegisterState' });
   store.dispatch({ type: 'resetPassword/resetState' });
 };
+
+export default store;

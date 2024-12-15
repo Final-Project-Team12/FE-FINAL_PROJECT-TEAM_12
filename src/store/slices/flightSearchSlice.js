@@ -7,6 +7,8 @@ const initialState = {
   toCityDisplay: '',
   departureDate: new Date(),
   returnDate: new Date(),
+  departureDateDisplay: '',
+  returnDateDisplay: '',
   isRoundTrip: false,
   passengerCounts: {
     adult: 1,
@@ -14,7 +16,8 @@ const initialState = {
     infant: 0,
   },
   selectedSeatClass: 'Economy',
-  selectedFlight: null,
+  selectedDepartureFlight: null,
+  selectedReturnFlight: null,
   searchResults: {
     outbound_flights: [],
     return_flights: [],
@@ -32,12 +35,15 @@ export const flightSearchSlice = createSlice({
   initialState,
   reducers: {
     updateFlightSearch: (state, action) => {
-      return {
-        ...state,
-        ...action.payload,
-      };
+      return { ...state, ...action.payload };
     },
     resetFlightSearch: () => initialState,
+    clearSelectedFlights: (state) => {
+      state.selectedDepartureFlight = null;
+      state.selectedReturnFlight = null;
+      state.departureDateDisplay = '';
+      state.returnDateDisplay = '';
+    },
     swapCities: (state) => {
       const tempCity = state.fromCity;
       const tempCityDisplay = state.fromCityDisplay;
@@ -73,6 +79,7 @@ export const flightSearchSlice = createSlice({
 export const {
   updateFlightSearch,
   resetFlightSearch,
+  clearSelectedFlights,
   swapCities,
   updatePassengerCount,
   setSeatPrices,
