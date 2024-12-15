@@ -241,7 +241,6 @@ const Notification = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-[90%] max-w-[500px] relative">
             <div className="flex items-start space-x-2">
-              {/* Indikator warna berdasarkan tipe */}
               <div
                 className={`rounded-full w-3 h-3 mt-1 ${getDotColor(selectedNotif.type)}`}
               ></div>
@@ -250,11 +249,11 @@ const Notification = () => {
             <p className="text-sm text-gray-500 mt-2">
               {formatLongDate(selectedNotif.date)}, {selectedNotif.time}
             </p>
-            <p className="mt-4">{selectedNotif.description || 'Tidak ada deskripsi tambahan.'}</p>
+            <p className="mt-2">{selectedNotif.description}</p>
             <div className="flex justify-end space-x-4 mt-6">
               <button
                 onClick={closeModal}
-                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+                className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600"
               >
                 Tutup
               </button>
