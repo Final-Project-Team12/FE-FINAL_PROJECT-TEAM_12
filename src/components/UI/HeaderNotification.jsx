@@ -23,13 +23,8 @@ const HeaderNotification = ({ onSearch, onDateRangeChange }) => {
             <div className="ml-3 text-white">Beranda</div>
           </div>
           <div className="flex justify-between gap-3 p-2 sm:flex sm:justify-between md:flex md:justify-between">
-            <div className=" h-[50px]">
-              <CalendarFilter
-                onDateRangeChange={(startDate, endDate) => {
-                  console.log('Selected Date Range:', startDate, endDate);
-                  onDateRangeChange(startDate, endDate);
-                }}
-              />
+            <div className="h-[50px]">
+              <CalendarFilter onDateRangeChange={handleDateRangeChange} />
             </div>
             <div className="w-10 ml-1">
               <SearchButtonNotification onSearch={onSearch} />
