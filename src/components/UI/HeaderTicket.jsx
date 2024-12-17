@@ -16,6 +16,10 @@ const HeaderTicket = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
+  const isInitialMount = useRef(true);
+  const originalDepartureDate = useRef(null);
+  const hasRestoredDate = useRef(false);
+
   const { activeFilters } = useSelector((state) => state.flightFilter);
   const {
     fromCity,
@@ -36,7 +40,41 @@ const HeaderTicket = () => {
     end: 3,
   });
   const [activeIndex, setActiveIndex] = useState(null);
-  const isInitialMount = useRef(true);
+
+  // Initial mount effect
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+
+      if (lastSearchParams && !isRoundTrip && !hasRestoredDate.current) {
+        originalDepartureDate.current = lastSearchParams.departureDate;
+        hasRestoredDate.current = true;
+
+        dispatch(
+          updateFlightSearch({
+            departureDate: new Date(lastSearchParams.departureDate),
+          })
+        );
+
+        dispatch(
+          fetchFilteredFlights({
+            page: 1,
+            filters: activeFilters,
+            searchParams: lastSearchParams,
+          })
+        );
+      } else {
+        originalDepartureDate.current = departureDate;
+      }
+    }
+  }, []);
+
+  // Reset flag when navigating away
+  useEffect(() => {
+    return () => {
+      hasRestoredDate.current = false;
+    };
+  }, []);
 
   const formatDay = (date) => {
     const days = [
@@ -78,7 +116,6 @@ const HeaderTicket = () => {
     try {
       const dateObj = new Date(date);
       if (isNaN(dateObj.getTime())) return '';
-
       return dateObj.toISOString().split('T')[0];
     } catch (error) {
       console.error('Error getting UTC date:', error);
@@ -87,8 +124,10 @@ const HeaderTicket = () => {
   };
 
   const getCurrentDate = () => {
-    if (lastSearchParams && !isRoundTrip) {
-      return new Date(lastSearchParams.departureDate);
+    if (!isRoundTrip) {
+      return hasRestoredDate.current
+        ? new Date(departureDate)
+        : new Date(originalDepartureDate.current || departureDate);
     }
 
     if (selectedDepartureFlight) {
@@ -130,6 +169,7 @@ const HeaderTicket = () => {
     returnDate,
     selectedDepartureFlight,
     lastSearchParams,
+    isRoundTrip,
   ]);
 
   useEffect(() => {
@@ -150,19 +190,6 @@ const HeaderTicket = () => {
     dates,
     lastSearchParams,
   ]);
-
-  useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      if (lastSearchParams && !isRoundTrip) {
-        dispatch(
-          updateFlightSearch({
-            departureDate: new Date(lastSearchParams.departureDate),
-          })
-        );
-      }
-    }
-  }, []);
 
   const handleDateFilter = async (selectedDate) => {
     if (!selectedDate) return;
@@ -192,10 +219,18 @@ const HeaderTicket = () => {
         searchPayload.returnDate = getUTCDate(returnDate);
       }
 
+      // Allow updating the departure date after initial restore
+      if (!isRoundTrip) {
+        hasRestoredDate.current = true;
+      }
+
       dispatch(
         updateFlightSearch({
           departureDate: new Date(selectedDate),
-          lastSearchParams: searchPayload,
+          lastSearchParams: {
+            ...searchPayload,
+            departureDate: selectedDate,
+          },
         })
       );
     }
