@@ -1,4 +1,3 @@
-// usePayment.js
 import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -63,13 +62,11 @@ export const usePayment = () => {
         }
       } catch (error) {
         dispatch(setError(error.message));
-
         Swal.fire({
           icon: 'error',
           title: 'Transaction Failed',
           text: error.message || 'Failed to create transaction',
         });
-
         return false;
       } finally {
         dispatch(setLoading(false));
@@ -79,26 +76,24 @@ export const usePayment = () => {
   );
 
   const initiatePayment = useCallback(
-    async (amount) => {
+    async (paymentData) => {
       dispatch(setLoading(true));
       try {
-        const orderDetails = state.orderData;
-
         const paymentDetails = {
-          amount,
+          orderId: paymentData.orderId,
+          amount: paymentData.amount,
           customerDetails: {
-            name: orderDetails.orderName,
-            email: orderDetails.email,
-            mobile_number: orderDetails.phone,
+            name: paymentData.customerDetails.name,
+            email: paymentData.customerDetails.email,
+            mobile_number: paymentData.customerDetails.mobile_number,
             address: user.address || '',
           },
           productDetails: [
             {
-              productId:
-                flightState.selectedDepartureFlight.plane_id.toString(),
-              productName: `Flight ${flightState.selectedDepartureFlight.plane_code}`,
-              quantity: flightState.isRoundTrip ? 2 : 1,
-              price: amount,
+              productId: paymentData.productDetails[0].productId,
+              productName: paymentData.productDetails[0].productName,
+              quantity: paymentData.productDetails[0].quantity,
+              price: paymentData.productDetails[0].price,
             },
           ],
         };
@@ -107,7 +102,9 @@ export const usePayment = () => {
 
         if (result.isSuccess) {
           dispatch(setPaymentId(result.data.id));
-          dispatch(setPaymentData(paymentDetails));
+          dispatch(
+            setPaymentData({ ...paymentDetails, orderId: result.orderId })
+          );
 
           Swal.fire({
             icon: 'success',
@@ -116,10 +113,6 @@ export const usePayment = () => {
             timer: 1500,
             showConfirmButton: false,
           });
-
-          setTimeout(() => {
-            navigate('/payment-success');
-          }, 1500);
 
           return true;
         } else {
@@ -139,7 +132,7 @@ export const usePayment = () => {
         dispatch(setLoading(false));
       }
     },
-    [dispatch, state.orderData, flightState, user, navigate]
+    [dispatch, user]
   );
 
   const resetPaymentData = useCallback(() => {

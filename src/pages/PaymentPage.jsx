@@ -1,3 +1,4 @@
+// PaymentPage.jsx
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
@@ -8,15 +9,18 @@ import Navbar from '../components/UI/Navbar';
 import Stepper from '../components/UI/Stepper';
 import OrderForm from '../components/UI/OrderForm';
 import FlightDetails from '../components/UI/FlightDetail';
+import Swal from 'sweetalert2';
 
 const PaymentPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { departureId, returnId } = useParams();
+  const { departureId } = useParams();
   const { initiatePayment, loading } = usePayment();
-  const { timeLeft, isSubmitted: showSuccess } = useSelector(
-    (state) => state.payment
-  );
+  const {
+    timeLeft,
+    isSubmitted: showSuccess,
+    orderData,
+  } = useSelector((state) => state.payment);
   const flightDetails = useSelector((state) => state.flightSearch);
 
   useEffect(() => {
@@ -36,31 +40,51 @@ const PaymentPage = () => {
   const calculateTotalAmount = () => {
     let total = 0;
     if (flightDetails.selectedDepartureFlight) {
+      // Calculate total based on number of passengers
       const seatPrice =
         flightDetails.selectedDepartureFlight.seats_detail.find(
           (seat) => seat.class === flightDetails.selectedSeatClass
         )?.price || 0;
-      total += seatPrice;
-    }
-    if (flightDetails.isRoundTrip && flightDetails.selectedReturnFlight) {
-      const returnSeatPrice =
-        flightDetails.selectedReturnFlight.seats_detail.find(
-          (seat) => seat.class === flightDetails.selectedSeatClass
-        )?.price || 0;
-      total += returnSeatPrice;
+      const passengerCount = orderData.passengers?.length || 1;
+      total += seatPrice * passengerCount;
     }
     return total;
   };
 
   const handleProceedToPayment = async () => {
-    const totalAmount = calculateTotalAmount();
-    if (returnId) {
-      navigate(`/payment/${departureId}/${returnId}`);
-    } else {
-      navigate(`/payment/${departureId}`);
+    try {
+      const totalAmount = calculateTotalAmount();
+      const paymentResult = await initiatePayment({
+        amount: totalAmount,
+        customerDetails: {
+          name: orderData.orderName,
+          email: orderData.email,
+          mobile_number: orderData.phone,
+        },
+        productDetails: [
+          {
+            productId:
+              flightDetails.selectedDepartureFlight.plane_id.toString(),
+            productName: `Flight ${flightDetails.selectedDepartureFlight.plane_code}`,
+            quantity: orderData.passengers.length,
+            price: totalAmount,
+          },
+        ],
+      });
+
+      if (paymentResult) {
+        navigate(`/payment/${departureId}`);
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Payment Failed',
+        text: error.message || 'Failed to process payment',
+      });
     }
   };
 
+  // Rest of the component render code remains the same
   return (
     <div className="min-h-screen bg-gray-50 overflow-x-hidden mb-10">
       <Navbar />
