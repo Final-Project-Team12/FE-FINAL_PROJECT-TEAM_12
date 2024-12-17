@@ -126,6 +126,17 @@ const getTotalPassengers = (passengerCounts) => {
   return Object.values(passengerCounts).reduce((sum, count) => sum + count, 0);
 };
 
+const formatDateForAPI = (dateString) => {
+  if (!dateString) return '';
+  try {
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0];
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return '';
+  }
+};
+
 export const flightManagementAndBookingService = {
   async fetchAvailableFlightsWithFiltersAndPagination(params) {
     try {
@@ -144,18 +155,24 @@ export const flightManagementAndBookingService = {
           passengerAdult,
           passengerChild,
           passengerInfant,
+          isRoundTrip,
         } = params.searchParams;
+
+        const formattedDepartureDate = formatDateForAPI(departureDate);
+        const formattedReturnDate = formatDateForAPI(returnDate);
 
         if (from) queryParams.from = from;
         if (to) queryParams.to = to;
-        if (departureDate) queryParams.departureDate = departureDate;
+        if (formattedDepartureDate)
+          queryParams.departureDate = formattedDepartureDate;
         if (seatClass) queryParams.seatClass = seatClass;
         if (passengerAdult) queryParams.passengerAdult = passengerAdult;
         if (passengerChild) queryParams.passengerChild = passengerChild;
         if (passengerInfant) queryParams.passengerInfant = passengerInfant;
+        if (isRoundTrip !== undefined) queryParams.isRoundTrip = isRoundTrip;
 
-        if (returnDate) {
-          queryParams.returnDate = returnDate;
+        if (formattedReturnDate && isRoundTrip) {
+          queryParams.returnDate = formattedReturnDate;
         }
       }
 
@@ -185,42 +202,90 @@ export const flightManagementAndBookingService = {
         .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
         .join('&');
 
-      const response = await axiosInstance.get(
-        `/flights/search?${queryString}`
-      );
+      try {
+        const response = await axiosInstance.get(
+          `/flights/search?${queryString}`
+        );
 
-      const filterFlightsBySeatClass = (flights) =>
-        flights.filter((flight) => {
-          const seatInfo = flight.seats_detail.find(
-            (seat) => seat.class === params.searchParams.seatClass
-          );
-          return (
-            seatInfo &&
-            seatInfo.available_seats >=
+        const filterFlightsBySeatClass = (flights) =>
+          flights?.filter((flight) => {
+            const seatInfo = flight.seats_detail.find(
+              (seat) => seat.class === params.searchParams.seatClass
+            );
+            const totalPassengers =
               (params.searchParams.passengerAdult || 0) +
-                (params.searchParams.passengerChild || 0) +
-                (params.searchParams.passengerInfant || 0)
+              (params.searchParams.passengerChild || 0) +
+              (params.searchParams.passengerInfant || 0);
+            return seatInfo && seatInfo.available_seats >= totalPassengers;
+          }) || [];
+
+        const filteredOutboundFlights = filterFlightsBySeatClass(
+          response.data.data.outbound_flights
+        );
+
+        const filteredReturnFlights = response.data.data.return_flights
+          ? filterFlightsBySeatClass(response.data.data.return_flights)
+          : [];
+
+        return {
+          ...response.data,
+          data: {
+            outbound_flights: filteredOutboundFlights,
+            return_flights: filteredReturnFlights,
+          },
+        };
+      } catch (error) {
+        if (error.response) {
+          switch (error.response.status) {
+            case 404:
+              return {
+                data: {
+                  outbound_flights: [],
+                  return_flights: [],
+                },
+                pagination: {
+                  totalItems: 0,
+                  totalPages: 0,
+                  currentPage: queryParams.page,
+                  hasNextPage: false,
+                },
+              };
+            case 400:
+              throw new Error(
+                'Invalid search parameters. Please check your input and try again.'
+              );
+            case 401:
+              throw new Error(
+                'Please login to continue searching for flights.'
+              );
+            case 403:
+              throw new Error(
+                'You do not have permission to access this resource.'
+              );
+            case 429:
+              throw new Error('Too many requests. Please try again later.');
+            case 500:
+              throw new Error('Internal server error. Please try again later.');
+            default:
+              throw new Error(
+                'An error occurred while searching for flights. Please try again.'
+              );
+          }
+        } else if (error.request) {
+          throw new Error(
+            'Unable to connect to the server. Please check your internet connection.'
           );
-        });
-
-      let filteredOutboundFlights = filterFlightsBySeatClass(
-        response.data.data.outbound_flights
-      );
-
-      let filteredReturnFlights = response.data.data.return_flights
-        ? filterFlightsBySeatClass(response.data.data.return_flights)
-        : [];
-
-      return {
-        ...response.data,
-        data: {
-          outbound_flights: filteredOutboundFlights,
-          return_flights: filteredReturnFlights,
-        },
-      };
+        } else {
+          throw new Error(
+            'An error occurred while preparing your request. Please try again.'
+          );
+        }
+      }
     } catch (error) {
       console.error('Error fetching flights:', error);
       throw error;
     }
   },
 };
+
+export default flightManagementAndBookingService;

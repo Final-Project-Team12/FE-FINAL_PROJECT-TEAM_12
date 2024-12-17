@@ -28,6 +28,7 @@ const initialState = {
     Business: 0,
     'First Class': 0,
   },
+  lastSearchParams: null,
 };
 
 export const flightSearchSlice = createSlice({
@@ -73,6 +74,12 @@ export const flightSearchSlice = createSlice({
         return_flights: [],
       };
     },
+    setLastSearchParams: (state, action) => {
+      state.lastSearchParams = action.payload;
+    },
+    clearLastSearchParams: (state) => {
+      state.lastSearchParams = null;
+    },
   },
 });
 
@@ -86,6 +93,8 @@ export const {
   updateSelectedSeatClass,
   setSearchResults,
   clearSearchResults,
+  setLastSearchParams,
+  clearLastSearchParams,
 } = flightSearchSlice.actions;
 
 export default flightSearchSlice.reducer;

@@ -1,10 +1,11 @@
 import { useEffect, useCallback, useRef, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
 import {
   fetchFilteredFlights,
   goToNextPage,
+  setSearchParams,
 } from '../../store/slices/flightFilterSlice';
 import { updateFlightSearch } from '../../store/slices/flightSearchSlice';
 import LoadingTicket from './LoadingTicket';
@@ -12,7 +13,9 @@ import SearchResultEmpty from './SearchResultEmpety';
 
 const DetailsTicket = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
+  const isInitialMount = useRef(true);
 
   const {
     filteredFlights,
@@ -45,7 +48,6 @@ const DetailsTicket = () => {
       const date = new Date(dateString);
       if (isNaN(date.getTime())) return '';
 
-      const day = date.getDate();
       const months = [
         'Januari',
         'Februari',
@@ -60,9 +62,8 @@ const DetailsTicket = () => {
         'November',
         'Desember',
       ];
-      const month = months[date.getMonth()];
-      const year = date.getFullYear();
-      return `${day} ${month} ${year}`;
+
+      return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
     } catch (error) {
       console.error('Error formatting date:', error);
       return '';
@@ -85,36 +86,15 @@ const DetailsTicket = () => {
     }
   };
 
-  const getUTCDate = (date) => {
+  const formatDateForAPI = (date) => {
     if (!date) return '';
     try {
-      const localDate = new Date(date);
-      const utcDate = new Date(
-        Date.UTC(
-          localDate.getFullYear(),
-          localDate.getMonth(),
-          localDate.getDate(),
-          21,
-          1,
-          40,
-          471
-        )
-      );
+      const dateObj = new Date(date);
+      if (isNaN(dateObj.getTime())) return '';
 
-      const year = utcDate.getUTCFullYear();
-      const month = String(utcDate.getUTCMonth() + 1).padStart(2, '0');
-      const day = String(utcDate.getUTCDate()).padStart(2, '0');
-      const hours = String(utcDate.getUTCHours()).padStart(2, '0');
-      const minutes = String(utcDate.getUTCMinutes()).padStart(2, '0');
-      const seconds = String(utcDate.getUTCSeconds()).padStart(2, '0');
-      const milliseconds = String(utcDate.getUTCMilliseconds()).padStart(
-        3,
-        '0'
-      );
-
-      return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}Z`;
+      return dateObj.toISOString().split('T')[0];
     } catch (error) {
-      console.error('Error getting UTC date:', error);
+      console.error('Error formatting date for API:', error);
       return '';
     }
   };
@@ -125,20 +105,38 @@ const DetailsTicket = () => {
 
   const handleSelectFlight = (flight) => {
     if (!selectedDepartureFlight) {
+      const searchPayload = {
+        from: fromCity,
+        to: toCity,
+        departureDate: formatDateForAPI(departureDate),
+        seatClass: selectedSeatClass,
+        passengerAdult: passengerCounts.adult || 0,
+        passengerChild: passengerCounts.child || 0,
+        passengerInfant: passengerCounts.infant || 0,
+        isRoundTrip,
+      };
+
       if (isRoundTrip) {
         dispatch(
           updateFlightSearch({
             selectedDepartureFlight: flight,
             departureDateDisplay: formatDate(flight.departure_time),
+            searchPayload,
           })
         );
 
+        const returnSearchParams = {
+          from: flight.destination_airport.airport_code,
+          to: flight.origin_airport.airport_code,
+          fromCityDisplay: `${flight.destination_airport.name} (${flight.destination_airport.airport_code})`,
+          toCityDisplay: `${flight.origin_airport.name} (${flight.origin_airport.airport_code})`,
+        };
+
         dispatch(
           setSearchParams({
-            from: flight.destination_airport.airport_code,
-            to: flight.origin_airport.airport_code,
-            fromCityDisplay: `${flight.destination_airport.name} (${flight.destination_airport.airport_code})`,
-            toCityDisplay: `${flight.origin_airport.name} (${flight.origin_airport.airport_code})`,
+            ...returnSearchParams,
+            departureDate: formatDateForAPI(returnDate),
+            isRoundTrip: true,
           })
         );
 
@@ -147,9 +145,8 @@ const DetailsTicket = () => {
             page: 1,
             filters: activeFilters,
             searchParams: {
-              from: flight.destination_airport.airport_code,
-              to: flight.origin_airport.airport_code,
-              departureDate: getUTCDate(returnDate),
+              ...returnSearchParams,
+              departureDate: formatDateForAPI(returnDate),
               seatClass: selectedSeatClass,
               passengerAdult: passengerCounts.adult || 0,
               passengerChild: passengerCounts.child || 0,
@@ -163,6 +160,7 @@ const DetailsTicket = () => {
           updateFlightSearch({
             selectedDepartureFlight: flight,
             departureDateDisplay: formatDate(flight.departure_time),
+            searchPayload,
           })
         );
         navigate(`/checkout/${flight.plane_id}`);
@@ -183,23 +181,17 @@ const DetailsTicket = () => {
   const observer = useRef();
   const lastFlightElementRef = useCallback(
     (node) => {
-      if (isLoading) return;
+      if (isLoading || !hasMoreFlights || isRequestInProgress.current) return;
 
-      if (observer.current) {
-        observer.current.disconnect();
-      }
+      if (observer.current) observer.current.disconnect();
 
       observer.current = new IntersectionObserver(
         (entries) => {
-          if (
-            entries[0].isIntersecting &&
-            hasMoreFlights &&
-            !isRequestInProgress.current
-          ) {
+          if (entries[0].isIntersecting) {
             dispatch(goToNextPage());
           }
         },
-        { root: null, rootMargin: '20px', threshold: 0.1 }
+        { rootMargin: '20px', threshold: 0.1 }
       );
 
       if (node) observer.current.observe(node);
@@ -208,12 +200,34 @@ const DetailsTicket = () => {
   );
 
   const currentFlights = useMemo(() => {
-    if (selectedDepartureFlight && isRoundTrip) {
-      return filteredFlights.return_flights || [];
-    }
-
-    return filteredFlights.outbound_flights || [];
+    return selectedDepartureFlight && isRoundTrip
+      ? filteredFlights.return_flights || []
+      : filteredFlights.outbound_flights || [];
   }, [selectedDepartureFlight, isRoundTrip, filteredFlights]);
+
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+
+      if (!fromCity || !toCity || !departureDate) {
+        navigate('/');
+        return;
+      }
+
+      const initialSearchPayload = {
+        from: fromCity,
+        to: toCity,
+        departureDate: formatDateForAPI(departureDate),
+        seatClass: selectedSeatClass,
+        passengerAdult: passengerCounts.adult || 0,
+        passengerChild: passengerCounts.child || 0,
+        passengerInfant: passengerCounts.infant || 0,
+        isRoundTrip,
+      };
+
+      dispatch(setSearchParams(initialSearchPayload));
+    }
+  }, []);
 
   useEffect(() => {
     if (isRequestInProgress.current) return;
@@ -221,20 +235,28 @@ const DetailsTicket = () => {
     const fetchData = async () => {
       isRequestInProgress.current = true;
       try {
+        const currentDate =
+          isRoundTrip && selectedDepartureFlight ? returnDate : departureDate;
+        const formattedDate = formatDateForAPI(currentDate);
+
+        if (!formattedDate) {
+          console.error('Invalid date format');
+          return;
+        }
+
         const searchPayload = {
           from: fromCity,
           to: toCity,
-          departureDate: getUTCDate(
-            selectedDepartureFlight ? returnDate : departureDate
-          ),
+          departureDate: formattedDate,
           seatClass: selectedSeatClass,
           passengerAdult: passengerCounts.adult || 0,
           passengerChild: passengerCounts.child || 0,
           passengerInfant: passengerCounts.infant || 0,
           isRoundTrip,
           ...(selectedDepartureFlight &&
-            returnDate && {
-              returnDate: getUTCDate(returnDate),
+            returnDate &&
+            isRoundTrip && {
+              returnDate: formatDateForAPI(returnDate),
             }),
         };
 
@@ -252,7 +274,9 @@ const DetailsTicket = () => {
       }
     };
 
-    fetchData();
+    if (fromCity && toCity && departureDate) {
+      fetchData();
+    }
   }, [
     dispatch,
     currentPageNumber,
@@ -273,13 +297,13 @@ const DetailsTicket = () => {
     );
   }
 
+  if (!isLoading && (!currentFlights || currentFlights.length === 0)) {
+    return <SearchResultEmpty />;
+  }
+
   return (
     <div className="w-full px-4 pb-4 space-y-4">
-      {!isLoading && (!currentFlights || currentFlights.length === 0) && (
-        <SearchResultEmpty />
-      )}
-
-      {currentFlights?.map((flight, index) => (
+      {currentFlights.map((flight, index) => (
         <div
           key={flight.plane_id}
           ref={
@@ -364,7 +388,16 @@ const DetailsTicket = () => {
                   )}
                 </div>
                 <button
-                  className="mt-1 px-6 py-1 bg-purple-600 text-white rounded-md text-sm hover:bg-purple-700 transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  className={`
+                    mt-1 px-6 py-1 rounded-md text-sm transition-colors duration-200
+                    ${
+                      flight.seats_detail.find(
+                        (seat) => seat.class === selectedSeatClass
+                      )?.available_seats > 0
+                        ? 'bg-purple-600 text-white hover:bg-purple-700'
+                        : 'bg-gray-400 text-white cursor-not-allowed'
+                    }
+                  `}
                   onClick={() => handleSelectFlight(flight)}
                   disabled={
                     flight.seats_detail.find(

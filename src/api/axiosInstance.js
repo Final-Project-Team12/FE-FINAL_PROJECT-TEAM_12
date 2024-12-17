@@ -18,7 +18,13 @@ axiosInstance.interceptors.request.use(
     return config;
   },
   (error) => {
-    console.log(error);
+    if (error.response?.status === 404) {
+      console.error('Resource not found:', error.config.url);
+    } else if (error.response?.status === 401) {
+      console.error('Unauthorized access');
+
+      Cookies.remove('token');
+    }
     return Promise.reject(error);
   }
 );
@@ -28,6 +34,8 @@ axiosInstance.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       console.log('Unauthorized access');
+
+      Cookies.remove('token');
     }
     return Promise.reject(error);
   }
