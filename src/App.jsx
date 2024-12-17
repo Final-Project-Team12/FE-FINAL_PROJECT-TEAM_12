@@ -13,6 +13,7 @@ import AccountPage from './pages/AccountPage';
 import OtpPage from './pages/OtpPage';
 import OtpPasswordPage from './pages/OtpPasswordPage';
 import NotificationPage from './pages/NotificationPage';
+import PrintTicketPage from './pages/PrintTicketPage';
 
 function App() {
   return (
@@ -57,6 +58,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/print-ticket" element={<PrintTicketPage />} />
           <Route
             path="/notification"
             element={
