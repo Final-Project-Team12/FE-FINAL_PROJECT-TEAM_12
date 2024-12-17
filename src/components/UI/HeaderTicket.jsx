@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import {
@@ -14,6 +14,7 @@ import {
 
 const HeaderTicket = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
   const { activeFilters } = useSelector((state) => state.flightFilter);
   const {
@@ -27,6 +28,7 @@ const HeaderTicket = () => {
     returnDate,
     isRoundTrip,
     selectedDepartureFlight,
+    lastSearchParams,
   } = useSelector((state) => state.flightSearch);
 
   const [visibleDateRange, setVisibleDateRange] = useState({
@@ -34,6 +36,7 @@ const HeaderTicket = () => {
     end: 3,
   });
   const [activeIndex, setActiveIndex] = useState(null);
+  const isInitialMount = useRef(true);
 
   const formatDay = (date) => {
     const days = [
@@ -57,11 +60,17 @@ const HeaderTicket = () => {
   };
 
   const formatAPIDate = (date) => {
-    const d = new Date(date);
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    if (!date) return '';
+    try {
+      const d = new Date(date);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    } catch (error) {
+      console.error('Error formatting API date:', error);
+      return '';
+    }
   };
 
   const getUTCDate = (date) => {
@@ -70,31 +79,32 @@ const HeaderTicket = () => {
       const dateObj = new Date(date);
       if (isNaN(dateObj.getTime())) return '';
 
-      return new Date(
-        Date.UTC(
-          dateObj.getUTCFullYear(),
-          dateObj.getUTCMonth(),
-          dateObj.getUTCDate()
-        )
-      )
-        .toISOString()
-        .split('T')[0];
+      return dateObj.toISOString().split('T')[0];
     } catch (error) {
       console.error('Error getting UTC date:', error);
       return '';
     }
   };
 
-  const handleReset = () => {
-    dispatch(resetFlightSearch());
-    dispatch(clearAllFilters());
-    navigate('/');
+  const getCurrentDate = () => {
+    if (lastSearchParams && !isRoundTrip) {
+      return new Date(lastSearchParams.departureDate);
+    }
+
+    if (selectedDepartureFlight) {
+      return new Date(returnDate);
+    }
+
+    return new Date(departureDate);
   };
 
   const dates = useMemo(() => {
-    const currentDate = selectedDepartureFlight ? returnDate : departureDate;
-    const baseDate = new Date(currentDate);
+    const baseDate = getCurrentDate();
     const datesArray = [];
+
+    if (!baseDate || isNaN(baseDate.getTime())) {
+      return [];
+    }
 
     baseDate.setHours(0, 0, 0, 0);
 
@@ -114,10 +124,16 @@ const HeaderTicket = () => {
     }
 
     return datesArray;
-  }, [visibleDateRange, departureDate, returnDate, selectedDepartureFlight]);
+  }, [
+    visibleDateRange,
+    departureDate,
+    returnDate,
+    selectedDepartureFlight,
+    lastSearchParams,
+  ]);
 
   useEffect(() => {
-    const currentDate = selectedDepartureFlight ? returnDate : departureDate;
+    const currentDate = getCurrentDate();
     if (!currentDate) return;
 
     const dateIndex = dates.findIndex(
@@ -127,9 +143,30 @@ const HeaderTicket = () => {
     if (dateIndex !== -1) {
       setActiveIndex(dateIndex);
     }
-  }, [departureDate, returnDate, selectedDepartureFlight, dates]);
+  }, [
+    departureDate,
+    returnDate,
+    selectedDepartureFlight,
+    dates,
+    lastSearchParams,
+  ]);
+
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      if (lastSearchParams && !isRoundTrip) {
+        dispatch(
+          updateFlightSearch({
+            departureDate: new Date(lastSearchParams.departureDate),
+          })
+        );
+      }
+    }
+  }, []);
 
   const handleDateFilter = async (selectedDate) => {
+    if (!selectedDate) return;
+
     const searchPayload = {
       from: fromCity,
       to: toCity,
@@ -137,6 +174,7 @@ const HeaderTicket = () => {
       passengerAdult: passengerCounts.adult || 0,
       passengerChild: passengerCounts.child || 0,
       passengerInfant: passengerCounts.infant || 0,
+      isRoundTrip,
     };
 
     if (selectedDepartureFlight) {
@@ -150,7 +188,6 @@ const HeaderTicket = () => {
       );
     } else {
       searchPayload.departureDate = getUTCDate(selectedDate);
-
       if (isRoundTrip && returnDate) {
         searchPayload.returnDate = getUTCDate(returnDate);
       }
@@ -158,6 +195,7 @@ const HeaderTicket = () => {
       dispatch(
         updateFlightSearch({
           departureDate: new Date(selectedDate),
+          lastSearchParams: searchPayload,
         })
       );
     }
@@ -196,6 +234,12 @@ const HeaderTicket = () => {
       start: prev.start + 7,
       end: prev.end + 7,
     }));
+  };
+
+  const handleReset = () => {
+    dispatch(resetFlightSearch());
+    dispatch(clearAllFilters());
+    navigate('/');
   };
 
   const canShowPrevious = visibleDateRange.start > -30;

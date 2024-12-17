@@ -136,35 +136,6 @@ export const fetchFilteredFlights = createAsyncThunk(
   }
 );
 
-const initialState = {
-  filteredFlights: {
-    outbound_flights: [],
-    return_flights: [],
-  },
-  isLoading: false,
-  error: null,
-  hasMoreFlights: true,
-  currentPageNumber: 1,
-  activeFilters: {
-    minPrice: '',
-    maxPrice: '',
-    facilities: [],
-    departureDate: null,
-  },
-  searchParams: {
-    from: '',
-    to: '',
-    departureDate: '',
-    returnDate: '',
-    seatClass: '',
-    passengerAdult: 1,
-    passengerChild: 0,
-    passengerInfant: 0,
-    isRoundTrip: false,
-  },
-  sortCriteria: 'price_asc',
-};
-
 const sortFlights = (flights, criteria) => {
   if (!flights || !Array.isArray(flights)) return [];
   return [...flights].sort((a, b) => {
@@ -195,6 +166,35 @@ const sortFlights = (flights, criteria) => {
   });
 };
 
+const initialState = {
+  filteredFlights: {
+    outbound_flights: [],
+    return_flights: [],
+  },
+  isLoading: false,
+  error: null,
+  hasMoreFlights: true,
+  currentPageNumber: 1,
+  activeFilters: {
+    minPrice: '',
+    maxPrice: '',
+    facilities: [],
+    departureDate: null,
+  },
+  searchParams: {
+    from: '',
+    to: '',
+    departureDate: '',
+    returnDate: '',
+    seatClass: '',
+    passengerAdult: 1,
+    passengerChild: 0,
+    passengerInfant: 0,
+    isRoundTrip: false,
+  },
+  sortCriteria: 'price_asc',
+};
+
 const flightFilterSlice = createSlice({
   name: 'flightFilter',
   initialState,
@@ -215,7 +215,9 @@ const flightFilterSlice = createSlice({
       state.activeFilters = { ...state.activeFilters, ...action.payload };
       state.currentPageNumber = 1;
     },
-    clearAllFilters: () => initialState,
+    clearAllFilters: (state) => {
+      return { ...initialState, searchParams: state.searchParams };
+    },
     goToNextPage: (state) => {
       state.currentPageNumber += 1;
     },
