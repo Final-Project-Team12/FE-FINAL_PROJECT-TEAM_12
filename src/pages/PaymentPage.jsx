@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { Clock, CheckCircle } from 'lucide-react';
+import { usePayment } from '../hooks/usePayment';
 import { updateTimeLeft } from '../store/slices/paymentSlice';
 import Navbar from '../components/UI/Navbar';
 import Stepper from '../components/UI/Stepper';
@@ -11,9 +12,12 @@ import FlightDetails from '../components/UI/FlightDetail';
 const PaymentPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { departureId, returnId } = useParams();
+  const { initiatePayment, loading } = usePayment();
   const { timeLeft, isSubmitted: showSuccess } = useSelector(
     (state) => state.payment
   );
+  const flightDetails = useSelector((state) => state.flightSearch);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -29,8 +33,32 @@ const PaymentPage = () => {
     return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
   };
 
-  const handleProceedToPayment = () => {
-    navigate('/payment/1');
+  const calculateTotalAmount = () => {
+    let total = 0;
+    if (flightDetails.selectedDepartureFlight) {
+      const seatPrice =
+        flightDetails.selectedDepartureFlight.seats_detail.find(
+          (seat) => seat.class === flightDetails.selectedSeatClass
+        )?.price || 0;
+      total += seatPrice;
+    }
+    if (flightDetails.isRoundTrip && flightDetails.selectedReturnFlight) {
+      const returnSeatPrice =
+        flightDetails.selectedReturnFlight.seats_detail.find(
+          (seat) => seat.class === flightDetails.selectedSeatClass
+        )?.price || 0;
+      total += returnSeatPrice;
+    }
+    return total;
+  };
+
+  const handleProceedToPayment = async () => {
+    const totalAmount = calculateTotalAmount();
+    if (returnId) {
+      navigate(`/payment/${departureId}/${returnId}`);
+    } else {
+      navigate(`/payment/${departureId}`);
+    }
   };
 
   return (
@@ -64,9 +92,10 @@ const PaymentPage = () => {
           {showSuccess && (
             <button
               onClick={handleProceedToPayment}
-              className="w-full max-w-2xl bg-red-600 text-white py-4 rounded-lg text-xl font-semibold hover:opacity-90 transition-opacity mt-4"
+              disabled={loading}
+              className="w-full max-w-2xl bg-red-600 text-white py-4 rounded-lg text-xl font-semibold hover:opacity-90 transition-opacity mt-4 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              Lanjut Bayar
+              {loading ? 'Processing...' : 'Lanjut Bayar'}
             </button>
           )}
         </div>

@@ -1,33 +1,69 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
+  transactionData: {
+    userData: {
+      user_id: null,
+    },
+    passengerData: [
+      {
+        title: '',
+        full_name: '',
+        family_name: '',
+        birth_date: '',
+        nationality: '',
+        id_number: '',
+        id_issuer: '',
+        id_expiry: '',
+      },
+    ],
+    seatSelections: [],
+    planeId: null,
+  },
+  paymentData: {
+    orderId: '',
+    amount: 0,
+    customerDetails: {
+      name: '',
+      email: '',
+      mobile_number: '',
+      address: '',
+    },
+    productDetails: [],
+  },
+  transactionId: null,
+  paymentId: null,
   orderData: {
     orderName: '',
     orderFamily: '',
     phone: '',
     email: '',
-    passenger: {
-      hasFamily: false,
-      title: 'Mr.',
-      fullName: '',
-      familyName: '',
-      birthDate: '',
-      nationality: '',
-      idNumber: '',
-      issuingCountry: '',
-      expiryDate: '',
-    },
+    passengers: [],
   },
   selectedSeats: [],
   hasFamily: false,
   isSubmitted: false,
   timeLeft: 900,
+  loading: false,
+  error: null,
 };
 
 const paymentSlice = createSlice({
   name: 'payment',
   initialState,
   reducers: {
+    setTransactionData: (state, action) => {
+      state.transactionData = action.payload;
+    },
+    setPaymentData: (state, action) => {
+      state.paymentData = action.payload;
+    },
+    setTransactionId: (state, action) => {
+      state.transactionId = action.payload;
+    },
+    setPaymentId: (state, action) => {
+      state.paymentId = action.payload;
+    },
     updateOrderData: (state, action) => {
       state.orderData = {
         ...state.orderData,
@@ -35,10 +71,15 @@ const paymentSlice = createSlice({
       };
     },
     updatePassengerData: (state, action) => {
-      state.orderData.passenger = {
-        ...state.orderData.passenger,
-        ...action.payload,
-      };
+      if (state.orderData.passengers) {
+        const index = action.payload.index;
+        const passengerData = action.payload.data;
+
+        state.orderData.passengers = state.orderData.passengers.map(
+          (passenger, i) =>
+            i === index ? { ...passenger, ...passengerData } : passenger
+        );
+      }
     },
     setSelectedSeats: (state, action) => {
       state.selectedSeats = action.payload;
@@ -53,10 +94,40 @@ const paymentSlice = createSlice({
       state.timeLeft = action.payload;
     },
     resetPaymentState: () => initialState,
+    setLoading: (state, action) => {
+      state.loading = action.payload;
+    },
+    setError: (state, action) => {
+      state.error = action.payload;
+    },
+    addPassenger: (state, action) => {
+      if (!state.orderData.passengers) {
+        state.orderData.passengers = [];
+      }
+      state.orderData.passengers.push(action.payload);
+    },
+    removePassenger: (state, action) => {
+      const index = action.payload;
+      if (
+        state.orderData.passengers &&
+        state.orderData.passengers.length > index
+      ) {
+        state.orderData.passengers = state.orderData.passengers.filter(
+          (_, i) => i !== index
+        );
+      }
+    },
+    updateAllPassengers: (state, action) => {
+      state.orderData.passengers = action.payload;
+    },
   },
 });
 
 export const {
+  setTransactionData,
+  setPaymentData,
+  setTransactionId,
+  setPaymentId,
   updateOrderData,
   updatePassengerData,
   setSelectedSeats,
@@ -64,6 +135,11 @@ export const {
   setIsSubmitted,
   updateTimeLeft,
   resetPaymentState,
+  setLoading,
+  setError,
+  addPassenger,
+  removePassenger,
+  updateAllPassengers,
 } = paymentSlice.actions;
 
 export default paymentSlice.reducer;
