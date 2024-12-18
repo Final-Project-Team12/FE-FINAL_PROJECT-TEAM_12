@@ -1,21 +1,23 @@
 export const parseBookingDate = (dateString) => {
-  const [day, month, year] = dateString.split(' ');
-  return new Date(`${month} ${day}, ${year}`);
+  return new Date(dateString);
 };
 
 export const sortFlightsByDate = (flights) => {
+  if (!flights) return [];
+
+  // Buat copy dari array sebelum melakukan sort
   return [...flights].sort((a, b) => {
-    const aDate = parseBookingDate(a.bookingDate);
-    const bDate = parseBookingDate(b.bookingDate);
+    const aDate = parseBookingDate(a.transaction_date);
+    const bDate = parseBookingDate(b.transaction_date);
     return bDate.getTime() - aDate.getTime();
   });
 };
 
 export const filterFlightsByDateRange = (flights, startDate, endDate) => {
-  if (!startDate || !endDate) return flights;
+  if (!startDate || !endDate || !flights) return flights || [];
 
   return flights.filter((flight) => {
-    const bookingDate = parseBookingDate(flight.bookingDate);
-    return bookingDate >= startDate && bookingDate <= endDate;
+    const transactionDate = parseBookingDate(flight.transaction_date);
+    return transactionDate >= startDate && transactionDate <= endDate;
   });
 };

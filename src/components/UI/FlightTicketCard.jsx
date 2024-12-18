@@ -8,59 +8,56 @@ const FlightTicketCard = ({
   flight,
   onCardClick,
   isSelected,
-  bookingDate,
   selectedCard,
 }) => {
-  const {
-    id,
-    status,
-    departure,
-    arrival,
-    bookingCode,
-    duration,
-    flightClass,
-    pricePerPerson,
-    totalPassengers,
-    tax,
-  } = flight;
+  const { transaction_id, status, transaction_date, total_payment, tickets } =
+    flight;
 
-  const totalPrice = pricePerPerson * totalPassengers + tax;
+  // Get flight details from the first ticket
+  const firstTicket = tickets[0];
+  const flightDetails = firstTicket?.plane || {};
 
   const getStatusColor = (status) => {
-    switch (status) {
-      case 'Issued':
-        return 'bg-green-500'; // Green for Issued
-      case 'Unpaid':
-        return 'bg-red-500'; // Red for Unpaid
-      case 'Cancelled':
-        return 'bg-gray-500'; // Gray for Cancelled
+    switch (status.toUpperCase()) {
+      case 'ISSUED':
+        return 'bg-green-500';
+      case 'PENDING':
+        return 'bg-yellow-500';
+      case 'CANCELLED':
+        return 'bg-gray-500';
       default:
         return 'bg-gray-200';
     }
   };
 
   const handleCardClick = () => {
-    onCardClick(id);
+    onCardClick(transaction_id);
   };
 
-  // State untuk mengontrol modal
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Fungsi untuk membuka modal
-  const handleButton = () => {
-    setIsModalOpen(true); // Set modal terbuka
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('id-ID', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
   };
 
-  // Fungsi untuk menutup modal
-  const handleCloseModal = () => {
-    setIsModalOpen(false); // Set modal tertutup
+  const formatTime = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('id-ID', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   };
 
   return (
     <div>
-      <p className="font-bold mb-2">{bookingDate}</p>
+      <p className="font-bold mb-2">{formatDate(transaction_date)}</p>
       <div
-        className={` bg-white shadow-md rounded-lg overflow-hidden border-2 ${
+        className={`bg-white shadow-md rounded-lg overflow-hidden border-2 ${
           isSelected
             ? 'border-purple-500'
             : 'border-gray-200 hover:border-gray-300'
@@ -79,13 +76,17 @@ const FlightTicketCard = ({
                 <img src={Location} alt="Location Icon" />
               </div>
               <div>
-                <p className="font-bold">{departure.location}</p>
-                <p className="font-regular">{departure.date}</p>
-                <p className="font-regular">{departure.time}</p>
+                <p className="font-bold">{flightDetails.airport_id_origin}</p>
+                <p className="font-regular">
+                  {formatDate(flightDetails.departure_time)}
+                </p>
+                <p className="font-regular">
+                  {formatTime(flightDetails.departure_time)}
+                </p>
               </div>
             </div>
             <div className="hidden md:flex md:flex-col md:items-center md:justify-center">
-              <div>{duration}</div>
+              <div>{flightDetails.duration} mins</div>
               <div>
                 <img src={Arrow} alt="arrow icon" />
               </div>
@@ -95,41 +96,46 @@ const FlightTicketCard = ({
                 <img src={Location} alt="Location Icon" />
               </div>
               <div>
-                <p className="font-bold">{arrival.location}</p>
-                <p className="font-regular">{arrival.date}</p>
-                <p className="font-regular">{arrival.time}</p>
+                <p className="font-bold">
+                  {flightDetails.airport_id_destination}
+                </p>
+                <p className="font-regular">
+                  {formatDate(flightDetails.arrival_time)}
+                </p>
+                <p className="font-regular">
+                  {formatTime(flightDetails.arrival_time)}
+                </p>
               </div>
             </div>
           </div>
           <div className="w-full pt-1">
-            <hr className="h-px bg-gray-200 border-1 dark:bg-gray-500"></hr>
+            <hr className="h-px bg-gray-200 border-1 dark:bg-gray-500" />
           </div>
           <div className="flex justify-between">
             <div className="mt-2">
               <p className="font-bold">Booking Code:</p>
-              <p>{bookingCode}</p>
+              <p>{flight.token}</p>
             </div>
             <div className="hidden md:flex md:mt-2">
               <p className="font-bold">Class:</p>
-              <p>{flightClass}</p>
+              <p>{firstTicket?.seat?.class}</p>
             </div>
             <div className="mt-6">
               <p className="font-bold text-purple-900">
-                IDR {totalPrice.toLocaleString('id-ID')}
+                IDR {total_payment.toLocaleString('id-ID')}
               </p>
             </div>
           </div>
           <div className="block mt-3 lg:hidden">
-            <Button onClick={handleButton}>Details</Button>
+            <Button onClick={() => setIsModalOpen(true)}>Details</Button>
           </div>
         </div>
       </div>
 
-      {/* Modal */}
       {isModalOpen && (
         <OrderDetailsModal
-          flight={flight} // Passing flight data to modal
-          onClose={handleCloseModal} // Passing close function to modal
+          flight={flight}
+          onClose={() => setIsModalOpen(false)}
           selectedCard={selectedCard}
         />
       )}
