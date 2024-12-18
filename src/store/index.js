@@ -7,6 +7,7 @@ import flightSearchReducer from './slices/flightSearchSlice';
 import flightFilterReducer from './slices/flightFilterSlice';
 import registerReducer from './slices/registerSlice';
 import resetPasswordReducer from './slices/resetPasswordSlice';
+import orderHistoryReducer from './slices/orderHistorySlice';
 
 const dateSerializer = {
   serialize: (date) => (date instanceof Date ? date.toISOString() : date),
@@ -23,6 +24,7 @@ export const store = configureStore({
     flightFilter: flightFilterReducer,
     register: registerReducer,
     resetPassword: resetPasswordReducer,
+    orderHistory: orderHistoryReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
