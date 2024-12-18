@@ -33,15 +33,19 @@ const HistoryEmpty = () => {
         {transactions.length === 0 ? (
           <div className="text-center">
             <img
-              src=""
+              src="./images/Payment_Success.png"
               alt="Empty History"
-              className="w-24 h-24 mx-auto mb-4"
+              className="w-48 h-48 mx-auto mb-4"
             />
-            <h2 className="text-xl font-medium mb-2">No Transactions Found</h2>
-            <p className="text-gray-500">
-              You haven't made any transactions yet. When you do, they will
-              appear here.
+            <h2 className="text-sm text-purple-600 font-medium ">
+              Oops! Riwayat pesanan kosong
+            </h2>
+            <p className="text-sm mb-4">
+              Anda belum melakukan pemesanan penerbangan
             </p>
+            <button className="w-full h-12 bg-purple-800 text-white px-4 py-2 rounded-lg">
+              Cari Penerbangan
+            </button>
           </div>
         ) : (
           <div>Transactions found</div>
