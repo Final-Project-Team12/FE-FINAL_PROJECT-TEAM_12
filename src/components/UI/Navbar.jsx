@@ -1,7 +1,7 @@
 import { Search, Bell, List } from 'lucide-react';
 import { FaArrowRightToBracket } from 'react-icons/fa6';
 import { CgProfile } from 'react-icons/cg';
-import ProductLogo from '../../../public/icons/logo.svg';
+import ProductLogo from '../../../public/images/quickfly-horizontal.png';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -49,7 +49,7 @@ const Navbar = () => {
                 src={ProductLogo}
                 alt="QuickFly Logo"
                 onClick={handleLogoClick}
-                className="cursor-pointer"
+                className="cursor-pointer w-[150px]"
               />
             </div>
 
