@@ -130,7 +130,8 @@ const OrderForm = () => {
     if (
       !orderData.orderName?.trim() ||
       !orderData.phone?.trim() ||
-      !orderData.email?.trim()
+      !orderData.email?.trim() ||
+      !orderData.address?.trim() // Add address validation
     ) {
       Swal.fire({
         icon: 'error',
@@ -266,6 +267,19 @@ const OrderForm = () => {
               }
               placeholder="+62"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7126B5]"
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label className="text-[#7126B5] font-semibold mb-2">Alamat</label>
+            <textarea
+              value={orderData.address}
+              onChange={(e) =>
+                dispatch(updateOrderData({ address: e.target.value }))
+              }
+              placeholder="Masukkan alamat lengkap"
+              rows={3}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7126B5] resize-none"
             />
           </div>
         </form>
