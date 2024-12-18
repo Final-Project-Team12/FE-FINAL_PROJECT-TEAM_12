@@ -3,19 +3,19 @@ import LogoQuickFly from '../../../public/images/quickfly-vertical.png';
 const PrintTicket = () => {
   return (
     <div className="flex justify-center mt-10">
-      <div className="w-1/2 border flex flex-col rounded-lg shadow-lg lg:w-1/3 bg-gradient-to-br from-white to-gray-100">
-        <div className="flex justify-between items-center px-5 py-2">
-          <h1 className="font-bold text-[#7126B5] text-2xl">
+      <div className="w-2/3 border flex flex-col rounded-lg shadow-lg lg:w-1/3 bg-gradient-to-br from-white to-gray-100">
+        <div className="flex flex-col-reverse justify-between items-center px-5 py-2 md:flex-row">
+          <h1 className="flex items-center font-bold text-[#7126B5] text-md md:text-2xl">
             Your Boarding Pass
           </h1>
           <img src={LogoQuickFly} alt="Logo QuickFly" className="w-[70px]" />
         </div>
         <hr className="border-1 border-[#7126B5]" />
-        <div className="flex justify-between mt-10 p-5">
+        <div className="flex flex-col-reverse items-center justify-between mt-10 p-5 md:flex-row">
           <div className="flex flex-col mt-2 gap-4">
-            <span className="text-sm">Passenger: John Doe</span>
-            <span className="text-sm">Flight: AB1234</span>
-            <span className="text-sm">Departure: 12:30 PM</span>
+            <span className="text-xs md:text-sm">Passenger: John Doe</span>
+            <span className="text-xs md:text-sm">Flight: AB1234</span>
+            <span className="text-xs md:text-sm">Departure: 12:30 PM</span>
           </div>
           <div>
             <img
