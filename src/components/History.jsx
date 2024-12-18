@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Navbar from '../components/UI/Navbar';
 import FlightList from './UI/History/FlightList';
 import OrderDetailsPanel from './UI/History/OrderDetailsPanel';
+import HeaderHistory from './UI/HeaderHistory';
 import { useWindowDimensions } from '../hooks/useWindowDimensions';
 import {
   sortFlightsByDate,
@@ -66,6 +67,7 @@ const History = () => {
   return (
     <>
       <Navbar />
+      <HeaderHistory onDateRangeChange={handleDateRangeChange} />
       <div className="py-4 flex px-[10px] justify-center sm:flex-col sm:px-[15px] md:flex-col md:px-[20px] lg:flex-row lg:px-[50px] lg:gap-5 xl:flex-row xl:gap-12 xl:px-[260px] xl:min-h-[calc(100vh-84px)]">
         <FlightList
           flights={filteredFlightData}
