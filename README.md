@@ -4,12 +4,14 @@
 
 ## **FRONTEND TEAM**
 
-| **Name**                 | **Tasks**           |
-| ------------------------ | ------------------- |
-| **Rafly Aziz Abdillah**  | Init project, Login |
-| **Tegar Alfa Rizzi**     | _To be defined_     |
-| **Melinda Wijaya**       | _To be defined_     |
-| **Yogi Efani Yancandra** | _To be defined_     |
+| **Name**                 |
+| ------------------------ |
+| **Rafly Aziz Abdillah**  |
+| **Tegar Alfa Rizzi**     |
+| **Melinda Wijaya**       |
+| **Yogi Efani Yancandra** |
+
+For tasks and progress, visit our ClickUp workspace: [ClickUp Tasks](https://app.clickup.com/9018681465/v/b/8crwa3t-458)
 
 ---
 
@@ -35,7 +37,14 @@ Follow these steps to run the frontend project locally:
    npm install
    ```
 
-4. Run the application for local development:
+4. Set up environment variables by creating a `.env` file in the root directory with the following content:
+
+   ```env
+   VITE_BACKEND_URI=
+   VITE_MIDTRANS_CLIENT_KEY=
+   ```
+
+5. Run the application for local development:
    ```bash
    npm run dev
    ```
@@ -77,13 +86,70 @@ The project directory structure is organized as follows:
    - Contains the main pages of the application.
 
 6. **`/services`**
+
    - Contains files for API integration with reusable functions.
    - All functions here should use the **Axios instance** from the **`/api`** folder to ensure consistent API requests.
 
+7. **`/store`**
+   - Contains all Redux setup files and slices for state management.
+   - **Store Setup**:
+     - The `store` is configured using `@reduxjs/toolkit`'s `configureStore` function.
+     - Each slice represents a specific part of the application's state (e.g., `auth`, `user`, `flightSearch`, etc.).
+     - Middleware is customized to handle serializable checks and date serialization/deserialization.
+   - **Reducers**:
+     - `authReducer`: Manages authentication state.
+     - `userReducer`: Handles user profile and account management.
+     - `paymentReducer`: Manages payment data and processes.
+     - `flightReducer`: Stores selected flight data.
+     - `flightSearchReducer`: Handles flight search parameters and results.
+     - `flightFilterReducer`: Manages filters and sorting for flights.
+     - `registerReducer`: Handles registration and OTP verification.
+     - `resetPasswordReducer`: Manages password reset and OTP processes.
+     - `orderHistoryReducer`: Manages user order history.
+   - **Utilities**:
+     - `resetStore`: Dispatches actions to reset all slices to their initial states.
+     - `serializeDate` and `deserializeDate`: Functions to handle date conversion for Redux state.
+   - **Middleware**:
+     - Includes default middleware with custom configurations for serializable checks, such as ignoring specific paths and actions.
+
 ---
 
-## **Features (Soon)**
+## **Routes**
 
-- A list of features will be added in future updates.
+The application has the following routes:
+
+| **Route**                          | **Page**          | **Protected** |
+| ---------------------------------- | ----------------- | ------------- |
+| `/`                                | Homepage          | No            |
+| `/login`                           | LoginPage         | No            |
+| `/register`                        | RegisterPage      | No            |
+| `/reset-password`                  | ResetPasswordPage | No            |
+| `/otp`                             | OtpPage           | No            |
+| `/otp-password`                    | OtpPasswordPage   | No            |
+| `/flight-ticket`                   | FlightTicketPage  | No            |
+| `/checkout/:departureId`           | PaymentPage       | Yes           |
+| `/checkout/:departureId/:returnId` | PaymentPage       | Yes           |
+| `/payment/:id`                     | PaymentLastPage   | Yes           |
+| `/orderhistory`                    | OrderHistoryPage  | Yes           |
+| `/print-ticket`                    | PrintTicketPage   | Yes           |
+| `/notification`                    | NotificationPage  | Yes           |
+| `/account/:id`                     | AccountPage       | Yes           |
+| `*`                                | NotFoundPage      | No            |
+
+---
+
+## **Features**
+
+The following features are available or planned for the application:
+
+1. **Homepage**: Displays an overview of the service.
+2. **Login and Registration**: Authentication system for users.
+3. **Flight Ticket Search**: Allows users to search for flights.
+4. **Checkout**: Handles the booking process with payment integration.
+5. **Order History**: Shows the history of user bookings.
+6. **Notifications**: Displays user notifications for updates and alerts.
+7. **Account Management**: Users can update their profile and view details.
+8. **OTP Verification**: Ensures secure access to certain features.
+9. **Print Ticket**: Generates a printable ticket for booked flights.
 
 ---
