@@ -1,4 +1,3 @@
-// PaymentPage.jsx
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
@@ -21,7 +20,9 @@ const PaymentPage = () => {
     isSubmitted: showSuccess,
     orderData,
   } = useSelector((state) => state.payment);
-  const flightDetails = useSelector((state) => state.flightSearch);
+  const { selectedDepartureFlight, selectedSeatClass } = useSelector(
+    (state) => state.flightSearch
+  );
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -39,11 +40,10 @@ const PaymentPage = () => {
 
   const calculateTotalAmount = () => {
     let total = 0;
-    if (flightDetails.selectedDepartureFlight) {
-      // Calculate total based on number of passengers
+    if (selectedDepartureFlight) {
       const seatPrice =
-        flightDetails.selectedDepartureFlight.seats_detail.find(
-          (seat) => seat.class === flightDetails.selectedSeatClass
+        selectedDepartureFlight.seats_detail.find(
+          (seat) => seat.class === selectedSeatClass
         )?.price || 0;
       const passengerCount = orderData.passengers?.length || 1;
       total += seatPrice * passengerCount;
@@ -60,14 +60,14 @@ const PaymentPage = () => {
           name: orderData.orderName,
           email: orderData.email,
           mobile_number: orderData.phone,
+          address: orderData.address,
         },
         productDetails: [
           {
-            productId:
-              flightDetails.selectedDepartureFlight.plane_id.toString(),
-            productName: `Flight ${flightDetails.selectedDepartureFlight.plane_code}`,
+            productId: selectedDepartureFlight.plane_id.toString(),
+            productName: `Flight ${selectedDepartureFlight.plane_code}`,
             quantity: orderData.passengers.length,
-            price: totalAmount,
+            price: totalAmount / orderData.passengers.length,
           },
         ],
       });
@@ -84,7 +84,6 @@ const PaymentPage = () => {
     }
   };
 
-  // Rest of the component render code remains the same
   return (
     <div className="min-h-screen bg-gray-50 overflow-x-hidden mb-10">
       <Navbar />

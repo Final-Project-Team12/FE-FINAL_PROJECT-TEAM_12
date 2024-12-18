@@ -69,13 +69,11 @@ export const usePayment = () => {
         }
       } catch (error) {
         dispatch(setError(error.message));
-
         Swal.fire({
           icon: 'error',
           title: 'Transaction Failed',
           text: error.message || 'Failed to create transaction',
         });
-
         return false;
       } finally {
         dispatch(setLoading(false));
@@ -116,16 +114,9 @@ export const usePayment = () => {
             setPaymentData({
               ...paymentDetails,
               orderId: result.orderId,
+              token: result.data.data.payment.snapToken,
             })
           );
-
-          Swal.fire({
-            icon: 'success',
-            title: 'Payment Initiated!',
-            text: 'You will be redirected to the payment page',
-            timer: 1500,
-            showConfirmButton: false,
-          });
 
           return true;
         } else {
@@ -133,13 +124,11 @@ export const usePayment = () => {
         }
       } catch (error) {
         dispatch(setError(error.message));
-
         Swal.fire({
           icon: 'error',
           title: 'Payment Failed',
           text: error.message || 'Failed to initiate payment',
         });
-
         return false;
       } finally {
         dispatch(setLoading(false));
