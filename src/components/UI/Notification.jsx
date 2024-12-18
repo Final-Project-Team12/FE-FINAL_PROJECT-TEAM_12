@@ -23,8 +23,8 @@ const Notification = () => {
 
       const matchesDateRange =
         dateRange.startDate && dateRange.endDate
-          ? new Date(item.created_at) >= new Date(dateRange.startDate) &&
-            new Date(item.created_at) <= new Date(dateRange.endDate)
+          ? new Date(item.notification_date) >= new Date(dateRange.startDate) &&
+            new Date(item.notification_date) <= new Date(dateRange.endDate)
           : true;
 
       return matchesSearch && matchesDateRange;
@@ -96,8 +96,8 @@ const Notification = () => {
                     </span>
                     <div className="flex items-center space-x-2">
                       <span className="text-slate-500 text-sm">
-                        {formatDate(item.created_at)},{' '}
-                        {formatTime(item.created_at)}
+                        {formatDate(item.notification_date)},{' '}
+                        {formatTime(item.notification_date)}
                       </span>
                       <div
                         className={`rounded-full w-2 h-2 ${
@@ -138,8 +138,8 @@ const Notification = () => {
               </h2>
             </div>
             <p className="text-sm text-gray-500 mt-2">
-              {formatDate(selectedNotif.created_at)},{' '}
-              {formatTime(selectedNotif.created_at)}
+              {formatDate(selectedNotif.notification_date)},{' '}
+              {formatTime(selectedNotif.notification_date)}
             </p>
             <p className="mt-2">{selectedNotif.description}</p>
             <div className="flex justify-end space-x-4 mt-6">
