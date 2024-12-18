@@ -2,7 +2,7 @@ import React from 'react';
 import FlightTicketCard from '../FlightTicketCard';
 
 const FlightList = ({ flights, selectedCardId, onCardClick, selectedCard }) => {
-  if (flights.length === 0) {
+  if (!flights || flights.length === 0) {
     return (
       <div className="w-full flex justify-center items-center">
         <p className="text-gray-500 text-xl">
@@ -16,11 +16,10 @@ const FlightList = ({ flights, selectedCardId, onCardClick, selectedCard }) => {
     <div className="lg:w-3/5 sm:w-full space-y-4">
       {flights.map((flight) => (
         <FlightTicketCard
-          key={flight.id}
+          key={flight.transaction_id}
           flight={flight}
           onCardClick={onCardClick}
-          isSelected={flight.id === selectedCardId}
-          bookingDate={flight.bookingDate}
+          isSelected={flight.transaction_id === selectedCardId}
           selectedCard={selectedCard}
         />
       ))}
