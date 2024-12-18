@@ -1,7 +1,7 @@
-import HistoryEmpty from '../components/HistoryEmpty';
+import History from '../components/History';
 
 const OrderHistoryPage = () => {
-  return <HistoryEmpty />;
+  return <History />;
 };
 
 export default OrderHistoryPage;
