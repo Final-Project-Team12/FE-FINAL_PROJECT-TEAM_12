@@ -40,6 +40,7 @@ export const usePayment = () => {
           })),
           seatSelections: formData.seatSelections,
           planeId: formData.planeId,
+          total_payment: formData.total_payment,
         };
 
         const result = await paymentService.createTransaction(transactionData);
@@ -47,6 +48,12 @@ export const usePayment = () => {
         if (result.isSuccess) {
           dispatch(setTransactionId(result.data.id));
           dispatch(setTransactionData(transactionData));
+          dispatch(
+            setPaymentData({
+              amount: formData.total_payment,
+              orderId: result.data.transaction_id,
+            })
+          );
 
           Swal.fire({
             icon: 'success',
@@ -62,11 +69,13 @@ export const usePayment = () => {
         }
       } catch (error) {
         dispatch(setError(error.message));
+
         Swal.fire({
           icon: 'error',
           title: 'Transaction Failed',
           text: error.message || 'Failed to create transaction',
         });
+
         return false;
       } finally {
         dispatch(setLoading(false));
@@ -83,17 +92,18 @@ export const usePayment = () => {
           orderId: paymentData.orderId,
           amount: paymentData.amount,
           customerDetails: {
-            name: paymentData.customerDetails.name,
-            email: paymentData.customerDetails.email,
-            mobile_number: paymentData.customerDetails.mobile_number,
-            address: user.address || '',
+            name: state.orderData.orderName,
+            email: state.orderData.email,
+            mobile_number: state.orderData.phone,
+            address: state.orderData.address || user.address || '',
           },
           productDetails: [
             {
-              productId: paymentData.productDetails[0].productId,
-              productName: paymentData.productDetails[0].productName,
-              quantity: paymentData.productDetails[0].quantity,
-              price: paymentData.productDetails[0].price,
+              productId:
+                flightState.selectedDepartureFlight.plane_id.toString(),
+              productName: `Flight ${flightState.selectedDepartureFlight.plane_code}`,
+              quantity: state.orderData.passengers.length,
+              price: paymentData.amount / state.orderData.passengers.length,
             },
           ],
         };
@@ -103,7 +113,10 @@ export const usePayment = () => {
         if (result.isSuccess) {
           dispatch(setPaymentId(result.data.id));
           dispatch(
-            setPaymentData({ ...paymentDetails, orderId: result.orderId })
+            setPaymentData({
+              ...paymentDetails,
+              orderId: result.orderId,
+            })
           );
 
           Swal.fire({
@@ -132,7 +145,7 @@ export const usePayment = () => {
         dispatch(setLoading(false));
       }
     },
-    [dispatch, user]
+    [dispatch, state.orderData, flightState, user]
   );
 
   const resetPaymentData = useCallback(() => {
