@@ -3,7 +3,6 @@ import Location from '../../../public/icons/location.svg';
 import Arrow from '../../../public/icons/Arrow.svg';
 import Button from '../Elements/Buttons/Button';
 import OrderDetailsModal from './OrderDetails/OrderDetailsModal';
-import usePaymentStatus from '../../hooks/usePaymentStatus';
 
 const FlightTicketCard = ({
   flight,
@@ -14,22 +13,18 @@ const FlightTicketCard = ({
   const { transaction_id, status, transaction_date, total_payment, tickets } =
     flight;
 
-  const { paymentStatus, loading, error } = usePaymentStatus(flight?.token);
-
+  // Get flight details from the first ticket
   const firstTicket = tickets[0];
   const flightDetails = firstTicket?.plane || {};
 
   const getStatusColor = (status) => {
-    const currentStatus = paymentStatus || status;
-    switch (currentStatus.toUpperCase()) {
-      case 'ISSUED':
-      case 'SETTLEMENT':
+    switch (status.toUpperCase()) {
+      case 'SUCCESS':
         return 'bg-green-500';
       case 'PENDING':
         return 'bg-yellow-500';
       case 'CANCELLED':
-      case 'EXPIRE':
-        return 'bg-red-500';
+        return 'bg-gray-500';
       default:
         return 'bg-gray-200';
     }

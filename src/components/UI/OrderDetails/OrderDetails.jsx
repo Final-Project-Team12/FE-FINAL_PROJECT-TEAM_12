@@ -1,64 +1,64 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+
 import { useNavigate } from 'react-router-dom';
+import { usePayment } from '../../../hooks/usePayment';
 import FlowerLogo from '../../../../public/icons/flower_icon.svg';
 import Swal from 'sweetalert2';
-import usePaymentStatus from '../../../hooks/usePaymentStatus';
+
 const OrderDetails = ({ selectedCard }) => {
   const navigate = useNavigate();
-  const { paymentStatus, loading, error } = usePaymentStatus(
-    selectedCard?.token
-  );
+  const { initiatePayment, loading } = usePayment();
+
   if (!selectedCard) return null;
 
-  const { tickets, status, token, total_payment } = selectedCard;
+  const { tickets, status, token, total_payment, user } = selectedCard;
   const firstTicket = tickets[0];
   const flightDetails = firstTicket?.plane || {};
 
+  const handleProceedToPayment = async () => {
+    try {
+      const paymentResult = await initiatePayment({
+        amount: total_payment,
+        customerDetails: {
+          name: user.name,
+          email: user.email,
+          mobile_number: user.telephone_number,
+          address: user.address,
+        },
+        productDetails: [
+          {
+            productId: String(selectedCard.transaction_id),
+            productName: `Flight Ticket ${token}`,
+            quantity: 1,
+            price: total_payment,
+          },
+        ],
+      });
+
+      if (paymentResult) {
+        navigate(`/payment/${selectedCard.transaction_id}`);
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Payment Failed',
+        text: error.message || 'Failed to process payment',
+      });
+    }
+  };
+
   const getStatusColor = (status) => {
-    const currentStatus = paymentStatus || status;
-    switch (currentStatus.toUpperCase()) {
-      case 'ISSUED':
-      case 'SETTLEMENT':
+    switch (status.toUpperCase()) {
+      case 'SUCCESS':
         return 'bg-green-500';
       case 'PENDING':
         return 'bg-yellow-500';
       case 'CANCELLED':
-      case 'EXPIRE':
-        return 'bg-red-500';
+        return 'bg-gray-500';
       default:
         return 'bg-gray-200';
     }
   };
-
-  const handlePaymentClick = () => {
-    if (status === 'PENDING') {
-      navigate('/payment-gateway', {
-        state: {
-          token: token,
-          total_payment: total_payment,
-          flight_details: flightDetails,
-          passengers: tickets.map((ticket) => ticket.passenger),
-        },
-      });
-    }
-  };
-
-  const handlePrintTicket = () => {
-    if (status === 'ISSUED' || paymentStatus === 'SETTLEMENT') {
-      // Add print ticket logic here
-      Swal.fire({
-        icon: 'success',
-        title: 'Generating Ticket',
-        text: 'Your ticket is being prepared for printing',
-        showConfirmButton: false,
-        timer: 2000,
-      });
-    }
-  };
-
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.toString()}</div>;
-  if (!selectedCard) return null;
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -101,12 +101,12 @@ const OrderDetails = ({ selectedCard }) => {
         <div className="flex flex-col">
           <div>
             <p className="font-bold">
-              {formatTime(flightDetails.departure_time)}
+              {formatTime(firstTicket.plane.departure_time)}
             </p>
           </div>
           <div>
             <p className="text-sm">
-              {formatDate(flightDetails.departure_time)}
+              {formatDate(firstTicket.plane.departure_time)}
             </p>
           </div>
         </div>
@@ -195,20 +195,18 @@ const OrderDetails = ({ selectedCard }) => {
         </p>
       </div>
       <div className="w-full mt-4">
-        {(status === 'ISSUED' || paymentStatus === 'SETTLEMENT') && (
-          <button
-            onClick={handlePrintTicket}
-            className="w-full h-16 bg-purple-800 text-white px-4 py-2 rounded-lg hover:bg-purple-900 transition-colors"
-          >
-            Cetak Tiket
+        {status === 'SUCCESS' && (
+          <button className="w-full h-16 bg-purple-800 text-white px-4 py-2 rounded-lg">
+            Cetak Ticket
           </button>
         )}
-        {status === 'PENDING' && paymentStatus !== 'SETTLEMENT' && (
+        {status === 'PENDING' && (
           <button
-            onClick={handlePaymentClick}
-            className="w-full h-16 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
+            onClick={handleProceedToPayment}
+            disabled={loading}
+            className="w-full h-16 bg-red-500 text-white px-4 py-2 rounded-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
-            Lanjut Bayar
+            {loading ? 'Processing...' : 'Lanjut Bayar'}
           </button>
         )}
       </div>
