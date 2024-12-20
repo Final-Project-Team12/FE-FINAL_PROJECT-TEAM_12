@@ -20,9 +20,13 @@ const PaymentPage = () => {
     isSubmitted: showSuccess,
     orderData,
   } = useSelector((state) => state.payment);
-  const { selectedDepartureFlight, selectedSeatClass } = useSelector(
-    (state) => state.flightSearch
-  );
+  const {
+    selectedDepartureFlight,
+    selectedSeatClass,
+    selectedReturnFlight,
+    isRoundTrip,
+    passengerCounts,
+  } = useSelector((state) => state.flightSearch);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -39,21 +43,34 @@ const PaymentPage = () => {
   };
 
   const calculateTotalAmount = () => {
-    let total = 0;
-    if (selectedDepartureFlight) {
-      const seatPrice =
-        selectedDepartureFlight.seats_detail.find(
+    let totalBasePrice = 0;
+
+    const departureSeatPrice =
+      selectedDepartureFlight.seats_detail.find(
+        (seat) => seat.class === selectedSeatClass
+      )?.price || 0;
+
+    totalBasePrice +=
+      (passengerCounts.adult + passengerCounts.child) * departureSeatPrice;
+
+    if (isRoundTrip && selectedReturnFlight) {
+      const returnSeatPrice =
+        selectedReturnFlight.seats_detail.find(
           (seat) => seat.class === selectedSeatClass
         )?.price || 0;
-      const passengerCount = orderData.passengers?.length || 1;
-      total += seatPrice * passengerCount;
+      totalBasePrice +=
+        (passengerCounts.adult + passengerCounts.child) * returnSeatPrice;
     }
-    return total;
+
+    const tax = Math.round(totalBasePrice * 0.1);
+
+    return totalBasePrice + tax;
   };
 
   const handleProceedToPayment = async () => {
     try {
       const totalAmount = calculateTotalAmount();
+
       const paymentResult = await initiatePayment({
         amount: totalAmount,
         customerDetails: {
@@ -66,8 +83,8 @@ const PaymentPage = () => {
           {
             productId: selectedDepartureFlight.plane_id.toString(),
             productName: `Flight ${selectedDepartureFlight.plane_code}`,
-            quantity: orderData.passengers.length,
-            price: totalAmount / orderData.passengers.length,
+            quantity: 1,
+            price: totalAmount,
           },
         ],
       });
