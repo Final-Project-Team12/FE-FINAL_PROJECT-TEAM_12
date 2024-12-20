@@ -38,7 +38,6 @@ const History = () => {
     );
   }
 
-  // Pastikan orderHistory ada sebelum sorting
   const sortedFlightData = orderHistory ? sortFlightsByDate(orderHistory) : [];
   const filteredFlightData = selectedDateRange
     ? filterFlightsByDateRange(

@@ -2,25 +2,22 @@ import React from 'react';
 import FlowerLogo from '../../../../public/icons/flower_icon.svg';
 
 const OrderDetailsModal = ({ selectedCard, onClose }) => {
+  if (!selectedCard) return null;
+  const { tickets, status, token, total_payment } = selectedCard;
+  const firstTicket = tickets[0];
+  const flightDetails = firstTicket?.plane || {};
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Issued':
+      case 'ISSUED':
         return 'bg-green-500'; // Green for Issued
-      case 'Unpaid':
-        return 'bg-red-500'; // Red for Unpaid
-      case 'Cancelled':
-        return 'bg-gray-500'; // Gray for Cancelled
+      case 'PENDING':
+        return 'bg-yellow-500';
+      case 'CANCELLED':
+        return 'bg-red-500';
       default:
         return 'bg-gray-200';
     }
   };
-
-  const totalPriceAll =
-    selectedCard.pricePerPerson * selectedCard.totalPassengers +
-    selectedCard.tax;
-  selectedCard.totalPriceAll = totalPriceAll;
-
-  const totalPrice = selectedCard.pricePerPerson * selectedCard.totalPassengers;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4 sm:px-8 lg:hidden">
@@ -43,29 +40,26 @@ const OrderDetailsModal = ({ selectedCard, onClose }) => {
                 Detail Pesanan
               </h2>
               <span
-                className={`text-white text-xs font-light rounded-full px-3 py-1 flex justify-center items-center ${getStatusColor(selectedCard.status)}`}
+                className={`text-white text-xs font-light rounded-full px-3 py-1 flex justify-center items-center ${getStatusColor(status)}`}
               >
-                {selectedCard.status}
+                {status}
               </span>
             </div>
 
             <div className="mb-2">
               <h2 className="font-regular">
                 Booking Code:{' '}
-                <span className="text-purple-800 font-bold">
-                  {selectedCard.bookingCode}
-                </span>
+                <span className="text-purple-800 font-bold">{token}</span>
               </h2>
             </div>
 
-            {/* Departure Information */}
             <div className="flex justify-between">
               <div className="flex flex-col">
                 <p className="font-bold text-base md:text-lg">
-                  {selectedCard.departure.time}
+                  {flightDetails.departure_time}
                 </p>
                 <p className="text-sm md:text-base text-gray-600">
-                  {selectedCard.departure.date}
+                  {flightDetails.departure_time}
                 </p>
               </div>
               <p className="text-purple-500 font-bold text-sm md:text-base">
@@ -73,7 +67,7 @@ const OrderDetailsModal = ({ selectedCard, onClose }) => {
               </p>
             </div>
             <p className="font-medium text-sm text-gray-600">
-              {selectedCard.departure.airport}
+              {flightDetails.departure_terminal}
             </p>
 
             <div className="my-4 border-t border-gray-200"></div>
@@ -85,24 +79,24 @@ const OrderDetailsModal = ({ selectedCard, onClose }) => {
               </div>
               <div className="flex flex-col ml-2">
                 <p className="font-bold text-base md:text-lg">
-                  {selectedCard.airline}
+                  {flightDetails.airline_id}
                 </p>
                 <p className="text-sm md:text-base text-gray-600">
-                  Flight Number: {selectedCard.flightNumber}
+                  Flight Number: {flightDetails.plane_code}
                 </p>
 
                 <div className="pt-4">
                   <p className="font-bold text-sm md:text-base">Informasi:</p>
-                  {selectedCard.passengers?.map((passenger, index) => (
+                  {tickets.map((ticket, index) => (
                     <div
-                      key={passenger.id || index}
+                      key={ticket.ticket_id || index}
                       className="text-sm md:text-base"
                     >
                       <p className="text-purple-800">
                         Penumpang {index + 1}:{' '}
-                        {`${passenger.title} ${passenger.firstName} ${passenger.lastName}`}
+                        {`${ticket.passenger.title} ${ticket.passenger.full_name}`}
                       </p>
-                      <p>ID: {passenger.idNumber}</p>
+                      <p>ID: {ticket.passenger.id_number}</p>
                     </div>
                   ))}
                 </div>
@@ -115,10 +109,10 @@ const OrderDetailsModal = ({ selectedCard, onClose }) => {
             <div className="flex justify-between">
               <div className="flex flex-col">
                 <p className="font-bold text-base md:text-lg">
-                  {selectedCard.arrival.time}
+                  {flightDetails.arrival_time}
                 </p>
                 <p className="text-sm md:text-base text-gray-600">
-                  {selectedCard.arrival.date}
+                  {flightDetails.arrival_time}
                 </p>
               </div>
               <p className="text-purple-500 font-bold text-sm md:text-base">
@@ -126,7 +120,7 @@ const OrderDetailsModal = ({ selectedCard, onClose }) => {
               </p>
             </div>
             <p className="font-medium text-sm text-gray-600">
-              {selectedCard.arrival.airport}
+              {flightDetails.departure_terminal}
             </p>
 
             <div className="my-4 border-t border-gray-200"></div>
@@ -135,16 +129,8 @@ const OrderDetailsModal = ({ selectedCard, onClose }) => {
             <div>
               <p className="font-bold text-sm md:text-base">Rincian Harga</p>
               <div className="flex justify-between text-sm md:text-base">
-                <p>{selectedCard.totalPassengers} Adults</p>
-                <p>IDR {totalPrice.toLocaleString('id-ID')}</p>
-              </div>
-              <div className="flex justify-between text-sm md:text-base">
-                <p>1 Baby</p>
-                <p>IDR 0</p>
-              </div>
-              <div className="flex justify-between text-sm md:text-base">
-                <p>Tax</p>
-                <p>IDR {selectedCard.tax.toLocaleString('id-ID')}</p>
+                <p>{tickets.length} Penumpang</p>
+                <p>IDR {total_payment.toLocaleString('id-ID')}</p>
               </div>
             </div>
 
@@ -153,18 +139,18 @@ const OrderDetailsModal = ({ selectedCard, onClose }) => {
             <div className="flex justify-between font-bold text-sm md:text-base">
               <p>Total</p>
               <p className="text-purple-800">
-                IDR {totalPriceAll.toLocaleString('id-ID')}
+                IDR {total_payment.toLocaleString('id-ID')}
               </p>
             </div>
 
             {/* Action Buttons */}
             <div className="mt-6">
-              {selectedCard.status === 'Issued' && (
+              {status === 'Issued' && (
                 <button className="w-full py-3 bg-purple-800 text-white rounded-lg text-sm md:text-base">
                   Cetak Ticket
                 </button>
               )}
-              {selectedCard.status === 'Unpaid' && (
+              {status === 'Unpaid' && (
                 <button className="w-full py-3 bg-red-500 text-white rounded-lg text-sm md:text-base">
                   Lanjut Bayar
                 </button>
