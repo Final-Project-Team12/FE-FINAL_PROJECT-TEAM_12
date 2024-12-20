@@ -1,7 +1,13 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import FlowerLogo from '../../../../public/icons/flower_icon.svg';
+import Swal from 'sweetalert2';
 
 const OrderDetails = ({ selectedCard }) => {
+  const navigate = useNavigate();
+  const { paymentStatus, loading, error } = usePaymentStatus(
+    selectedCard?.token
+  );
   if (!selectedCard) return null;
 
   const { tickets, status, token, total_payment } = selectedCard;
@@ -9,15 +15,44 @@ const OrderDetails = ({ selectedCard }) => {
   const flightDetails = firstTicket?.plane || {};
 
   const getStatusColor = (status) => {
-    switch (status.toUpperCase()) {
+    const currentStatus = paymentStatus || status;
+    switch (currentStatus.toUpperCase()) {
       case 'ISSUED':
+      case 'SETTLEMENT':
         return 'bg-green-500';
       case 'PENDING':
         return 'bg-yellow-500';
       case 'CANCELLED':
+      case 'EXPIRE':
         return 'bg-red-500';
       default:
         return 'bg-gray-200';
+    }
+  };
+
+  const handlePaymentClick = () => {
+    if (status === 'PENDING') {
+      navigate('/payment-gateway', {
+        state: {
+          token: token,
+          total_payment: total_payment,
+          flight_details: flightDetails,
+          passengers: tickets.map((ticket) => ticket.passenger),
+        },
+      });
+    }
+  };
+
+  const handlePrintTicket = () => {
+    if (status === 'ISSUED' || paymentStatus === 'SETTLEMENT') {
+      // Add print ticket logic here
+      Swal.fire({
+        icon: 'success',
+        title: 'Generating Ticket',
+        text: 'Your ticket is being prepared for printing',
+        showConfirmButton: false,
+        timer: 2000,
+      });
     }
   };
 
@@ -156,13 +191,19 @@ const OrderDetails = ({ selectedCard }) => {
         </p>
       </div>
       <div className="w-full mt-4">
-        {status === 'ISSUED' && (
-          <button className="w-full h-16 bg-purple-800 text-white px-4 py-2 rounded-lg">
-            Cetak Ticket
+        {(status === 'ISSUED' || paymentStatus === 'SETTLEMENT') && (
+          <button
+            onClick={handlePrintTicket}
+            className="w-full h-16 bg-purple-800 text-white px-4 py-2 rounded-lg hover:bg-purple-900 transition-colors"
+          >
+            Cetak Tiket
           </button>
         )}
-        {status === 'PENDING' && (
-          <button className="w-full h-16 bg-red-500 text-white px-4 py-2 rounded-lg">
+        {status === 'PENDING' && paymentStatus !== 'SETTLEMENT' && (
+          <button
+            onClick={handlePaymentClick}
+            className="w-full h-16 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
+          >
             Lanjut Bayar
           </button>
         )}
