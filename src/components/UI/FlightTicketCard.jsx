@@ -19,7 +19,7 @@ const FlightTicketCard = ({
 
   const getStatusColor = (status) => {
     switch (status.toUpperCase()) {
-      case 'ISSUED':
+      case 'SUCCESS':
         return 'bg-green-500';
       case 'PENDING':
         return 'bg-yellow-500';
@@ -71,12 +71,11 @@ const FlightTicketCard = ({
             {status}
           </span>
           <div className="flex justify-between py-3 gap-3">
-            <div className="flex gap-2">
+            <div className="gap-2">
               <div className="hidden md:flex">
                 <img src={Location} alt="Location Icon" />
               </div>
               <div>
-                <p className="font-bold">{flightDetails.airport_id_origin}</p>
                 <p className="font-regular">
                   {formatDate(flightDetails.departure_time)}
                 </p>
@@ -96,9 +95,6 @@ const FlightTicketCard = ({
                 <img src={Location} alt="Location Icon" />
               </div>
               <div>
-                <p className="font-bold">
-                  {flightDetails.airport_id_destination}
-                </p>
                 <p className="font-regular">
                   {formatDate(flightDetails.arrival_time)}
                 </p>

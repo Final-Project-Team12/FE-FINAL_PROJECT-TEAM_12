@@ -1,16 +1,55 @@
-import React from 'react';
+import React, { useState } from 'react';
+
+import { useNavigate } from 'react-router-dom';
+import { usePayment } from '../../../hooks/usePayment';
 import FlowerLogo from '../../../../public/icons/flower_icon.svg';
+import Swal from 'sweetalert2';
 
 const OrderDetails = ({ selectedCard }) => {
+  const navigate = useNavigate();
+  const { initiatePayment, loading } = usePayment();
+
   if (!selectedCard) return null;
 
-  const { tickets, status, token, total_payment } = selectedCard;
+  const { tickets, status, token, total_payment, user } = selectedCard;
   const firstTicket = tickets[0];
   const flightDetails = firstTicket?.plane || {};
 
+  const handleProceedToPayment = async () => {
+    try {
+      const paymentResult = await initiatePayment({
+        amount: total_payment,
+        customerDetails: {
+          name: user.name,
+          email: user.email,
+          mobile_number: user.telephone_number,
+          address: user.address,
+        },
+        productDetails: [
+          {
+            productId: String(selectedCard.transaction_id),
+            productName: `Flight Ticket ${token}`,
+            quantity: 1,
+            price: total_payment,
+          },
+        ],
+      });
+
+      if (paymentResult) {
+        navigate(`/payment/${selectedCard.transaction_id}`);
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Payment Failed',
+        text: error.message || 'Failed to process payment',
+      });
+    }
+  };
+
   const getStatusColor = (status) => {
     switch (status.toUpperCase()) {
-      case 'ISSUED':
+      case 'SUCCESS':
         return 'bg-green-500';
       case 'PENDING':
         return 'bg-yellow-500';
@@ -62,12 +101,12 @@ const OrderDetails = ({ selectedCard }) => {
         <div className="flex flex-col">
           <div>
             <p className="font-bold">
-              {formatTime(flightDetails.departure_time)}
+              {formatTime(firstTicket.plane.departure_time)}
             </p>
           </div>
           <div>
             <p className="text-sm">
-              {formatDate(flightDetails.departure_time)}
+              {formatDate(firstTicket.plane.departure_time)}
             </p>
           </div>
         </div>
@@ -156,14 +195,18 @@ const OrderDetails = ({ selectedCard }) => {
         </p>
       </div>
       <div className="w-full mt-4">
-        {status === 'ISSUED' && (
+        {status === 'SUCCESS' && (
           <button className="w-full h-16 bg-purple-800 text-white px-4 py-2 rounded-lg">
             Cetak Ticket
           </button>
         )}
         {status === 'PENDING' && (
-          <button className="w-full h-16 bg-red-500 text-white px-4 py-2 rounded-lg">
-            Lanjut Bayar
+          <button
+            onClick={handleProceedToPayment}
+            disabled={loading}
+            className="w-full h-16 bg-red-500 text-white px-4 py-2 rounded-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
+          >
+            {loading ? 'Processing...' : 'Lanjut Bayar'}
           </button>
         )}
       </div>
