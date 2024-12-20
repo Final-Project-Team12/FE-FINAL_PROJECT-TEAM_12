@@ -30,12 +30,15 @@ const OrderForm = () => {
   const { orderData, hasFamily, selectedSeats, isSubmitted } = useSelector(
     (state) => state.payment
   );
-  const { passengerCounts, selectedDepartureFlight } = useSelector(
-    (state) => state.flightSearch
-  );
+  const {
+    passengerCounts,
+    selectedDepartureFlight,
+    selectedReturnFlight,
+    selectedSeatClass,
+    isRoundTrip,
+  } = useSelector((state) => state.flightSearch);
 
   useEffect(() => {
-    // Initialize orderData with passengers based on count
     dispatch(
       updateOrderData({
         orderName: '',
@@ -78,21 +81,34 @@ const OrderForm = () => {
     if (!validateForm()) return;
 
     try {
-      // Format passenger data properly
-      const formattedPassengers = orderData.passengers.map(
-        (passenger, index) => ({
-          title: passenger.title,
-          full_name: passenger.fullName.trim(),
-          family_name: passenger.hasFamily ? passenger.familyName.trim() : null,
-          birth_date: passenger.birthDate,
-          nationality: passenger.nationality,
-          id_number: passenger.idNumber.trim(),
-          id_issuer: passenger.issuingCountry,
-          id_expiry: passenger.expiryDate,
-        })
-      );
+      const formattedPassengers = orderData.passengers.map((passenger) => ({
+        title: passenger.title,
+        full_name: passenger.fullName.trim(),
+        family_name: passenger.hasFamily ? passenger.familyName.trim() : null,
+        birth_date: passenger.birthDate,
+        nationality: passenger.nationality,
+        id_number: passenger.idNumber.trim(),
+        id_issuer: passenger.issuingCountry,
+        id_expiry: passenger.expiryDate,
+      }));
 
-      // Create transaction data with the properly formatted passenger data
+      const departureSeatPrice =
+        selectedDepartureFlight.seats_detail.find(
+          (seat) => seat.class === selectedSeatClass
+        )?.price || 0;
+
+      const returnSeatPrice =
+        selectedReturnFlight?.seats_detail.find(
+          (seat) => seat.class === selectedSeatClass
+        )?.price || 0;
+
+      const totalBasePrice =
+        (departureSeatPrice + (isRoundTrip ? returnSeatPrice : 0)) *
+        orderData.passengers.length;
+
+      const tax = totalBasePrice * 0.1;
+      const totalPaymentWithTax = totalBasePrice + tax;
+
       const transactionData = {
         userData: {
           user_id: user.id,
@@ -103,9 +119,9 @@ const OrderForm = () => {
           version: 0,
         })),
         planeId: selectedDepartureFlight.plane_id,
+        total_payment: totalPaymentWithTax,
       };
 
-      // Pass the formatted data to createTransaction
       const success = await createTransaction(transactionData);
 
       if (success) {
@@ -126,12 +142,11 @@ const OrderForm = () => {
   };
 
   const validateForm = () => {
-    // Validate order data
     if (
       !orderData.orderName?.trim() ||
       !orderData.phone?.trim() ||
       !orderData.email?.trim() ||
-      !orderData.address?.trim() // Add address validation
+      !orderData.address?.trim()
     ) {
       Swal.fire({
         icon: 'error',
@@ -141,7 +156,6 @@ const OrderForm = () => {
       return false;
     }
 
-    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(orderData.email)) {
       Swal.fire({
@@ -152,7 +166,6 @@ const OrderForm = () => {
       return false;
     }
 
-    // Validate phone format
     const phoneRegex = /^\+?[\d\s-]{10,}$/;
     if (!phoneRegex.test(orderData.phone)) {
       Swal.fire({
@@ -163,7 +176,6 @@ const OrderForm = () => {
       return false;
     }
 
-    // Validate passenger data
     for (const [index, passenger] of orderData.passengers.entries()) {
       if (
         !passenger.fullName?.trim() ||
@@ -191,7 +203,6 @@ const OrderForm = () => {
       }
     }
 
-    // Validate seat selection
     if (selectedSeats.length !== orderData.passengers.length) {
       Swal.fire({
         icon: 'error',
