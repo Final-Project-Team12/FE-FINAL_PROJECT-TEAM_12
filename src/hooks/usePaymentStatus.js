@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import paymentService from '../services/payment.service';
+import paymentService from '../services/paymentChecker.service';
 
 const usePaymentStatus = (token) => {
   const [paymentStatus, setPaymentStatus] = useState(null);

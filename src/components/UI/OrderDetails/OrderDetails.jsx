@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import FlowerLogo from '../../../../public/icons/flower_icon.svg';
 import Swal from 'sweetalert2';
-
+import usePaymentStatus from '../../../hooks/usePaymentStatus';
 const OrderDetails = ({ selectedCard }) => {
   const navigate = useNavigate();
   const { paymentStatus, loading, error } = usePaymentStatus(
@@ -55,6 +55,10 @@ const OrderDetails = ({ selectedCard }) => {
       });
     }
   };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.toString()}</div>;
+  if (!selectedCard) return null;
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
