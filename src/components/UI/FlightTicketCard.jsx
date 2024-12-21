@@ -28,7 +28,8 @@ const FlightTicketCard = ({
       case 'PENDING':
         return 'bg-yellow-500';
       case 'CANCELLED':
-        return 'bg-gray-500';
+      case 'EXPIRED':
+        return 'bg-red-500';
       default:
         return 'bg-gray-200';
     }
