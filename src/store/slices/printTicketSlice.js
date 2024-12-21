@@ -1,10 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
-import registerSlice from './registerSlice';
-import { printTicket } from '../../services/printTicket.service';
 
 const initialState = {
   loading: false,
-  printTicket: false,
+  printTicket: null,
   error: null,
 };
 
@@ -16,15 +14,14 @@ const printTicketSlice = createSlice({
       state.loading = true;
       state.error = null;
     },
-    printTicketSuccess: (state) => {
+    printTicketSuccess: (state, action) => {
       state.loading = false;
-      state.printTicket = true;
+      state.printTicket = action.payload;
       state.error = null;
     },
-    printTicketFailure: (state) => {
+    printTicketFailure: (state, action) => {
       state.loading = false;
-      state.printTicket = false;
-      state.error = action.payload || { message: 'Print ticket failed' };
+      state.error = action.payload;
     },
   },
 });
