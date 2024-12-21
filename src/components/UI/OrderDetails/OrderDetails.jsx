@@ -1,23 +1,46 @@
-import React, { useState } from 'react';
-
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { usePayment } from '../../../hooks/usePayment';
+import { useDispatch } from 'react-redux';
+import { useOrderPayment } from '../../../hooks/useOrderPayment';
 import FlowerLogo from '../../../../public/icons/flower_icon.svg';
 import Swal from 'sweetalert2';
+import { setPaymentData } from '../../../store/slices/paymentSlice';
 
 const OrderDetails = ({ selectedCard }) => {
   const navigate = useNavigate();
-  const { initiatePayment, loading } = usePayment();
+  const dispatch = useDispatch();
+  const { initiateOrderPayment, loading } = useOrderPayment();
 
-  if (!selectedCard) return null;
+  if (!selectedCard) {
+    return (
+      <div className="flex justify-center items-center p-4">
+        <p className="text-gray-500">No order selected</p>
+      </div>
+    );
+  }
 
-  const { tickets, status, token, total_payment, user } = selectedCard;
+  const {
+    tickets = [],
+    status = '',
+    token = '',
+    total_payment = 0,
+    user = {},
+  } = selectedCard;
   const firstTicket = tickets[0];
   const flightDetails = firstTicket?.plane || {};
 
   const handleProceedToPayment = async () => {
+    if (!flightDetails?.plane_code) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid Flight Details',
+        text: 'Flight information is missing or invalid',
+      });
+      return;
+    }
+
     try {
-      const paymentResult = await initiatePayment({
+      const paymentResult = await initiateOrderPayment({
         amount: total_payment,
         customerDetails: {
           name: user.name,
@@ -35,8 +58,24 @@ const OrderDetails = ({ selectedCard }) => {
         ],
       });
 
-      if (paymentResult) {
-        navigate(`/payment/${selectedCard.transaction_id}`);
+      if (paymentResult.success) {
+        // Store payment data in Redux
+        dispatch(
+          setPaymentData({
+            token: paymentResult.token,
+            orderId: paymentResult.orderId,
+            amount: total_payment,
+            customerDetails: {
+              name: user.name,
+              email: user.email,
+              mobile_number: user.telephone_number,
+              address: user.address,
+            },
+          })
+        );
+
+        console.log('Payment initiated successfully');
+        navigate(`/payment/${paymentResult.orderId}`);
       }
     } catch (error) {
       Swal.fire({
