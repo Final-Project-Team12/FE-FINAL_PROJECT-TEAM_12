@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { useOrderPayment } from '../../../hooks/useOrderPayment';
-import FlowerLogo from '../../../../public/icons/flower_icon.svg';
 import Swal from 'sweetalert2';
 import { setPaymentData } from '../../../store/slices/paymentSlice';
 import PrintTicketModal from '../PrintTicketModal';
@@ -198,8 +197,10 @@ const OrderDetails = ({ selectedCard }) => {
         </div>
         <div className="flex flex-col">
           <div>
-            <p className="font-bold">Airline {flightDetails.airline_id}</p>
-            <p className="font-bold">{flightDetails.plane_code}</p>
+            <p className="font-bold">
+              Airline {flightDetails?.airline_id || '-'}
+            </p>
+            <p className="font-bold">{flightDetails?.plane_code || '-'}</p>
           </div>
           <div className="pt-4">
             <p className="font-bold text-sm">Informasi:</p>
