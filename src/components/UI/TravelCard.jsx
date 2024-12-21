@@ -11,9 +11,8 @@ const TravelCard = ({ travel }) => {
   const dispatch = useDispatch();
 
   const formatDisplayDate = (dateString) => {
-    const dateOnly = dateString.split('T')[0];
-    const localDateObj = new Date(`${dateOnly}T00:00:00Z`);
-    return localDateObj.toLocaleDateString('id-ID', {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('id-ID', {
       day: 'numeric',
       month: 'long',
       year: 'numeric',
@@ -22,11 +21,7 @@ const TravelCard = ({ travel }) => {
 
   const getApiDate = (dateString) => {
     const date = new Date(dateString);
-
-    const utcDate = new Date(
-      Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
-    );
-    return utcDate;
+    return date;
   };
 
   const getFlightPrices = (seatsDetail) => {
