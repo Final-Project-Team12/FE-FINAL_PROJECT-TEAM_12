@@ -26,7 +26,7 @@ export const store = configureStore({
     register: registerReducer,
     resetPassword: resetPasswordReducer,
     orderHistory: orderHistoryReducer,
-    printTIcket: printTicketSliceReducer,
+    printTicket: printTicketSliceReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
