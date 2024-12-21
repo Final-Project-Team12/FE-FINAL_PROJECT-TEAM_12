@@ -3,6 +3,7 @@ import Navbar from '../components/UI/Navbar';
 import FlightList from './UI/History/FlightList';
 import OrderDetailsPanel from './UI/History/OrderDetailsPanel';
 import HeaderHistory from './UI/HeaderHistory';
+import LoadingHistory from './UI/LoadingHistory';
 import { useWindowDimensions } from '../hooks/useWindowDimensions';
 import {
   sortFlightsByDate,
@@ -23,11 +24,7 @@ const History = () => {
   }, [loading, orderHistory, selectedCardId]);
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        Loading order history...
-      </div>
-    );
+    return <LoadingHistory />;
   }
 
   if (error) {
