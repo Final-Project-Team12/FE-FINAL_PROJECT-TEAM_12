@@ -5,13 +5,18 @@ import Button from '../Elements/Buttons/Button';
 import OrderDetailsModal from './OrderDetails/OrderDetailsModal';
 
 const FlightTicketCard = ({
-  flight,
+  flight = {},
   onCardClick,
   isSelected,
   selectedCard,
 }) => {
-  const { transaction_id, status, transaction_date, total_payment, tickets } =
-    flight;
+  const {
+    transaction_id,
+    status = '',
+    transaction_date,
+    total_payment = 0,
+    tickets = [],
+  } = flight;
 
   // Get flight details from the first ticket
   const firstTicket = tickets[0];
