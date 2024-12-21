@@ -1,7 +1,7 @@
 import React from 'react';
 import { formatDate, formatTime } from '../../utils/orderUtils';
 
-const FlightInfo = ({ type, time, terminal, className = '' }) => {
+const FlightInfo = ({ type, time, airport, terminal, className = '' }) => {
   return (
     <div className={`flex justify-between ${className}`}>
       <div className="flex flex-col">
@@ -13,7 +13,9 @@ const FlightInfo = ({ type, time, terminal, className = '' }) => {
         </div>
         {terminal && (
           <div>
-            <p className="font-medium text-sm">Terminal {terminal}</p>
+            <p className="font-medium text-sm">
+              {airport?.name || '-'} - {terminal || '-'}
+            </p>
           </div>
         )}
       </div>

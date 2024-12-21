@@ -74,15 +74,26 @@ const OrderDetails = ({ selectedCard }) => {
         type="departure"
         time={flightDetails.departure_time}
         terminal={flightDetails.departure_terminal}
+        airport={flightDetails.origin_airport}
       />
 
       <Divider />
 
-      <PassengerInfo tickets={tickets} airline={firstTicket.plane.airline} />
+      <PassengerInfo
+        tickets={tickets}
+        plane={firstTicket.plane}
+        seat={firstTicket.seat}
+        airline={firstTicket.plane.airline}
+      />
 
       <Divider />
 
-      <FlightInfo type="arrival" time={flightDetails.arrival_time} />
+      <FlightInfo
+        type="arrival"
+        time={flightDetails.arrival_time}
+        terminal={flightDetails.departure_terminal}
+        airport={flightDetails.destination_airport}
+      />
 
       <Divider />
 
