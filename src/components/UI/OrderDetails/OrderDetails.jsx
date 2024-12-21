@@ -5,6 +5,7 @@ import { useOrderPayment } from '../../../hooks/useOrderPayment';
 import FlowerLogo from '../../../../public/icons/flower_icon.svg';
 import Swal from 'sweetalert2';
 import { setPaymentData } from '../../../store/slices/paymentSlice';
+import usePrintTicket from '../../../hooks/usePrintTIcket';
 
 const OrderDetails = ({ selectedCard }) => {
   const navigate = useNavigate();
@@ -114,6 +115,20 @@ const OrderDetails = ({ selectedCard }) => {
       hour: '2-digit',
       minute: '2-digit',
     });
+  };
+
+  const printTicket = usePrintTicket();
+
+  const handleCetak = async () => {
+    const dataPrintTicket = {
+      transaction_id: selectedCard.transaction_id,
+    };
+    console.log(dataPrintTicket);
+    try {
+      await printTicket(dataPrintTicket);
+    } catch (error) {
+      console.error('Terjadi kesalahan saat mencetak tiket:', error);
+    }
   };
 
   return (
@@ -235,7 +250,10 @@ const OrderDetails = ({ selectedCard }) => {
       </div>
       <div className="w-full mt-4">
         {status === 'SUCCESS' && (
-          <button className="w-full h-16 bg-purple-800 text-white px-4 py-2 rounded-lg">
+          <button
+            className="w-full h-16 bg-purple-800 text-white px-4 py-2 rounded-lg"
+            onClick={handleCetak}
+          >
             Cetak Ticket
           </button>
         )}
