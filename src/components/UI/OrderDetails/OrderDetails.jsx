@@ -1,16 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { useOrderPayment } from '../../../hooks/useOrderPayment';
 import FlowerLogo from '../../../../public/icons/flower_icon.svg';
 import Swal from 'sweetalert2';
 import { setPaymentData } from '../../../store/slices/paymentSlice';
+import PrintTicketModal from '../PrintTicketModal';
 import usePrintTicket from '../../../hooks/usePrintTIcket';
 
 const OrderDetails = ({ selectedCard }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { initiateOrderPayment, loading } = useOrderPayment();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   if (!selectedCard) {
     return (
@@ -60,7 +63,6 @@ const OrderDetails = ({ selectedCard }) => {
       });
 
       if (paymentResult.success) {
-        // Store payment data in Redux
         dispatch(
           setPaymentData({
             token: paymentResult.token,
@@ -126,12 +128,17 @@ const OrderDetails = ({ selectedCard }) => {
     const dataPrintTicket = {
       transaction_id: selectedCard.transaction_id,
     };
-    console.log(dataPrintTicket);
+
     try {
       await printTicket(dataPrintTicket);
+      setIsModalOpen(true);
     } catch (error) {
       console.error('Terjadi kesalahan saat mencetak tiket:', error);
     }
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
   };
 
   return (
@@ -280,6 +287,8 @@ const OrderDetails = ({ selectedCard }) => {
           </button>
         )}
       </div>
+
+      <PrintTicketModal isOpen={isModalOpen} onClose={handleCloseModal} />
     </div>
   );
 };
