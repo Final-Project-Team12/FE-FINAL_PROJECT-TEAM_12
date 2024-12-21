@@ -26,7 +26,7 @@ const OrderDetails = ({ selectedCard }) => {
     total_payment = 0,
     user = {},
   } = selectedCard;
-  const firstTicket = tickets[0];
+  const firstTicket = tickets?.[0] || {};
   const flightDetails = firstTicket?.plane || {};
 
   const handleProceedToPayment = async () => {
@@ -50,8 +50,8 @@ const OrderDetails = ({ selectedCard }) => {
         },
         productDetails: [
           {
-            productId: String(selectedCard.transaction_id),
-            productName: `Flight Ticket ${token}`,
+            productId: flightDetails.plane_id?.toString(),
+            productName: `Flight ${flightDetails.plane_code}`,
             quantity: 1,
             price: total_payment,
           },
@@ -164,8 +164,8 @@ const OrderDetails = ({ selectedCard }) => {
         <hr className="w-11/12 h-px bg-gray-200 border-1 dark:bg-gray-200" />
       </div>
       <div className="flex flex-start">
-        <div className="w-10 flex justify-center p-2">
-          <img className="" src={FlowerLogo} alt="" />
+        <div className="h-10 flex justify-center p-2">
+          <img className="" src={firstTicket.plane.airline.image_url} alt="" />
         </div>
         <div className="flex flex-col">
           <div>
