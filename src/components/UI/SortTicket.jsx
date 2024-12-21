@@ -78,23 +78,18 @@ const SortTicket = () => {
     setSelectedFilter(filter);
   };
 
-  const getUTCDate = (date) => {
+  const formatApiDate = (date) => {
     if (!date) return '';
     try {
       const dateObj = new Date(date);
       if (isNaN(dateObj.getTime())) return '';
 
-      return new Date(
-        Date.UTC(
-          dateObj.getUTCFullYear(),
-          dateObj.getUTCMonth(),
-          dateObj.getUTCDate()
-        )
-      )
-        .toISOString()
-        .split('T')[0];
+      const year = dateObj.getFullYear();
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const day = String(dateObj.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
     } catch (error) {
-      console.error('Error getting UTC date:', error);
+      console.error('Error formatting date:', error);
       return '';
     }
   };
@@ -105,14 +100,14 @@ const SortTicket = () => {
     const searchPayload = {
       from: fromCity,
       to: toCity,
-      departureDate: getUTCDate(departureDate),
+      departureDate: formatApiDate(departureDate),
       seatClass: selectedSeatClass,
       passengerAdult: passengerCounts.adult || 0,
       passengerChild: passengerCounts.child || 0,
       passengerInfant: passengerCounts.infant || 0,
       ...(selectedDepartureFlight &&
         returnDate && {
-          returnDate: getUTCDate(returnDate),
+          returnDate: formatApiDate(returnDate),
         }),
     };
 

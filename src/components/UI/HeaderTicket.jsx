@@ -111,18 +111,6 @@ const HeaderTicket = () => {
     }
   };
 
-  const getUTCDate = (date) => {
-    if (!date) return '';
-    try {
-      const dateObj = new Date(date);
-      if (isNaN(dateObj.getTime())) return '';
-      return dateObj.toISOString().split('T')[0];
-    } catch (error) {
-      console.error('Error getting UTC date:', error);
-      return '';
-    }
-  };
-
   const getCurrentDate = () => {
     if (!isRoundTrip) {
       return hasRestoredDate.current
@@ -205,8 +193,8 @@ const HeaderTicket = () => {
     };
 
     if (selectedDepartureFlight) {
-      searchPayload.departureDate = getUTCDate(departureDate);
-      searchPayload.returnDate = getUTCDate(selectedDate);
+      searchPayload.departureDate = formatAPIDate(departureDate);
+      searchPayload.returnDate = formatAPIDate(selectedDate);
 
       dispatch(
         updateFlightSearch({
@@ -214,9 +202,9 @@ const HeaderTicket = () => {
         })
       );
     } else {
-      searchPayload.departureDate = getUTCDate(selectedDate);
+      searchPayload.departureDate = formatAPIDate(selectedDate);
       if (isRoundTrip && returnDate) {
-        searchPayload.returnDate = getUTCDate(returnDate);
+        searchPayload.returnDate = formatAPIDate(returnDate);
       }
 
       // Allow updating the departure date after initial restore
