@@ -17,13 +17,6 @@ const usePrintTicket = () => {
       dispatch(printTicketStart());
       const response = await printTicketService(dataPrintTIcket);
       dispatch(printTicketSuccess(response.data));
-      await Swal.fire({
-        icon: 'success',
-        title: 'Print Tiket Berhasil',
-        text: 'Tiket berhasil dicetak. Silakan cek tiket Anda.',
-        confirmButtonColor: '#7126B5',
-      });
-      navigate('/print-ticket');
     } catch (error) {
       const errorMessage =
         error?.response?.data?.message || 'Print tiket gagal';
