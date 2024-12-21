@@ -140,12 +140,16 @@ const OrderDetails = ({ selectedCard }) => {
         <div className="flex flex-col">
           <div>
             <p className="font-bold">
-              {formatTime(firstTicket.plane.departure_time)}
+              {flightDetails?.departure_time
+                ? formatTime(flightDetails.departure_time)
+                : '-'}
             </p>
           </div>
           <div>
             <p className="text-sm">
-              {formatDate(firstTicket.plane.departure_time)}
+              {flightDetails?.departure_time
+                ? formatDate(flightDetails.departure_time)
+                : '-'}
             </p>
           </div>
         </div>
@@ -201,11 +205,17 @@ const OrderDetails = ({ selectedCard }) => {
         <div className="flex flex-col">
           <div>
             <p className="font-bold">
-              {formatTime(flightDetails.arrival_time)}
+              {flightDetails?.arrival_time
+                ? formatTime(flightDetails.arrival_time)
+                : '-'}
             </p>
           </div>
           <div>
-            <p className="text-sm">{formatDate(flightDetails.arrival_time)}</p>
+            <p className="text-sm">
+              {flightDetails?.arrival_time
+                ? formatDate(flightDetails.arrival_time)
+                : '-'}
+            </p>
           </div>
         </div>
         <div>
