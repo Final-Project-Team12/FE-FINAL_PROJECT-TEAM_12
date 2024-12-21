@@ -1,6 +1,6 @@
 import React from 'react';
 
-const PassengerInfo = ({ tickets, airline }) => {
+const PassengerInfo = ({ tickets, plane, seat, airline }) => {
   return (
     <div className="flex flex-start">
       <div className="h-10 flex justify-center p-2">
@@ -12,8 +12,10 @@ const PassengerInfo = ({ tickets, airline }) => {
       </div>
       <div className="flex flex-col">
         <div>
-          <p className="font-bold">Airline {airline?.id || '-'}</p>
-          <p className="font-bold">{airline?.plane_code || '-'}</p>
+          <p className="font-bold">
+            {airline?.airline_name || '-'} - {seat?.class || '-'}
+          </p>
+          <p className="font-bold">{plane?.plane_code || '-'}</p>
         </div>
         <div className="pt-4">
           <p className="font-bold text-sm">Informasi:</p>
