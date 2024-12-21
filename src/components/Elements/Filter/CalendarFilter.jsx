@@ -93,7 +93,7 @@ const CalendarFilter = ({ onDateRangeChange }) => {
     return date.toLocaleDateString('id-ID', {
       day: 'numeric',
       month: 'short',
-      year: 'numeric'
+      year: 'numeric',
     });
   };
 
@@ -103,17 +103,15 @@ const CalendarFilter = ({ onDateRangeChange }) => {
         <button
           ref={buttonRef}
           className={`h-10 px-4 mt-1 rounded-full border transition-colors flex items-center gap-1 ${
-            isFiltered 
+            isFiltered
               ? 'border-purple-500 bg-purple-500 text-white'
               : 'border-purple-500'
           }`}
           onClick={handleFilterButtonClick}
         >
-          <Filter className={`w-6 ${
-            isFiltered 
-              ? 'text-white'
-              : 'text-slate-500'
-          }`}/>
+          <Filter
+            className={`w-6 ${isFiltered ? 'text-white' : 'text-slate-500'}`}
+          />
           <span>Filter</span>
         </button>
         {isFiltered && (
@@ -155,7 +153,9 @@ const CalendarFilter = ({ onDateRangeChange }) => {
           >
             {/* Header with close button */}
             <div className="flex justify-between items-center p-3 bg-gray-50 border-b">
-              <h3 className="text-lg font-semibold text-gray-700">Pilih Rentang Tanggal</h3>
+              <h3 className="text-lg font-semibold text-gray-700">
+                Pilih Rentang Tanggal
+              </h3>
               <button
                 className="text-gray-500 hover:text-gray-700 transition-colors"
                 onClick={handleCloseCalendar}
@@ -178,7 +178,10 @@ const CalendarFilter = ({ onDateRangeChange }) => {
             </div>
 
             {/* Calendar */}
-            <div className="w-full overflow-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+            <div
+              className="w-full overflow-auto"
+              style={{ maxHeight: 'calc(100vh - 200px)' }}
+            >
               <DateRange
                 editableDateInputs={true}
                 onChange={handleDateRangeChange}
@@ -223,7 +226,7 @@ const CalendarFilter = ({ onDateRangeChange }) => {
   );
 };
 
-export default CalendarFilter;  
+export default CalendarFilter;
 
 // import { useState } from 'react';
 // import { DateRange } from 'react-date-range';

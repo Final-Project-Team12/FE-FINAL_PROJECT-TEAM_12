@@ -58,7 +58,6 @@ const FlightDetails = () => {
     };
   };
 
-  // Return early if no flight selected
   if (!selectedDepartureFlight) return <div>No flight selected</div>;
 
   const prices = calculatePrices();
