@@ -83,22 +83,20 @@ const DatePickerModal = ({
   };
 
   const handleDateSelection = (date) => {
-    const utcDate = new Date(
-      Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
-    );
+    const selectedDate = new Date(date);
 
     if (minDate) {
-      const minUtcDate = new Date(
-        Date.UTC(minDate.getFullYear(), minDate.getMonth(), minDate.getDate())
-      );
+      const minDateTime = new Date(minDate);
+      minDateTime.setHours(0, 0, 0, 0);
+      selectedDate.setHours(0, 0, 0, 0);
 
-      if (utcDate >= minUtcDate) {
-        onSelect(utcDate);
+      if (selectedDate >= minDateTime) {
+        onSelect(selectedDate);
       } else {
         alert('Tanggal kembali tidak boleh lebih awal dari tanggal berangkat');
       }
     } else {
-      onSelect(utcDate);
+      onSelect(selectedDate);
     }
   };
 
