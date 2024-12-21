@@ -3,7 +3,7 @@ import axiosInstance from '../api/axiosInstance';
 const generateRandomId = () => {
   const timestamp = new Date().getTime();
   const randomStr = Math.random().toString(36).substring(2, 10);
-  return `order_${timestamp}_${randomStr}`;
+  return `${timestamp}_${randomStr}`;
 };
 
 export const paymentService = {
