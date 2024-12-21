@@ -6,14 +6,15 @@ const OrderDetailsModal = ({ selectedCard, onClose }) => {
   const { tickets, status, token, total_payment } = selectedCard;
   const firstTicket = tickets[0];
   const flightDetails = firstTicket?.plane || {};
+
   const getStatusColor = (status) => {
-    switch (status) {
-      case 'ISSUED':
-        return 'bg-green-500'; // Green for Issued
+    switch (status.toUpperCase()) {
+      case 'SUCCESS':
+        return 'bg-green-500';
       case 'PENDING':
         return 'bg-yellow-500';
       case 'CANCELLED':
-        return 'bg-red-500';
+        return 'bg-gray-500';
       default:
         return 'bg-gray-200';
     }
@@ -72,10 +73,13 @@ const OrderDetailsModal = ({ selectedCard, onClose }) => {
 
             <div className="my-4 border-t border-gray-200"></div>
 
-            {/* Flight Information */}
             <div className="flex items-start">
-              <div className="w-10 flex justify-center p-2">
-                <img className="w-8 h-8" src={FlowerLogo} alt="" />
+              <div className="h-8 flex justify-center p-2">
+                <img
+                  className=""
+                  src={flightDetails.airline.image_url}
+                  alt=""
+                />
               </div>
               <div className="flex flex-col ml-2">
                 <p className="font-bold text-base md:text-lg">

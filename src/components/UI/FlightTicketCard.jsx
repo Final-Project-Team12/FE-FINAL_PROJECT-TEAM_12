@@ -18,7 +18,6 @@ const FlightTicketCard = ({
     tickets = [],
   } = flight;
 
-  // Get flight details from the first ticket
   const firstTicket = tickets[0];
   const flightDetails = firstTicket?.plane || {};
 
