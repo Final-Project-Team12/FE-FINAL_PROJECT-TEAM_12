@@ -304,7 +304,7 @@ const HeaderTicket = () => {
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row gap-3 mb-6">
             <div
-              className="w-full sm:w-3/4 h-[50px] rounded-[12px] bg-[#A06ECE] flex items-center cursor-pointer"
+              className="w-full sm:w-3/4 h-[50px] rounded-[12px] bg-[#A06ECE] hover:bg-purple-800 flex items-center cursor-pointer"
               onClick={handleReset}
             >
               <img
