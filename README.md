@@ -1,89 +1,170 @@
-### **Frontend Team Documentation**
+# ✈️ QuickFly- Next-Gen Flight Booking Platform
+<img src="https://ik.imagekit.io/yogiefani/quickfly-horizontal.png?updatedAt=1734901604981" 
+width="100%">
+<div align="center">
+<img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=600&size=30&pause=1000&color=6C63FF&center=true&vCenter=true&random=false&width=435&lines=QuickFly+Frontend;Modern+Flight+Booking;React+%2B+Vite+%2B+Redux" alt="Typing SVG" />
 
----
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" alt="rainbow" width="100%">
 
-## **FRONTEND TEAM**
 
-| **Name**                 | **Tasks**       |
-| ------------------------ | --------------- |
-| **Rafly Aziz Abdillah**  | Init project    |
-| **Tegar Alfa Rizzi**     | _To be defined_ |
-| **Melinda Wijaya**       | _To be defined_ |
-| **Yogi Efani Yancandra** | _To be defined_ |
+</div>
 
----
+## 🎯 Project Overview
 
-## **Project Setup**
+<div align="center">
+<img src="https://i.imgur.com/dBaSKWF.gif" height="20" width="100%">
+</div>
 
-Follow these steps to run the frontend project locally:
+A blazing-fast ⚡ flight booking SPA built with the latest frontend tech stack. Our platform delivers a pixel-perfect, responsive UI with buttery-smooth animations and state-of-the-art user experience.
 
-1. Clone the repository from GitHub:
+## 🛠️ Tech Stack & Architecture
 
-   ```bash
+<div align="center">
+
+<img src="https://user-images.githubusercontent.com/74038190/212257454-16e3712e-945a-4ca2-b238-408ad0bf87e6.gif" width="100"><img src="https://user-images.githubusercontent.com/74038190/212257467-871d32b7-e401-42e8-a166-fcfd7baa4c6b.gif" width="100">
+<img src="https://user-images.githubusercontent.com/74038190/212257472-08f6a927-c1a0-4f1c-8d30-c3182a3b1c43.gif" width="100">
+<img src="https://user-images.githubusercontent.com/74038190/212257468-1e9a91f1-b626-4baa-b15d-5c385dfa7ed2.gif" width="100">
+<img src="https://user-images.githubusercontent.com/74038190/212257465-7ce8d493-cac5-494e-982a-5a9deb852c4b.gif" width="100">
+
+<div align="center">
+
+### Core Technologies
+![React](https://img.shields.io/badge/React-18.3.1-61DAFB?style=for-the-badge&logo=react)
+![Vite](https://img.shields.io/badge/Vite-5.4.10-646CFF?style=for-the-badge&logo=vite)
+![Redux Toolkit](https://img.shields.io/badge/Redux_Toolkit-2.4.0-764ABC?style=for-the-badge&logo=redux)
+
+### Styling & UI
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4.15-38B2AC?style=for-the-badge&logo=tailwind-css)
+![Flowbite](https://img.shields.io/badge/Flowbite-2.5.2-FF69B4?style=for-the-badge)
+![Headless UI](https://img.shields.io/badge/Headless_UI-2.2.0-66E3FF?style=for-the-badge)
+
+### Development Tools
+![ESLint](https://img.shields.io/badge/ESLint-9.13.0-4B32C3?style=for-the-badge&logo=eslint)
+![Prettier](https://img.shields.io/badge/Prettier-3.3.3-F7B93E?style=for-the-badge&logo=prettier)
+
+</div>
+
+</div>
+
+## 👨‍💻 Kelompok 12
+
+<div align="center">
+
+<img src="https://i.imgur.com/dBaSKWF.gif" height="20" width="100%">
+
+| Avatar | Name | Role | GitHub |
+|--------|------|------|--------|
+| <img src="https://avatars.githubusercontent.com/u/108708078?v=4" width="50" height="50" style="border-radius:50%"> | **Rafly Aziz Abdillah** | Fullstack Web | [@rafly](https://github.com/raflytch) |
+| <img src="https://avatars.githubusercontent.com/u/171102959?v=4" width="50" height="50" style="border-radius:50%"> | **Tegar Alfa Rizzi** | Fullstack Web | [@tegar](https://github.com/TegarAlfaR) |
+| <img src="https://avatars.githubusercontent.com/u/127614248?v=4" width="50" height="50" style="border-radius:50%"> | **Melinda Wijaya** | Fullstack Web | [@melinda](https://github.com/melindawijaya) |
+| <img src="https://avatars.githubusercontent.com/u/106648832?v=4" width="50" height="50" style="border-radius:50%"> | **Yogi Efani Yancandra** | Fullstack Web | [@yogi](https://github.com/yogiefani) |
+
+</div>
+
+
+</div>
+
+
+
+
+## 🔥 Features
+
+- 🎫 *Smart Flight Search* - Advanced filtering and sorting
+- 💳 *Secure Payments* - Integrated with trusted payment gateways
+- 📱 *Responsive Design* - Seamless experience across all devices
+- 🔐 *OTP Verification* - Enhanced security for users
+- 📄 *E-Tickets* - Easy download and print options
+- 📊 *Booking History* - Comprehensive order tracking
+- 🔔 *Real-time Notifications* - Stay updated with your bookings
+- 👤 *Profile Management* - Easy account management
+
+## 🛠 Quick Setup
+
+1. *Clone the Repository*
+   bash
    git clone https://github.com/Final-Project-Team12/FE-FINAL_PROJECT-TEAM_12
-   ```
-
-2. Navigate to the project directory:
-
-   ```bash
    cd FE-FINAL_PROJECT-TEAM_12
-   ```
+   
 
-3. Install dependencies:
-
-   ```bash
+2. *Install Dependencies*
+   bash
    npm install
-   ```
+   
 
-4. Run the application for local development:
-   ```bash
+3. *Environment Setup*
+   bash
+   # Create .env file and add:
+   VITE_BACKEND_URI=your_backend_url
+   VITE_MIDTRANS_CLIENT_KEY=your_midtrans_key
+   
+
+4. *Launch Development Server*
+   bash
    npm run dev
-   ```
+   
+
+## 📁 Project Architecture
+
+
+src/
+├── api/          # API configuration & instances
+├── components/   # Reusable UI components
+│   └── Elements/ # Atomic UI elements
+├── contexts/     # React context providers
+├── hooks/        # Custom React hooks
+├── pages/        # Main application pages
+├── services/     # API integration services
+└── store/        # Redux state management
+
+
+## 🛣 Route Map
+
+| Path | Component | Access |
+|------|-----------|--------|
+| / | Homepage | 🌐 Public |
+| /login | LoginPage | 🌐 Public |
+| /register | RegisterPage | 🌐 Public |
+| /flight-ticket | FlightTicketPage | 🌐 Public |
+| /checkout/:id | PaymentPage | 🔒 Protected |
+| /orderhistory | OrderHistoryPage | 🔒 Protected |
+| /account/:id | AccountPage | 🔒 Protected |
+
+## 🔄 State Management
+
+Our Redux store is organized into logical slices:
+
+- 🔐 authReducer: Authentication state
+- 👤 userReducer: User profile data
+- 💳 paymentReducer: Payment processing
+- ✈ flightReducer: Flight information
+- 🔍 flightSearchReducer: Search parameters
+- 📋 orderHistoryReducer: Booking history
+
+## 🤝 Contributing
+
+1. Fork the Project
+2. Create your Feature Branch (git checkout -b feature/AmazingFeature)
+3. Commit your Changes (git commit -m 'Add some AmazingFeature')
+4. Push to the Branch (git push origin feature/AmazingFeature)
+5. Open a Pull Request
+
+## 📜 License
+
+Distributed under the MIT License. See LICENSE for more information.
+
+## 📞 Contact
+
+Frontend Team - [Track us on ClickUp](https://app.clickup.com/9018681465/v/b/8crwa3t-458)
 
 ---
 
-## **Folder Structure**
 
-The project directory structure is organized as follows:
+<div align="center">
 
-### **`/public`**
+### 🚀 Made with caffeine and React by Frontend Kelompok 12
 
-- **`/icons`**: Directory for storing icons.
-- **`/images`**: Directory for storing images.
+<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&height=100&section=footer" width="100%"/>
 
-### **`/src`**
+![Visits](https://api.visitorbadge.io/api/visitors?path=airtix-frontend&label=repo%20views&labelColor=%23000000&countColor=%2337d67a)
 
-1. **`/api`**
-
-   - Contains configuration files for the **Axios instance** used for API integration.
-   - **Note**: All HTTP requests must use this instance for consistency.
-
-2. **`/components`**
-
-   - Stores all **UI components**.
-   - **`/Elements`**: A sub-folder for smaller, reusable UI elements.
-
-3. **`/hooks`**
-
-   - Stores **custom hooks**.
-   - **Note**: All custom hooks must begin with the prefix **`use`**, such as **`useForm`** or **`useFetch`**.
-
-4. **`/contexts`**
-
-   - Stores all **React Contexts** used in the application.
-
-5. **`/pages`**
-
-   - Contains the main pages of the application.
-
-6. **`/services`**
-   - Contains files for API integration with reusable functions.
-   - All functions here should use the **Axios instance** from the **`/api`** folder to ensure consistent API requests.
-
----
-
-## **Features (Soon)**
-
-- A list of features will be added in future updates.
-
----
+</div>

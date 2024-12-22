@@ -1,139 +1,428 @@
-import React from 'react';
-import { Plane, Calendar, Users, ArrowLeftRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowLeftRight } from 'lucide-react';
+import {
+  MdFlightTakeoff,
+  MdDateRange,
+  MdOutlineAirlineSeatReclineNormal,
+} from 'react-icons/md';
+import { Switch } from '@headlessui/react';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  updateFlightSearch,
+  swapCities,
+  updatePassengerCount,
+} from '../../store/slices/flightSearchSlice';
+import { setSearchParams } from '../../store/slices/flightFilterSlice';
+import CitySelectionModal from '../Elements/Modal/CitySelectionModal';
+import DatePickerModal from '../Elements/Modal/DatePickerModal';
+import PassengerSelector from '../Elements/Modal/PassengerSelector';
+import SeatClassModal from '../Elements/Modal/SeatClassModal';
 
 const FlightSearch = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const flightSearch = useSelector((state) => state.flightSearch);
+
+  const {
+    fromCity,
+    toCity,
+    departureDate,
+    returnDate,
+    isRoundTrip,
+    passengerCounts,
+    selectedSeatClass,
+  } = flightSearch;
+
+  const [isFromModalOpen, setIsFromModalOpen] = useState(false);
+  const [isToModalOpen, setIsToModalOpen] = useState(false);
+  const [isDepartureDateModalOpen, setIsDepartureDateModalOpen] =
+    useState(false);
+  const [isReturnDateModalOpen, setIsReturnDateModalOpen] = useState(false);
+  const [isPassengerSelectorOpen, setIsPassengerSelectorOpen] = useState(false);
+  const [isSeatClassModalOpen, setIsSeatClassModalOpen] = useState(false);
+
+  const formatDate = (date) => {
+    if (!date) return '';
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    const dateObj = new Date(date);
+    return `${dateObj.getDate()} ${months[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
+  };
+
+  const handleFromCitySelection = (city) => {
+    dispatch(
+      updateFlightSearch({
+        fromCity: city,
+        fromCityDisplay: city,
+      })
+    );
+  };
+
+  const handleToCitySelection = (city) => {
+    dispatch(
+      updateFlightSearch({
+        toCity: city,
+        toCityDisplay: city,
+      })
+    );
+  };
+
+  const handleSwapCities = () => {
+    dispatch(
+      updateFlightSearch({
+        fromCity: toCity,
+        toCity: fromCity,
+        fromCityDisplay: flightSearch.toCityDisplay || toCity,
+        toCityDisplay: flightSearch.fromCityDisplay || fromCity,
+      })
+    );
+  };
+
+  const handleSearch = async (e) => {
+    e.preventDefault();
+
+    const searchParams = {
+      from: fromCity,
+      to: toCity,
+      departureDate,
+      seatClass: selectedSeatClass,
+      passengerAdult: passengerCounts.adult || 0,
+      passengerChild: passengerCounts.child || 0,
+      passengerInfant: passengerCounts.infant || 0,
+      isRoundTrip,
+      ...(isRoundTrip && returnDate && { returnDate }),
+    };
+
+    dispatch(setSearchParams(searchParams));
+
+    navigate('/flight-ticket');
+  };
+
+  const getTotalPassengers = () => {
+    const total = Object.values(passengerCounts).reduce(
+      (acc, curr) => acc + curr,
+      0
+    );
+    return `${total} Penumpang`;
+  };
+
+  const getPassengerBreakdown = () => {
+    const parts = [];
+    if (passengerCounts.adult > 0) {
+      parts.push(`${passengerCounts.adult} Dewasa`);
+    }
+    if (passengerCounts.child > 0) {
+      parts.push(`${passengerCounts.child} Anak`);
+    }
+    if (passengerCounts.infant > 0) {
+      parts.push(`${passengerCounts.infant} Bayi`);
+    }
+    return parts.join(', ');
+  };
+
   return (
-    <div className="relative z-20 max-w-5xl mx-auto pt-12 px-4">
-      <div className="bg-white rounded-xl shadow-lg">
-        <div className="p-6">
-          <h2 className="text-xl font-bold mb-6">
-            Pilih Jadwal Penerbangan spesial di{' '}
-            <span className="text-purple-600">Tiketku!</span>
-          </h2>
+    <>
+      <div className="relative -mt-16 sm:-mt-18 md:-mt-20 z-20 px-4 sm:px-6 md:px-0">
+        <div className="bg-white w-full max-w-[360px] sm:max-w-[640px] md:max-w-6xl mx-auto rounded-xl sm:rounded-2xl shadow-lg overflow-hidden">
+          <form onSubmit={handleSearch}>
+            <div className="p-3 sm:p-4 md:p-6">
+              <h2 className="text-base sm:text-lg md:text-xl font-bold mb-3 sm:mb-4 md:mb-6">
+                Pilih Jadwal Penerbangan spesial di{' '}
+                <span className="text-[#7126B5]">QuickFly!</span>
+              </h2>
 
-          <div className="space-y-6">
-            {/* Row 1: From-To */}
-            <div className="grid grid-cols-2 gap-8 items-center relative">
-              <div className="relative">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                  <Plane size={16} className="rotate-45" />
-                </div>
-                <div>
-                  <div className="text-gray-500 text-xs mb-1 ml-2">From</div>
-                  <input
-                    type="text"
-                    value="Jakarta (JKTA)"
-                    className="w-full py-2 px-4 pl-10 border-b text-base focus:outline-none focus:border-purple-600"
-                    readOnly
-                  />
-                </div>
-              </div>
-
-              <div className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-                <div className="bg-black rounded-full p-1.5">
-                  <ArrowLeftRight size={16} className="text-white" />
-                </div>
-              </div>
-
-              <div className="relative">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                  <Plane size={16} className="-rotate-45" />
-                </div>
-                <div>
-                  <div className="text-gray-500 text-xs mb-1 ml-2">To</div>
-                  <input
-                    type="text"
-                    value="Melbourne (MLB)"
-                    className="w-full py-2 px-4 pl-10 border-b text-base focus:outline-none focus:border-purple-600"
-                    readOnly
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Row 2: Date and Passengers */}
-            <div className="grid grid-cols-2 gap-8">
-              {/* Left Side - Dates */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="relative">
-                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                    <Calendar size={16} />
-                  </div>
-                  <div>
-                    <div className="text-gray-500 text-xs mb-1 ml-2">
-                      Departure
+              {/* Form content */}
+              <div className="space-y-3 sm:space-y-4 md:space-y-6">
+                {/* From-To Section */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-8 items-start md:items-center relative">
+                  {/* From Field */}
+                  <div className="flex items-start gap-2">
+                    <div className="flex-1">
+                      <div className="text-gray-500 text-[10px] sm:text-xs mb-1">
+                        From
+                      </div>
+                      <div className="relative flex items-center">
+                        <div className="flex items-center px-2 sm:px-3">
+                          <MdFlightTakeoff className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
+                        </div>
+                        <input
+                          type="text"
+                          value={flightSearch.fromCityDisplay || fromCity}
+                          readOnly
+                          placeholder="Jakarta (JKTA)"
+                          className="flex-1 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base focus:outline-none focus:border-[#7126B5] border-b cursor-pointer"
+                          onClick={() => setIsFromModalOpen(true)}
+                        />
+                      </div>
                     </div>
-                    <input
-                      type="text"
-                      value="1 Maret 2023"
-                      className="w-full py-2 px-4 pl-10 border-b text-base focus:outline-none focus:border-purple-600"
-                      readOnly
-                    />
-                  </div>
-                </div>
 
-                <div className="relative">
-                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                    <Calendar size={16} />
+                    {/* Mobile Swap Button */}
+                    <div className="md:hidden pt-6">
+                      <button
+                        type="button"
+                        onClick={handleSwapCities}
+                        className="bg-black rounded-full p-1.5 hover:bg-gray-800 transition-colors"
+                      >
+                        <ArrowLeftRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex items-center">
-                    <div>
-                      <div className="text-gray-500 text-xs mb-1 ml-2">
-                        Return
+
+                  {/* Desktop Swap Button */}
+                  <div className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+                    <button
+                      type="button"
+                      onClick={handleSwapCities}
+                      className="bg-black rounded-full p-1.5 mx-4 hover:bg-gray-800 transition-colors"
+                    >
+                      <ArrowLeftRight className="w-4 h-4 text-white" />
+                    </button>
+                  </div>
+
+                  {/* To Field */}
+                  <div>
+                    <div className="text-gray-500 text-[10px] sm:text-xs mb-1">
+                      To
+                    </div>
+                    <div className="relative flex items-center">
+                      <div className="flex items-center px-2 sm:px-3">
+                        <MdFlightTakeoff className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
                       </div>
                       <input
                         type="text"
-                        placeholder="Pilih Tanggal"
-                        className="w-full py-2 px-4 pl-10 border-b text-base focus:outline-none focus:border-purple-600 placeholder-purple-600"
+                        value={flightSearch.toCityDisplay || toCity}
+                        readOnly
+                        placeholder="Bandung (BDG)"
+                        className="flex-1 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base focus:outline-none focus:border-[#7126B5] border-b cursor-pointer"
+                        onClick={() => setIsToModalOpen(true)}
                       />
                     </div>
-                    <div className="absolute right-0 top-0 mt-1">
-                      <div className="w-8 h-4 bg-purple-600 rounded-full relative">
-                        <div className="absolute right-0 w-4 h-4 bg-white rounded-full border-2 border-purple-600"></div>
+                  </div>
+                </div>
+
+                {/* Dates and Passengers Section */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-8">
+                  {/* Dates Section */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                    {/* Departure Date */}
+                    <div>
+                      <div className="text-gray-500 text-[10px] sm:text-xs mb-1">
+                        Departure
+                      </div>
+                      <div className="relative flex items-center">
+                        <div className="flex items-center px-2 sm:px-3">
+                          <MdDateRange className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
+                        </div>
+                        <input
+                          type="text"
+                          value={formatDate(departureDate)}
+                          readOnly
+                          className="flex-1 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base focus:outline-none focus:border-[#7126B5] border-b cursor-pointer"
+                          onClick={() => setIsDepartureDateModalOpen(true)}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Return Date */}
+                    <div>
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="text-gray-500 text-[10px] sm:text-xs">
+                          Return
+                        </span>
+                        <Switch
+                          checked={isRoundTrip}
+                          onChange={(checked) =>
+                            dispatch(
+                              updateFlightSearch({ isRoundTrip: checked })
+                            )
+                          }
+                          className={`${
+                            isRoundTrip ? 'bg-[#7126B5]' : 'bg-gray-200'
+                          } relative inline-flex h-4 sm:h-5 w-8 sm:w-10 items-center rounded-full transition-colors focus:outline-none`}
+                        >
+                          <span
+                            className={`${
+                              isRoundTrip
+                                ? 'translate-x-4 sm:translate-x-6'
+                                : 'translate-x-1'
+                            } inline-block h-2 sm:h-3 w-2 sm:w-3 transform rounded-full bg-white transition-transform`}
+                          />
+                        </Switch>
+                      </div>
+                      <div className="relative flex items-center">
+                        <div className="flex items-center px-2 sm:px-3">
+                          <MdDateRange className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
+                        </div>
+                        <input
+                          type="text"
+                          value={
+                            isRoundTrip
+                              ? formatDate(returnDate)
+                              : 'Pilih Tanggal'
+                          }
+                          readOnly
+                          className={`flex-1 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base focus:outline-none focus:border-[#7126B5] border-b cursor-pointer ${
+                            !isRoundTrip && 'opacity-50'
+                          }`}
+                          onClick={() =>
+                            isRoundTrip && setIsReturnDateModalOpen(true)
+                          }
+                          disabled={!isRoundTrip}
+                        />
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
 
-              {/* Right Side - Passengers and Seat Class */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="relative">
-                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                    <Users size={16} />
-                  </div>
-                  <div>
-                    <div className="text-gray-500 text-xs mb-1 ml-2">To</div>
-                    <input
-                      type="text"
-                      value="2 Penumpang"
-                      className="w-full py-2 px-4 pl-10 border-b text-base focus:outline-none focus:border-purple-600"
-                      readOnly
-                    />
-                  </div>
-                </div>
+                  {/* Passengers and Seat Class */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                    {/* Passengers */}
+                    <div>
+                      <div className="text-gray-500 text-[10px] sm:text-xs mb-1">
+                        Passengers
+                      </div>
+                      <div className="relative flex items-center">
+                        <div className="flex items-center px-2 sm:px-3">
+                          <MdOutlineAirlineSeatReclineNormal className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
+                        </div>
+                        <input
+                          type="text"
+                          value={getTotalPassengers()}
+                          title={getPassengerBreakdown()}
+                          readOnly
+                          className="flex-1 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base focus:outline-none focus:border-[#7126B5] border-b cursor-pointer"
+                          onClick={() => setIsPassengerSelectorOpen(true)}
+                        />
+                      </div>
+                    </div>
 
-                <div>
-                  <div className="text-gray-500 text-xs mb-1 ml-2">
-                    Seat Class
+                    {/* Seat Class */}
+                    <div>
+                      <div className="text-gray-500 text-[10px] sm:text-xs mb-1">
+                        Seat Class
+                      </div>
+                      <input
+                        type="text"
+                        value={selectedSeatClass}
+                        readOnly
+                        className="w-full py-1.5 sm:py-2 text-xs sm:text-sm md:text-base border-b focus:outline-none focus:border-[#7126B5] cursor-pointer"
+                        onClick={() => setIsSeatClassModalOpen(true)}
+                      />
+                    </div>
                   </div>
-                  <input
-                    type="text"
-                    value="Business"
-                    className="w-full py-2 px-4 border-b text-base focus:outline-none focus:border-purple-600"
-                    readOnly
-                  />
                 </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        <button className="w-full bg-purple-600 text-white py-2 rounded-b-xl font-medium hover:bg-purple-700 transition-colors text-base">
-          Cari Penerbangan
-        </button>
+            <button
+              type="submit"
+              disabled={
+                !fromCity ||
+                !toCity ||
+                !departureDate ||
+                (isRoundTrip && !returnDate)
+              }
+              className="w-full bg-[#7126B5] text-white py-3 sm:py-3.5 md:py-4 text-xs sm:text-sm md:text-base rounded-b-xl sm:rounded-b-2xl font-medium hover:bg-[#7126B5] transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
+              {!fromCity ||
+              !toCity ||
+              !departureDate ||
+              (isRoundTrip && !returnDate)
+                ? 'Cari Penerbangan'
+                : 'Cari Penerbangan'}
+            </button>
+          </form>
+        </div>
       </div>
-    </div>
+
+      {/* Modals */}
+      <CitySelectionModal
+        isOpen={isFromModalOpen}
+        onClose={() => setIsFromModalOpen(false)}
+        onSelect={handleFromCitySelection}
+        title="From"
+      />
+
+      <CitySelectionModal
+        isOpen={isToModalOpen}
+        onClose={() => setIsToModalOpen(false)}
+        onSelect={handleToCitySelection}
+        title="To"
+      />
+
+      <DatePickerModal
+        isOpen={isDepartureDateModalOpen}
+        onClose={() => setIsDepartureDateModalOpen(false)}
+        onSelect={(date) => {
+          dispatch(updateFlightSearch({ departureDate: date }));
+
+          if (
+            isRoundTrip &&
+            returnDate &&
+            new Date(returnDate) < new Date(date)
+          ) {
+            dispatch(updateFlightSearch({ returnDate: date }));
+          }
+          setIsDepartureDateModalOpen(false);
+        }}
+        selectedDate={departureDate}
+        title="Select Departure Date"
+        minDate={new Date()}
+      />
+
+      <DatePickerModal
+        isOpen={isReturnDateModalOpen}
+        onClose={() => setIsReturnDateModalOpen(false)}
+        onSelect={(date) => {
+          const selectedTime = new Date(date).setHours(0, 0, 0, 0);
+          const departureTime = new Date(departureDate).setHours(0, 0, 0, 0);
+
+          if (selectedTime >= departureTime) {
+            dispatch(updateFlightSearch({ returnDate: date }));
+            setIsReturnDateModalOpen(false);
+          } else {
+            alert(
+              'Tanggal kembali tidak boleh lebih awal dari tanggal berangkat'
+            );
+          }
+        }}
+        selectedDate={returnDate}
+        title="Select Return Date"
+        minDate={departureDate}
+        disabled={!isRoundTrip}
+      />
+
+      <SeatClassModal
+        isOpen={isSeatClassModalOpen}
+        onClose={() => setIsSeatClassModalOpen(false)}
+        onSelect={(seatClass) => {
+          dispatch(updateFlightSearch({ selectedSeatClass: seatClass }));
+          setIsSeatClassModalOpen(false);
+        }}
+        selectedClass={selectedSeatClass}
+      />
+
+      <PassengerSelector
+        isOpen={isPassengerSelectorOpen}
+        onClose={() => setIsPassengerSelectorOpen(false)}
+        passengerCounts={passengerCounts}
+        onUpdatePassengers={(counts) => {
+          dispatch(updatePassengerCount(counts));
+        }}
+      />
+    </>
   );
 };
 
