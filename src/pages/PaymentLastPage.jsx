@@ -1,4 +1,3 @@
-// PaymentLastPage.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
@@ -32,6 +31,7 @@ const PaymentLastPage = () => {
 
   useEffect(() => {
     if (!paymentData?.token) {
+      dispatch(resetPaymentState());
       navigate('/', { replace: true });
     }
     document.body.style.overflow = 'auto';
@@ -46,7 +46,7 @@ const PaymentLastPage = () => {
         snapEmbed.remove();
       }
     };
-  }, [paymentData?.token, navigate]);
+  }, [paymentData?.token, navigate, dispatch]);
 
   const handlePaymentSuccess = () => {
     setIsPaymentSuccess(true);
