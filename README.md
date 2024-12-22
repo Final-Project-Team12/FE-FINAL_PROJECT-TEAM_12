@@ -162,7 +162,7 @@ Frontend Team - [Track us on ClickUp](https://app.clickup.com/9018681465/v/b/8cr
    <img src="https://ik.imagekit.io/yogiefani/ilustrasi%203.gif?updatedAt=1734903554569" >
 </div>
 <div align="center">
-### 🚀 Made with caffeine and React by Frontend Kelompok 12
+### 🚀 Made with React by Frontend Kelompok 12
 
 <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&height=100&section=footer" width="100%"/>
 
