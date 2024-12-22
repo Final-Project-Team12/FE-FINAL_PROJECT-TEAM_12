@@ -119,15 +119,25 @@ src/
 
 ## 🛣 Route Map
 
-| Path | Component | Access |
-|------|-----------|--------|
-| / | Homepage | 🌐 Public |
-| /login | LoginPage | 🌐 Public |
-| /register | RegisterPage | 🌐 Public |
-| /flight-ticket | FlightTicketPage | 🌐 Public |
-| /checkout/:id | PaymentPage | 🔒 Protected |
-| /orderhistory | OrderHistoryPage | 🔒 Protected |
-| /account/:id | AccountPage | 🔒 Protected |
+| *Route*                          | *Page*          | *Protected* |
+| ---------------------------------- | ----------------- | ------------- |
+| /                                | Homepage          | No            |
+| /login                           | LoginPage         | No            |
+| /register                        | RegisterPage      | No            |
+| /reset-password                  | ResetPasswordPage | No            |
+| /otp                             | OtpPage           | No            |
+| /otp-password                    | OtpPasswordPage   | No            |
+| /flight-ticket                   | FlightTicketPage  | No            |
+| /checkout/:departureId           | PaymentPage       | Yes           |
+| /checkout/:departureId/:returnId | PaymentPage       | Yes           |
+| /payment/:id                     | PaymentLastPage   | Yes           |
+| /orderhistory                    | OrderHistoryPage  | Yes           |
+| /print-ticket                    | PrintTicketPage   | Yes           |
+| /notification                    | NotificationPage  | Yes           |
+| /account/:id                     | AccountPage       | Yes           |
+| *                                | NotFoundPage      | No            |
+
+
 
 ## 🔄 State Management
 
@@ -157,10 +167,10 @@ Distributed under the MIT License. See LICENSE for more information.
 Frontend Team - [Track us on ClickUp](https://app.clickup.com/9018681465/v/b/8crwa3t-458)
 
 ---
-
-
 <div align="center">
-
+   <img src="https://ik.imagekit.io/yogiefani/ilustrasi%203.gif?updatedAt=1734903554569" >
+</div>
+<div align="center">
 ### 🚀 Made with caffeine and React by Frontend Kelompok 12
 
 <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&height=100&section=footer" width="100%"/>
