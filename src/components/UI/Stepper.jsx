@@ -9,22 +9,25 @@ const Stepper = ({ currentStep = 1 }) => {
   ];
 
   return (
-    <div className="p-4">
-      <div className="flex items-center gap-3 text-base">
+    <div className="p-2 sm:p-3 md:p-4">
+      <div className="flex items-center justify-between sm:justify-start sm:gap-3 w-full">
         {steps.map((step, index) => (
           <React.Fragment key={step.step}>
-            <span
-              className={`font-semibold text-xl 
-                ${currentStep >= step.step ? 'text-black' : 'text-gray-400'}`}
-            >
-              {step.label}
-            </span>
-            {index < steps.length - 1 && (
-              <MdOutlineKeyboardArrowRight
-                size={24}
-                className="text-gray-400"
-              />
-            )}
+            <div className="flex items-center">
+              <span
+                className={`font-semibold text-sm sm:text-base md:text-lg lg:text-xl
+                  ${currentStep >= step.step ? 'text-black' : 'text-gray-400'}`}
+              >
+                {step.label}
+              </span>
+              {index < steps.length - 1 && (
+                <MdOutlineKeyboardArrowRight
+                  className={`ml-1 sm:ml-2 md:ml-3
+                    w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 
+                    text-gray-400`}
+                />
+              )}
+            </div>
           </React.Fragment>
         ))}
       </div>

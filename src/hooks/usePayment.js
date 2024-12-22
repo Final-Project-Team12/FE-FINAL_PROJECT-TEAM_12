@@ -1,3 +1,4 @@
+// usePayment.js
 import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -22,52 +23,119 @@ export const usePayment = () => {
 
   const calculateTotalWithTax = useCallback(
     (formData) => {
-      const departureSeatPrice =
-        flightState.selectedDepartureFlight.seats_detail.find(
-          (seat) => seat.class === flightState.selectedSeatClass
-        )?.price || 0;
+      try {
+        // Get seat prices based on selected class
+        const departureSeat =
+          flightState.selectedDepartureFlight.seats_detail.find(
+            (seat) => seat.class === flightState.selectedSeatClass
+          );
+        const returnSeat = flightState.isRoundTrip
+          ? flightState.selectedReturnFlight?.seats_detail.find(
+              (seat) => seat.class === flightState.selectedSeatClass
+            )
+          : null;
 
-      const returnSeatPrice =
-        flightState.selectedReturnFlight?.seats_detail.find(
-          (seat) => seat.class === flightState.selectedSeatClass
-        )?.price || 0;
+        const departureSeatPrice = departureSeat?.price || 0;
+        const returnSeatPrice = returnSeat?.price || 0;
 
-      const baseAmount = flightState.isRoundTrip
-        ? (departureSeatPrice + returnSeatPrice) * formData.passengerData.length
-        : departureSeatPrice * formData.passengerData.length;
+        // Calculate base amount per passenger
+        const totalBasePrice =
+          departureSeatPrice + (flightState.isRoundTrip ? returnSeatPrice : 0);
 
-      const tax = baseAmount * 0.1;
+        // Calculate total for all passengers
+        const totalPassengerPrice =
+          totalBasePrice * formData.passengerData.length;
 
-      return baseAmount + tax;
+        // Calculate tax (10%)
+        const tax = Math.round(totalPassengerPrice * 0.1);
+
+        // Calculate final total
+        const totalPayment = totalPassengerPrice + tax;
+
+        console.log('Payment calculation:', {
+          departureSeatPrice,
+          returnSeatPrice,
+          totalBasePrice,
+          passengerCount: formData.passengerData.length,
+          totalPassengerPrice,
+          tax,
+          totalPayment,
+        });
+
+        return totalPayment;
+      } catch (error) {
+        console.error('Error calculating total:', error);
+        throw error;
+      }
     },
     [flightState]
+  );
+
+  const validateSeatSelections = useCallback(
+    (seatSelections, passengerCount) => {
+      if (
+        !Array.isArray(seatSelections) ||
+        seatSelections.length !== passengerCount
+      ) {
+        throw new Error('Invalid seat selection count');
+      }
+
+      return seatSelections.every((seatId) => {
+        const numericSeatId = Number(seatId);
+        return !isNaN(numericSeatId) && numericSeatId > 0;
+      });
+    },
+    []
   );
 
   const createTransaction = useCallback(
     async (formData) => {
       dispatch(setLoading(true));
       try {
-        const totalPaymentWithTax = calculateTotalWithTax(formData);
+        // Validate seat selections
+        const passengerCount = formData.passengerData.length;
+
+        if (!validateSeatSelections(formData.seatSelections, passengerCount)) {
+          throw new Error('Invalid seat selections');
+        }
+
+        if (
+          flightState.isRoundTrip &&
+          !validateSeatSelections(formData.returnSeatSelections, passengerCount)
+        ) {
+          throw new Error('Invalid return seat selections');
+        }
+
+        const totalPayment = calculateTotalWithTax(formData);
+
+        // Format seat selections ensuring numeric seat_id values
+        const seatSelections = formData.seatSelections.map((seatId) => ({
+          seat_id: Number(seatId),
+          version: 0,
+        }));
 
         const transactionData = {
           userData: {
             user_id: user.id,
           },
-          passengerData: formData.passengerData.map((passenger) => ({
-            title: passenger.title,
-            full_name: passenger.full_name,
-            family_name: passenger.family_name,
-            birth_date: passenger.birth_date,
-            nationality: passenger.nationality,
-            id_number: passenger.id_number,
-            id_issuer: passenger.id_issuer,
-            id_expiry: passenger.id_expiry,
-          })),
-          seatSelections: formData.seatSelections,
-          planeId: formData.planeId,
-          total_payment: totalPaymentWithTax,
+          passengerData: formData.passengerData,
+          seatSelections,
+          planeId: flightState.selectedDepartureFlight.plane_id,
           is_round_trip: flightState.isRoundTrip,
+          total_payment: totalPayment,
         };
+
+        if (flightState.isRoundTrip) {
+          transactionData.returnPlaneId =
+            flightState.selectedReturnFlight.plane_id;
+          transactionData.returnSeatSelections =
+            formData.returnSeatSelections.map((seatId) => ({
+              seat_id: Number(seatId),
+              version: 0,
+            }));
+        }
+
+        console.log('Sending transaction data:', transactionData);
 
         const result = await paymentService.createTransaction(transactionData);
 
@@ -76,7 +144,7 @@ export const usePayment = () => {
           dispatch(setTransactionData(transactionData));
           dispatch(
             setPaymentData({
-              amount: totalPaymentWithTax,
+              amount: totalPayment,
               orderId: result.data.transaction_id,
             })
           );
@@ -94,6 +162,7 @@ export const usePayment = () => {
           throw new Error(result.message || 'Failed to create transaction');
         }
       } catch (error) {
+        console.error('Transaction error:', error);
         dispatch(setError(error.message));
         Swal.fire({
           icon: 'error',
@@ -105,7 +174,7 @@ export const usePayment = () => {
         dispatch(setLoading(false));
       }
     },
-    [dispatch, user, flightState, calculateTotalWithTax]
+    [dispatch, user, flightState, calculateTotalWithTax, validateSeatSelections]
   );
 
   const initiatePayment = useCallback(
@@ -147,7 +216,6 @@ export const usePayment = () => {
               token: result.data.data.payment.snapToken,
             })
           );
-
           return true;
         } else {
           throw new Error(result.message || 'Failed to initiate payment');

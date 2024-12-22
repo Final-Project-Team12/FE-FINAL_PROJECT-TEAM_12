@@ -1,38 +1,52 @@
-import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { setSelectedSeats } from '../../store/slices/paymentSlice';
+import { useEffect, useMemo } from 'react';
 import Swal from 'sweetalert2';
 
-const SeatSelection = ({ maxSeats, getDataFromChildren }) => {
-  const dispatch = useDispatch();
-  const selectedSeats = useSelector((state) => state.payment.selectedSeats);
+const SeatSelection = ({
+  selectedSeats = [],
+  maxSeats,
+  onSeatSelect,
+  flightData,
+}) => {
+  const seatLabelToId = useMemo(() => {
+    const mapping = {};
+    let id = 1;
+    for (let row = 1; row <= 12; row++) {
+      ['A', 'B', 'C', 'D', 'E', 'F'].forEach((col) => {
+        mapping[`${col}${row}`] = id++;
+      });
+    }
 
-  const seatLayout = {
-    totalRows: 12,
-    leftColumns: ['A', 'B', 'C'],
-    rightColumns: ['D', 'E', 'F'],
-  };
+    return mapping;
+  }, []);
+
+  const seatIdToLabel = useMemo(() => {
+    const mapping = {};
+    Object.entries(seatLabelToId).forEach(([label, id]) => {
+      mapping[id] = label;
+    });
+
+    return mapping;
+  }, [seatLabelToId]);
 
   const calculateSeatId = (col, row) => {
-    const columnMap = {
-      A: 0,
-      B: 1,
-      C: 2,
-      D: 3,
-      E: 4,
-      F: 5,
-    };
+    const label = `${col}${row}`;
+    const seatId = seatLabelToId[label];
 
-    const seatId = columnMap[col] * 12 + row;
     return seatId;
+  };
+
+  const getSeatLabel = (seatId) => {
+    const label = seatIdToLabel[seatId];
+
+    return label || '';
   };
 
   const handleSeatSelect = (col, row) => {
     const seatId = calculateSeatId(col, row);
 
     const isSelected = selectedSeats.includes(seatId);
-
     let newSelectedSeats;
+
     if (isSelected) {
       newSelectedSeats = selectedSeats.filter((id) => id !== seatId);
     } else {
@@ -47,31 +61,47 @@ const SeatSelection = ({ maxSeats, getDataFromChildren }) => {
       newSelectedSeats = [...selectedSeats, seatId];
     }
 
-    dispatch(setSelectedSeats(newSelectedSeats));
-    getDataFromChildren(seatId);
+    onSeatSelect(newSelectedSeats);
   };
 
   const getSeatColor = (seatId) => {
-    if (selectedSeats.includes(seatId)) return 'bg-[#7126B5]';
-    return 'bg-[#73CA5C] hover:bg-[#73CA5C]/80';
+    if (selectedSeats.includes(seatId)) {
+      return 'bg-[#7126B5]';
+    }
+
+    const isUnavailable = flightData?.seats_detail?.some(
+      (seat) => seat.seat_id === seatId && !seat.is_available
+    );
+
+    return isUnavailable
+      ? 'bg-gray-400 cursor-not-allowed'
+      : 'bg-[#73CA5C] hover:bg-[#73CA5C]/80';
   };
 
-  const rows = Array.from({ length: seatLayout.totalRows }, (_, i) => i + 1);
+  const isSeatDisabled = (seatId) => {
+    const isDisabled = flightData?.seats_detail?.some(
+      (seat) => seat.seat_id === seatId && !seat.is_available
+    );
+
+    return isDisabled || false;
+  };
+
+  const rows = Array.from({ length: 12 }, (_, i) => i + 1);
+  const columns = ['A', 'B', 'C', 'D', 'E', 'F'];
 
   return (
     <div className="w-full max-w-2xl border border-gray-300 rounded-lg">
       <div className="p-6">
-        <h2 className="text-2xl font-bold mb-6">Pilih Kursi</h2>
-
         <div className="bg-[#73CA5C] text-white p-4 rounded-t-lg mb-8 text-center">
           <h3 className="text-xl font-semibold">Economy - Seats Available</h3>
         </div>
 
         <div className="flex justify-center mb-8">
           <div className="grid gap-2">
+            {/* Column Headers */}
             <div className="grid grid-cols-7 gap-2">
               <div className="col-span-3 grid grid-cols-3">
-                {seatLayout.leftColumns.map((col) => (
+                {columns.slice(0, 3).map((col) => (
                   <div
                     key={col}
                     className="text-center font-semibold text-gray-500"
@@ -82,7 +112,7 @@ const SeatSelection = ({ maxSeats, getDataFromChildren }) => {
               </div>
               <div />
               <div className="col-span-3 grid grid-cols-3">
-                {seatLayout.rightColumns.map((col) => (
+                {columns.slice(3).map((col) => (
                   <div
                     key={col}
                     className="text-center font-semibold text-gray-500"
@@ -93,16 +123,20 @@ const SeatSelection = ({ maxSeats, getDataFromChildren }) => {
               </div>
             </div>
 
+            {/* Seat Grid */}
             {rows.map((row) => (
               <div key={row} className="grid grid-cols-7 gap-2">
+                {/* Left Block (ABC) */}
                 <div className="col-span-3 grid grid-cols-3 gap-2">
-                  {seatLayout.leftColumns.map((col) => {
+                  {columns.slice(0, 3).map((col) => {
                     const seatId = calculateSeatId(col, row);
                     return (
                       <button
                         key={`${col}${row}`}
                         className={`w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold transition-colors ${getSeatColor(seatId)}`}
                         onClick={() => handleSeatSelect(col, row)}
+                        disabled={isSeatDisabled(seatId)}
+                        title={`Seat ${col}${row} (ID: ${seatId})`}
                       >
                         {selectedSeats.includes(seatId) ? `${col}${row}` : ''}
                       </button>
@@ -114,14 +148,17 @@ const SeatSelection = ({ maxSeats, getDataFromChildren }) => {
                   {row}
                 </div>
 
+                {/* Right Block (DEF) */}
                 <div className="col-span-3 grid grid-cols-3 gap-2">
-                  {seatLayout.rightColumns.map((col) => {
+                  {columns.slice(3).map((col) => {
                     const seatId = calculateSeatId(col, row);
                     return (
                       <button
                         key={`${col}${row}`}
                         className={`w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold transition-colors ${getSeatColor(seatId)}`}
                         onClick={() => handleSeatSelect(col, row)}
+                        disabled={isSeatDisabled(seatId)}
+                        title={`Seat ${col}${row} (ID: ${seatId})`}
                       >
                         {selectedSeats.includes(seatId) ? `${col}${row}` : ''}
                       </button>
@@ -130,6 +167,22 @@ const SeatSelection = ({ maxSeats, getDataFromChildren }) => {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Seat Legend */}
+        <div className="flex justify-center gap-6">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 bg-[#73CA5C] rounded" />
+            <span>Available</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 bg-[#7126B5] rounded" />
+            <span>Selected</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 bg-gray-400 rounded" />
+            <span>Booked</span>
           </div>
         </div>
       </div>

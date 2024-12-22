@@ -7,7 +7,8 @@ import {
   updatePassengerData,
   setIsSubmitted,
   setHasFamily,
-  setSelectedSeats,
+  setSelectedDepartureSeats,
+  setSelectedReturnSeats,
 } from '../../store/slices/paymentSlice';
 import SeatSelection from './SeatSelection';
 import DatePicker from '../Elements/DatePicker/DatePicker';
@@ -27,9 +28,14 @@ const OrderForm = () => {
   const { user } = useAuth();
   const { createTransaction, loading } = usePayment();
 
-  const { orderData, hasFamily, selectedSeats, isSubmitted } = useSelector(
-    (state) => state.payment
-  );
+  const {
+    orderData,
+    hasFamily,
+    selectedDepartureSeats,
+    selectedReturnSeats,
+    isSubmitted,
+  } = useSelector((state) => state.payment);
+
   const {
     passengerCounts,
     selectedDepartureFlight,
@@ -44,9 +50,13 @@ const OrderForm = () => {
         orderName: '',
         email: '',
         phone: '',
+        address: '',
         passengers: generatePassengerList(),
       })
     );
+
+    dispatch(setSelectedDepartureSeats([]));
+    dispatch(setSelectedReturnSeats([]));
   }, [dispatch, passengerCounts]);
 
   const generatePassengerList = () => {
@@ -75,70 +85,6 @@ const OrderForm = () => {
     });
 
     return passengers;
-  };
-
-  const handleSubmit = async () => {
-    if (!validateForm()) return;
-
-    try {
-      const formattedPassengers = orderData.passengers.map((passenger) => ({
-        title: passenger.title,
-        full_name: passenger.fullName.trim(),
-        family_name: passenger.hasFamily ? passenger.familyName.trim() : null,
-        birth_date: passenger.birthDate,
-        nationality: passenger.nationality,
-        id_number: passenger.idNumber.trim(),
-        id_issuer: passenger.issuingCountry,
-        id_expiry: passenger.expiryDate,
-      }));
-
-      const departureSeatPrice =
-        selectedDepartureFlight.seats_detail.find(
-          (seat) => seat.class === selectedSeatClass
-        )?.price || 0;
-
-      const returnSeatPrice =
-        selectedReturnFlight?.seats_detail.find(
-          (seat) => seat.class === selectedSeatClass
-        )?.price || 0;
-
-      const totalBasePrice =
-        (departureSeatPrice + (isRoundTrip ? returnSeatPrice : 0)) *
-        orderData.passengers.length;
-
-      const tax = totalBasePrice * 0.1;
-      const totalPaymentWithTax = totalBasePrice + tax;
-
-      const transactionData = {
-        userData: {
-          user_id: user.id,
-        },
-        passengerData: formattedPassengers,
-        seatSelections: selectedSeats.map((seatId) => ({
-          seat_id: parseInt(seatId, 10),
-          version: 0,
-        })),
-        planeId: selectedDepartureFlight.plane_id,
-        total_payment: totalPaymentWithTax,
-      };
-
-      const success = await createTransaction(transactionData);
-
-      if (success) {
-        dispatch(setIsSubmitted(true));
-        Swal.fire({
-          icon: 'success',
-          title: 'Berhasil!',
-          text: 'Data pemesanan berhasil disimpan',
-        });
-      }
-    } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: error.message || 'Failed to save order data',
-      });
-    }
   };
 
   const validateForm = () => {
@@ -203,16 +149,92 @@ const OrderForm = () => {
       }
     }
 
-    if (selectedSeats.length !== orderData.passengers.length) {
+    if (
+      !Array.isArray(selectedDepartureSeats) ||
+      selectedDepartureSeats.length !== orderData.passengers.length
+    ) {
       Swal.fire({
         icon: 'error',
-        title: 'Seat Selection Required',
-        text: 'Please select seats for all passengers',
+        title: 'Departure Seat Selection Required',
+        text: 'Please select departure seats for all passengers',
+      });
+      return false;
+    }
+
+    if (
+      isRoundTrip &&
+      (!Array.isArray(selectedReturnSeats) ||
+        selectedReturnSeats.length !== orderData.passengers.length)
+    ) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Return Seat Selection Required',
+        text: 'Please select return seats for all passengers',
       });
       return false;
     }
 
     return true;
+  };
+
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
+
+    try {
+      const formattedPassengers = orderData.passengers.map((passenger) => ({
+        title: passenger.title,
+        full_name: passenger.fullName.trim(),
+        family_name: passenger.hasFamily ? passenger.familyName.trim() : null,
+        birth_date: passenger.birthDate,
+        nationality: passenger.nationality,
+        id_number: passenger.idNumber.trim(),
+        id_issuer: passenger.issuingCountry,
+        id_expiry: passenger.expiryDate,
+      }));
+
+      const departureSeatSelections = selectedDepartureSeats.map((seatId) =>
+        Number(seatId)
+      );
+
+      const transactionData = {
+        userData: {
+          user_id: user.id,
+        },
+        passengerData: formattedPassengers,
+        seatSelections: departureSeatSelections,
+        planeId: selectedDepartureFlight.plane_id,
+        is_round_trip: isRoundTrip,
+        total_payment: 0,
+      };
+
+      if (isRoundTrip) {
+        const returnSeatSelections = selectedReturnSeats.map((seatId) =>
+          Number(seatId)
+        );
+        transactionData.returnPlaneId = selectedReturnFlight.plane_id;
+        transactionData.returnSeatSelections = returnSeatSelections;
+      }
+
+      console.log('Submitting transaction:', transactionData);
+
+      const success = await createTransaction(transactionData);
+
+      if (success) {
+        dispatch(setIsSubmitted(true));
+        Swal.fire({
+          icon: 'success',
+          title: 'Success!',
+          text: 'Order data has been saved',
+        });
+      }
+    } catch (error) {
+      console.error('Transaction error:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: error.message || 'Failed to save order data',
+      });
+    }
   };
 
   const handlePassengerUpdate = (index, field, value) => {
@@ -222,10 +244,6 @@ const OrderForm = () => {
       [field]: value,
     };
     dispatch(updateOrderData({ passengers: updatedPassengers }));
-  };
-
-  const handleSeatData = (seatId) => {
-    console.log(`Selected seat ID: ${seatId}`);
   };
 
   return (
@@ -248,7 +266,7 @@ const OrderForm = () => {
               onChange={(e) =>
                 dispatch(updateOrderData({ orderName: e.target.value }))
               }
-              placeholder="Masukkan nama lengkap"
+              placeholder="Enter full name"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7126B5]"
             />
           </div>
@@ -261,7 +279,7 @@ const OrderForm = () => {
               onChange={(e) =>
                 dispatch(updateOrderData({ email: e.target.value }))
               }
-              placeholder="Masukkan email"
+              placeholder="Enter email"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7126B5]"
             />
           </div>
@@ -276,7 +294,7 @@ const OrderForm = () => {
               onChange={(e) =>
                 dispatch(updateOrderData({ phone: e.target.value }))
               }
-              placeholder="+62"
+              placeholder="Enter phone number"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7126B5]"
             />
           </div>
@@ -288,7 +306,7 @@ const OrderForm = () => {
               onChange={(e) =>
                 dispatch(updateOrderData({ address: e.target.value }))
               }
-              placeholder="Masukkan alamat lengkap"
+              placeholder="Enter full address"
               rows={3}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7126B5] resize-none"
             />
@@ -304,7 +322,7 @@ const OrderForm = () => {
         >
           <div className="bg-gray-800 text-white p-4 rounded-t-lg mb-6">
             <h3 className="text-xl font-semibold">
-              Data Diri Penumpang {index + 1} - {passenger.type}
+              Data Penumpang {index + 1} - {passenger.type}
             </h3>
           </div>
 
@@ -330,7 +348,7 @@ const OrderForm = () => {
               </label>
               <input
                 type="text"
-                placeholder="Masukkan nama lengkap"
+                placeholder="Enter full name"
                 value={passenger.fullName}
                 onChange={(e) =>
                   handlePassengerUpdate(index, 'fullName', e.target.value)
@@ -357,7 +375,7 @@ const OrderForm = () => {
                 </label>
                 <input
                   type="text"
-                  placeholder="Masukkan nama keluarga"
+                  placeholder="Enter family name"
                   value={passenger.familyName}
                   onChange={(e) =>
                     handlePassengerUpdate(index, 'familyName', e.target.value)
@@ -386,7 +404,7 @@ const OrderForm = () => {
                   handlePassengerUpdate(index, 'nationality', e.target.value)
                 }
               >
-                <option value="">Pilih kewarganegaraan</option>
+                <option value="">Pilih Kewarganegaraan</option>
                 {NATIONALITIES.map(({ value, label }) => (
                   <option key={value} value={value}>
                     {label}
@@ -401,7 +419,7 @@ const OrderForm = () => {
               </label>
               <input
                 type="text"
-                placeholder="Masukkan nomor KTP/Paspor"
+                placeholder="Enter ID/Passport number"
                 value={passenger.idNumber}
                 onChange={(e) =>
                   handlePassengerUpdate(index, 'idNumber', e.target.value)
@@ -421,7 +439,7 @@ const OrderForm = () => {
                   handlePassengerUpdate(index, 'issuingCountry', e.target.value)
                 }
               >
-                <option value="">Pilih negara penerbit</option>
+                <option value="">Pilih Negara Penerbit</option>
                 {NATIONALITIES.map(({ value, label }) => (
                   <option key={value} value={value}>
                     {label}
@@ -441,15 +459,29 @@ const OrderForm = () => {
         </div>
       ))}
 
-      {/* Seat Selection Section */}
+      {/* Departure Seat Selection Section */}
       <div className="w-full border border-gray-300 rounded-lg p-6">
-        <h2 className="text-xl font-bold mb-6">Pilih Kursi</h2>
+        <h2 className="text-xl font-bold mb-6">Choose Departure Seats</h2>
         <SeatSelection
-          selectedSeats={selectedSeats}
+          selectedSeats={selectedDepartureSeats}
           maxSeats={orderData.passengers?.length || 0}
-          getDataFromChildren={handleSeatData}
+          onSeatSelect={(seats) => dispatch(setSelectedDepartureSeats(seats))}
+          flightData={selectedDepartureFlight}
         />
       </div>
+
+      {/* Return Seat Selection Section - Only shown for round trips */}
+      {isRoundTrip && (
+        <div className="w-full border border-gray-300 rounded-lg p-6">
+          <h2 className="text-xl font-bold mb-6">Choose Return Seats</h2>
+          <SeatSelection
+            selectedSeats={selectedReturnSeats}
+            maxSeats={orderData.passengers?.length || 0}
+            onSeatSelect={(seats) => dispatch(setSelectedReturnSeats(seats))}
+            flightData={selectedReturnFlight}
+          />
+        </div>
+      )}
 
       {/* Submit Button */}
       <div className="mx-auto w-[95%]">
@@ -462,7 +494,7 @@ const OrderForm = () => {
               : 'bg-[#7126B5] hover:opacity-90'
           } text-white py-4 rounded-lg text-xl font-semibold transition-all`}
         >
-          {loading ? 'Processing...' : 'Simpan'}
+          {loading ? 'Processing...' : 'Save'}
         </button>
       </div>
     </div>
