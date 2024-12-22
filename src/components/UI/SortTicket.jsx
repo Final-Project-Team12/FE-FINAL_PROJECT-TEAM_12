@@ -157,7 +157,7 @@ const SortTicket = () => {
           ></div>
 
           <div className="absolute right-0 z-50 pt-8">
-            <div className="bg-white rounded-2xl w-[360px] relative animate-[slideUp_0.2s_ease-out]">
+            <div className="bg-white rounded-2xl w-[280px] md:w-[360px] relative animate-[slideUp_0.2s_ease-out]">
               <div className="px-4 pt-4 pb-6 border-b border-gray-200">
                 <button
                   onClick={toggleModal}
