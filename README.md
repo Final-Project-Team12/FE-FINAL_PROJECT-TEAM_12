@@ -110,23 +110,23 @@ src/
 
 ## 🛣 Route Map
 
-| *Route*                          | *Page*          | *Protected* |
+| *Route*                          | *Page*          | *Access* |
 | ---------------------------------- | ----------------- | ------------- |
-| /                                | Homepage          | No            |
-| /login                           | LoginPage         | No            |
-| /register                        | RegisterPage      | No            |
-| /reset-password                  | ResetPasswordPage | No            |
-| /otp                             | OtpPage           | No            |
-| /otp-password                    | OtpPasswordPage   | No            |
-| /flight-ticket                   | FlightTicketPage  | No            |
-| /checkout/:departureId           | PaymentPage       | Yes           |
-| /checkout/:departureId/:returnId | PaymentPage       | Yes           |
-| /payment/:id                     | PaymentLastPage   | Yes           |
-| /orderhistory                    | OrderHistoryPage  | Yes           |
-| /print-ticket                    | PrintTicketPage   | Yes           |
-| /notification                    | NotificationPage  | Yes           |
-| /account/:id                     | AccountPage       | Yes           |
-| *                                | NotFoundPage      | No            |
+| /                                | Homepage          | 🌐 Public |
+| /login                           | LoginPage         | 🌐 Public |
+| /register                        | RegisterPage      | 🌐 Public |
+| /reset-password                  | ResetPasswordPage | 🌐 Public |
+| /otp                             | OtpPage           | 🌐 Public |
+| /otp-password                    | OtpPasswordPage   | 🌐 Public |
+| /flight-ticket                   | FlightTicketPage  | 🌐 Public |
+| /checkout/:departureId           | PaymentPage       | 🔒 Protected |
+| /checkout/:departureId/:returnId | PaymentPage       | 🔒 Protected |
+| /payment/:id                     | PaymentLastPage   | 🔒 Protected |
+| /orderhistory                    | OrderHistoryPage  | 🔒 Protected |
+| /print-ticket                    | PrintTicketPage   | 🔒 Protected |
+| /notification                    | NotificationPage  | 🔒 Protected |
+| /account/:id                     | AccountPage       | 🔒 Protected |
+| *                                | NotFoundPage      | 🌐 Public |
 
 
 
