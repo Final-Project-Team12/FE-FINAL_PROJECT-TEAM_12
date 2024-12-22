@@ -6,8 +6,8 @@ const PassengerInfo = ({ tickets, plane, seat, airline }) => {
       <div className="h-10 flex justify-center p-2">
         <img
           className=""
-          src={airline?.image_url}
-          alt={`${airline?.name} logo`}
+          src={airline?.image_url || '-'}
+          alt={`${airline?.name || '-'} logo`}
         />
       </div>
       <div className="flex flex-col">
