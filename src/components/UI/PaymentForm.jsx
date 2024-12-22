@@ -135,7 +135,7 @@ const PaymentForm = ({ onPaymentSuccess }) => {
 
   return (
     <div className="w-full mx-auto border border-gray-300 rounded-lg p-6">
-      <div id="snap-container" className="w-full h-[600px]">
+      <div id="snap-container" className="w-full h-[600px] overflow-hidden">
         {!paymentData?.token && (
           <div className="flex items-center justify-center h-full">
             <p>Loading payment...</p>

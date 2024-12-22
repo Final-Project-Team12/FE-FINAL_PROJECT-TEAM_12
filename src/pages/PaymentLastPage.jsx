@@ -87,7 +87,7 @@ const PaymentLastPage = () => {
           <Stepper currentStep={isPaymentSuccess ? 3 : 2} />
           <div className="px-4 sm:px-6 lg:px-8">
             {!isPaymentSuccess ? (
-              <div className="bg-red-600 text-white rounded-md p-3 flex items-center justify-center space-x-2 mt-4">
+              <div className="bg-red-600 text-white rounded-md p-2 sm:p-3 flex items-center justify-center space-x-2 mt-4 text-sm sm:text-base">
                 <span>Selesaikan Pembayaran sampai {formattedDeadline}</span>
               </div>
             ) : (
