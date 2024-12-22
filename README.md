@@ -4,7 +4,7 @@
 
 ### **Website**
 
-[QuickFly Website](https://www.web-quickfly.my.id/)
+
 
 ---
 
