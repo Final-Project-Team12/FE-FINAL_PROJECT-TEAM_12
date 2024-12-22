@@ -10,12 +10,26 @@ export const useNotification = () => {
   const fetchNotifications = async () => {
     try {
       const data = await notificationService.getNotifications();
-
       const userNotifications = data.filter(
         (notif) => notif.user_id === user?.id
       );
       setNotifications(userNotifications);
       setError(null);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const markAsRead = async (notificationId) => {
+    try {
+      await notificationService.markAsRead(notificationId);
+      setNotifications((prevNotifications) =>
+        prevNotifications.map((notif) =>
+          notif.notification_id === notificationId
+            ? { ...notif, is_read: true }
+            : notif
+        )
+      );
     } catch (err) {
       setError(err.message);
     }
@@ -30,5 +44,6 @@ export const useNotification = () => {
   return {
     notifications,
     error,
+    markAsRead,
   };
 };

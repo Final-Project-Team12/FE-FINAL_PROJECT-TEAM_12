@@ -5,7 +5,7 @@ import HeaderNotification from './HeaderNotification';
 import { useNotification } from '../../hooks/useNotification';
 
 const Notification = () => {
-  const { notifications, error } = useNotification();
+  const { notifications, error, markAsRead } = useNotification();
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredNotifications, setFilteredNotifications] = useState([]);
   const [dateRange, setDateRange] = useState({
@@ -69,6 +69,12 @@ const Notification = () => {
       minute: '2-digit',
     });
   };
+  const handleNotificationClick = async (notification) => {
+    if (!notification.is_read) {
+      await markAsRead(notification.notification_id);
+    }
+    openModal(notification);
+  };
 
   return (
     <>
@@ -82,7 +88,7 @@ const Notification = () => {
           filteredNotifications.map((item) => (
             <div
               key={item.notification_id}
-              onClick={() => openModal(item)}
+              onClick={() => handleNotificationClick(item)}
               className="cursor-pointer"
             >
               <div className="flex w-full space-x-4">
@@ -101,7 +107,7 @@ const Notification = () => {
                       </span>
                       <div
                         className={`rounded-full w-2 h-2 ${
-                          item.is_read ? 'bg-gray-400' : 'bg-purple-600'
+                          item.is_read ? 'bg-green-400' : 'bg-purple-600'
                         }`}
                       ></div>
                     </div>

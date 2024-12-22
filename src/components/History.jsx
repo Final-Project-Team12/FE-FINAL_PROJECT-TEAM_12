@@ -57,7 +57,6 @@ const History = () => {
     }
   }, [loading, orderHistory, selectedCardId]);
 
-  // Update selectedCardId only if current selection is not in filtered results
   useEffect(() => {
     if (filteredFlightData.length > 0) {
       const currentCardExists = filteredFlightData.some(
