@@ -105,9 +105,9 @@ const PaymentPage = () => {
     <div className="min-h-screen bg-gray-50 overflow-x-hidden mb-10">
       <Navbar />
       <div className="w-full bg-white rounded-lg shadow-[0px_2px_10px_rgba(0,0,0,0.1)]">
-        <div className="max-w-6xl mx-auto px-4 py-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
           <Stepper currentStep={showSuccess ? 2 : 1} />
-          <div className="px-10">
+          <div className="px-4 sm:px-10">
             {!showSuccess ? (
               <div className="bg-red-600 text-white rounded-md p-3 flex items-center justify-center space-x-2">
                 <Clock className="h-5 w-5" />
@@ -123,11 +123,11 @@ const PaymentPage = () => {
           </div>
         </div>
       </div>
-      <div className="max-w-6xl mx-auto px-4 flex space-x-6 mt-8 justify-center">
-        <div className="flex flex-col space-y-4 w-1/2">
+      <div className="max-w-6xl mx-auto px-4 flex flex-col lg:flex-row lg:space-x-6 space-y-6 lg:space-y-0 mt-8 justify-center">
+        <div className="flex flex-col space-y-4 w-full lg:w-1/2">
           <OrderForm />
         </div>
-        <div className="w-[450px] mt-4">
+        <div className="w-full lg:w-[450px] mt-4">
           <FlightDetails />
           {showSuccess && (
             <button
