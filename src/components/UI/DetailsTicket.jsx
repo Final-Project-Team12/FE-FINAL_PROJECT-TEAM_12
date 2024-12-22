@@ -347,8 +347,8 @@ const DetailsTicket = () => {
               </button>
             </div>
 
-            <div className="mt-2 flex items-center justify-between">
-              <div className="flex items-center space-x-4 pl-10">
+            <div className="mt-2 flex flex-col items-center md:flex-row md:justify-between">
+              <div className="flex items-center space-x-4 md:pl-10">
                 <div className="text-left">
                   <div className="text-[14px] font-bold">
                     {formatTime(flight.departure_time)}
@@ -378,8 +378,8 @@ const DetailsTicket = () => {
                 <img src={iconBaggage} alt="" />
               </div>
 
-              <div className="text-right">
-                <div className="text-lg font-bold text-purple-600">
+              <div className="w-full mt-3 flex justify-between md:w-1/4 md:text-right md:block md:mt-0">
+                <div className="text-[16px] font-bold text-purple-600">
                   {new Intl.NumberFormat('id-ID', {
                     style: 'currency',
                     currency: 'IDR',

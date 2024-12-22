@@ -206,13 +206,13 @@ const TicketFilterSidebar = () => {
 
   return (
     <>
-      <div className="mb-[47px]">
-        <div className="w-[260px] bg-white rounded-2xl border border-slate-200 shadow-md p-6">
+      <div className="mb-[20px]">
+        <div className="w-full md:w-[260px] bg-white rounded-2xl border border-slate-200 shadow-md p-6">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-medium">Filter</h3>
+            <h3 className="text-xs md:text-[16px] font-medium">Filter</h3>
             <button
               onClick={handleResetFilters}
-              className="text-sm text-purple-600 hover:text-purple-700"
+              className="text-xs md:text-sm text-purple-600 hover:text-purple-700"
             >
               Reset
             </button>
@@ -226,7 +226,9 @@ const TicketFilterSidebar = () => {
             >
               <div className="flex items-center gap-2">
                 <Heart size={24} className="text-slate-500" />
-                <span className="font-normal text-left">Fasilitas</span>
+                <span className="text-left text-xs md:text-[16px]">
+                  Fasilitas
+                </span>
               </div>
               <span className="text-gray-500">
                 <ChevronIcon isOpen={filters.fasilitas} />
@@ -282,7 +284,7 @@ const TicketFilterSidebar = () => {
             >
               <div className="flex items-center gap-2">
                 <DollarSign size={24} className="text-slate-500" />
-                <span className="font-normal text-left">Harga</span>
+                <span className="text-xs md:text-[16px] text-left">Harga</span>
               </div>
               <span className="text-gray-500">
                 <ChevronIcon isOpen={isModalOpen} />
