@@ -17,8 +17,14 @@ const initialState = {
         id_expiry: '',
       },
     ],
-    seatSelections: [],
+    seatSelections: {
+      departure: [],
+      return: [],
+    },
     planeId: null,
+    is_round_trip: false,
+    returnPlaneId: null,
+    total_payment: 0,
   },
   paymentData: {
     orderId: '',
@@ -38,9 +44,11 @@ const initialState = {
     orderFamily: '',
     phone: '',
     email: '',
+    address: '',
     passengers: [],
   },
-  selectedSeats: [],
+  selectedDepartureSeats: [],
+  selectedReturnSeats: [],
   hasFamily: false,
   isSubmitted: false,
   timeLeft: 900,
@@ -74,15 +82,17 @@ const paymentSlice = createSlice({
       if (state.orderData.passengers) {
         const index = action.payload.index;
         const passengerData = action.payload.data;
-
         state.orderData.passengers = state.orderData.passengers.map(
           (passenger, i) =>
             i === index ? { ...passenger, ...passengerData } : passenger
         );
       }
     },
-    setSelectedSeats: (state, action) => {
-      state.selectedSeats = action.payload;
+    setSelectedDepartureSeats: (state, action) => {
+      state.selectedDepartureSeats = action.payload;
+    },
+    setSelectedReturnSeats: (state, action) => {
+      state.selectedReturnSeats = action.payload;
     },
     setHasFamily: (state, action) => {
       state.hasFamily = action.payload;
@@ -130,7 +140,8 @@ export const {
   setPaymentId,
   updateOrderData,
   updatePassengerData,
-  setSelectedSeats,
+  setSelectedDepartureSeats,
+  setSelectedReturnSeats,
   setHasFamily,
   setIsSubmitted,
   updateTimeLeft,
