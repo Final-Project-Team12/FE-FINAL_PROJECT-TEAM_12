@@ -1,205 +1,146 @@
-### **Frontend Team Documentation**
+# 🚀 Flight Booking System - Frontend
 
----
+<div align="center">
 
-### **Website**
+![Flight Booking System](https://img.shields.io/badge/Project-Flight%20Booking-blue?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)
+![Team Size](https://img.shields.io/badge/Team%20Size-4-orange?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
+</div>
 
+## 🛫 About The Project
 
----
+A modern flight booking system built with React and powered by cutting-edge technologies. Our platform provides a seamless experience for users to search, book, and manage their flight reservations.
 
-## **FRONTEND TEAM**
+## 👥 Dream Team
 
-| **Name**                 |
-| ------------------------ |
-| **Rafly Aziz Abdillah**  |
-| **Tegar Alfa Rizzi**     |
-| **Melinda Wijaya**       |
-| **Yogi Efani Yancandra** |
+<div align="center">
 
-For tasks and progress, visit our ClickUp workspace: [ClickUp Tasks](https://app.clickup.com/9018681465/v/b/8crwa3t-458)
+| Role | Name |
+|------|------|
+| 👨‍💻 Frontend Developer | **Rafly Aziz Abdillah** |
+| 👨‍💻 Frontend Developer | **Tegar Alfa Rizzi** |
+| 👩‍💻 Frontend Developer | **Melinda Wijaya** |
+| 👨‍💻 Frontend Developer | **Yogi Efani Yancandra** |
 
----
+[📋 Track Our Progress on ClickUp](https://app.clickup.com/9018681465/v/b/8crwa3t-458)
 
-## **Project Setup**
+</div>
 
-Follow these steps to run the frontend project locally:
+## 🚀 Tech Arsenal
 
-1. Clone the repository from GitHub:
+<div align="center">
 
+### Core Technologies
+![React](https://img.shields.io/badge/React-18.3.1-61DAFB?style=for-the-badge&logo=react)
+![Vite](https://img.shields.io/badge/Vite-5.4.10-646CFF?style=for-the-badge&logo=vite)
+![Redux Toolkit](https://img.shields.io/badge/Redux_Toolkit-2.4.0-764ABC?style=for-the-badge&logo=redux)
+
+### Styling & UI
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4.15-38B2AC?style=for-the-badge&logo=tailwind-css)
+![Flowbite](https://img.shields.io/badge/Flowbite-2.5.2-FF69B4?style=for-the-badge)
+![Headless UI](https://img.shields.io/badge/Headless_UI-2.2.0-66E3FF?style=for-the-badge)
+
+### Development Tools
+![ESLint](https://img.shields.io/badge/ESLint-9.13.0-4B32C3?style=for-the-badge&logo=eslint)
+![Prettier](https://img.shields.io/badge/Prettier-3.3.3-F7B93E?style=for-the-badge&logo=prettier)
+
+</div>
+
+## 🔥 Features
+
+- 🎫 **Smart Flight Search** - Advanced filtering and sorting
+- 💳 **Secure Payments** - Integrated with trusted payment gateways
+- 📱 **Responsive Design** - Seamless experience across all devices
+- 🔐 **OTP Verification** - Enhanced security for users
+- 📄 **E-Tickets** - Easy download and print options
+- 📊 **Booking History** - Comprehensive order tracking
+- 🔔 **Real-time Notifications** - Stay updated with your bookings
+- 👤 **Profile Management** - Easy account management
+
+## 🛠️ Quick Setup
+
+1. **Clone the Repository**
    ```bash
    git clone https://github.com/Final-Project-Team12/FE-FINAL_PROJECT-TEAM_12
-   ```
-
-2. Navigate to the project directory:
-
-   ```bash
    cd FE-FINAL_PROJECT-TEAM_12
    ```
 
-3. Install dependencies:
-
+2. **Install Dependencies**
    ```bash
    npm install
    ```
 
-4. Set up environment variables by creating a `.env` file in the root directory with the following content:
-
-   ```env
-   VITE_BACKEND_URI=
-   VITE_MIDTRANS_CLIENT_KEY=
+3. **Environment Setup**
+   ```bash
+   # Create .env file and add:
+   VITE_BACKEND_URI=your_backend_url
+   VITE_MIDTRANS_CLIENT_KEY=your_midtrans_key
    ```
 
-5. Run the application for local development:
+4. **Launch Development Server**
    ```bash
    npm run dev
    ```
 
----
+## 📁 Project Architecture
 
-## **Folder Structure**
+```
+src/
+├── api/          # API configuration & instances
+├── components/   # Reusable UI components
+│   └── Elements/ # Atomic UI elements
+├── contexts/     # React context providers
+├── hooks/        # Custom React hooks
+├── pages/        # Main application pages
+├── services/     # API integration services
+└── store/        # Redux state management
+```
 
-The project directory structure is organized as follows:
+## 🛣️ Route Map
 
-### **`/public`**
+| Path | Component | Access |
+|------|-----------|--------|
+| `/` | Homepage | 🌐 Public |
+| `/login` | LoginPage | 🌐 Public |
+| `/register` | RegisterPage | 🌐 Public |
+| `/flight-ticket` | FlightTicketPage | 🌐 Public |
+| `/checkout/:id` | PaymentPage | 🔒 Protected |
+| `/orderhistory` | OrderHistoryPage | 🔒 Protected |
+| `/account/:id` | AccountPage | 🔒 Protected |
 
-- **`/icons`**: Directory for storing icons.
-- **`/images`**: Directory for storing images.
+## 🔄 State Management
 
-### **`/src`**
+Our Redux store is organized into logical slices:
 
-1. **`/api`**
+- 🔐 `authReducer`: Authentication state
+- 👤 `userReducer`: User profile data
+- 💳 `paymentReducer`: Payment processing
+- ✈️ `flightReducer`: Flight information
+- 🔍 `flightSearchReducer`: Search parameters
+- 📋 `orderHistoryReducer`: Booking history
 
-   - Contains configuration files for the **Axios instance** used for API integration.
-   - **Note**: All HTTP requests must use this instance for consistency.
+## 🤝 Contributing
 
-2. **`/components`**
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-   - Stores all **UI components**.
-   - **`/Elements`**: A sub-folder for smaller, reusable UI elements.
+## 📜 License
 
-3. **`/hooks`**
+Distributed under the MIT License. See `LICENSE` for more information.
 
-   - Stores **custom hooks**.
-   - **Note**: All custom hooks must begin with the prefix **`use`**, such as **`useForm`** or **`useFetch`**.
+## 📞 Contact
 
-4. **`/contexts`**
-
-   - Stores all **React Contexts** used in the application.
-
-5. **`/pages`**
-
-   - Contains the main pages of the application.
-
-6. **`/services`**
-
-   - Contains files for API integration with reusable functions.
-   - All functions here should use the **Axios instance** from the **`/api`** folder to ensure consistent API requests.
-
-7. **`/store`**
-   - Contains all Redux setup files and slices for state management.
-   - **Store Setup**:
-     - The `store` is configured using `@reduxjs/toolkit`'s `configureStore` function.
-     - Each slice represents a specific part of the application's state (e.g., `auth`, `user`, `flightSearch`, etc.).
-     - Middleware is customized to handle serializable checks and date serialization/deserialization.
-   - **Reducers**:
-     - `authReducer`: Manages authentication state.
-     - `userReducer`: Handles user profile and account management.
-     - `paymentReducer`: Manages payment data and processes.
-     - `flightReducer`: Stores selected flight data.
-     - `flightSearchReducer`: Handles flight search parameters and results.
-     - `flightFilterReducer`: Manages filters and sorting for flights.
-     - `registerReducer`: Handles registration and OTP verification.
-     - `resetPasswordReducer`: Manages password reset and OTP processes.
-     - `orderHistoryReducer`: Manages user order history.
-   - **Utilities**:
-     - `resetStore`: Dispatches actions to reset all slices to their initial states.
-     - `serializeDate` and `deserializeDate`: Functions to handle date conversion for Redux state.
-   - **Middleware**:
-     - Includes default middleware with custom configurations for serializable checks, such as ignoring specific paths and actions.
+Frontend Team - [Track us on ClickUp](https://app.clickup.com/9018681465/v/b/8crwa3t-458)
 
 ---
 
-## **Routes**
+<div align="center">
 
-The application has the following routes:
+Made with ❤️ by the Frontend Dream Team
 
-| **Route**                          | **Page**          | **Protected** |
-| ---------------------------------- | ----------------- | ------------- |
-| `/`                                | Homepage          | No            |
-| `/login`                           | LoginPage         | No            |
-| `/register`                        | RegisterPage      | No            |
-| `/reset-password`                  | ResetPasswordPage | No            |
-| `/otp`                             | OtpPage           | No            |
-| `/otp-password`                    | OtpPasswordPage   | No            |
-| `/flight-ticket`                   | FlightTicketPage  | No            |
-| `/checkout/:departureId`           | PaymentPage       | Yes           |
-| `/checkout/:departureId/:returnId` | PaymentPage       | Yes           |
-| `/payment/:id`                     | PaymentLastPage   | Yes           |
-| `/orderhistory`                    | OrderHistoryPage  | Yes           |
-| `/print-ticket`                    | PrintTicketPage   | Yes           |
-| `/notification`                    | NotificationPage  | Yes           |
-| `/account/:id`                     | AccountPage       | Yes           |
-| `*`                                | NotFoundPage      | No            |
-
----
-
-## **Features**
-
-The following features are available or planned for the application:
-
-1. **Homepage**: Displays an overview of the service.
-2. **Login and Registration**: Authentication system for users.
-3. **Flight Ticket Search**: Allows users to search for flights.
-4. **Checkout**: Handles the booking process with payment integration.
-5. **Order History**: Shows the history of user bookings.
-6. **Notifications**: Displays user notifications for updates and alerts.
-7. **Account Management**: Users can update their profile and view details.
-8. **OTP Verification**: Ensures secure access to certain features.
-9. **Print Ticket**: Generates a printable ticket for booked flights.
-
----
-
-## **Tech Stack**
-
-The application leverages the following technologies:
-
-### **Frontend Framework**
-
-- React 18.3.1
-
-### **Development Tools**
-
-- Vite 5.4.10
-- Prettier 3.3.3
-- ESLint 9.13.0
-- Tailwind CSS 3.4.15
-
-### **State Management**
-
-- Redux Toolkit 2.4.0
-
-### **API Communication**
-
-- Axios 1.7.7
-
-### **Utilities**
-
-- Date-fns 4.1.0
-- JS-Cookie 3.0.5
-- JWT-Decode 4.0.0
-- React Toastify 10.0.6
-- SweetAlert2 11.14.5
-
-### **UI Components**
-
-- Flowbite 2.5.2
-- Headless UI 2.2.0
-- React Icons 5.3.0
-
-### **Others**
-
-- React Router Dom 7.0.2
-- React Hook Form 7.53.2
-- React Loading Skeleton 3.5.0
-- Lottie Files 0.10.0
+</div>
