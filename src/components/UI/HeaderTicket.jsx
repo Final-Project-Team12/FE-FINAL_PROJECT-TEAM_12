@@ -312,10 +312,12 @@ const HeaderTicket = () => {
                 alt="Back"
                 className="w-6 h-6 ml-4 hover:scale-125 transition-all duration-200 text-white"
               />
-              <div className="ml-3 text-white">{headerText}</div>
+              <div className="ml-3 text-xs font-medium text-white md:text-[16px]">
+                {headerText}
+              </div>
             </div>
             <button
-              className="w-full sm:w-1/4 h-[50px] rounded-[12px] bg-[#73CA5C] font-bold text-white hover:bg-[#65b350] transition-colors"
+              className="w-full text-sm  h-[50px] rounded-[12px] bg-[#73CA5C] font-bold text-white hover:bg-[#65b350] transition-colors md:font-[16px] md:w-1/4"
               onClick={handleReset}
             >
               Ubah Pencarian
