@@ -19,12 +19,7 @@ A blazing-fast ⚡ flight booking SPA built with the latest frontend tech stack.
 
 ## 🛠️ Tech Stack & Architecture
 
-<div align="center">
 
-<img src="https://user-images.githubusercontent.com/74038190/212257454-16e3712e-945a-4ca2-b238-408ad0bf87e6.gif" width="100"><img src="https://user-images.githubusercontent.com/74038190/212257467-871d32b7-e401-42e8-a166-fcfd7baa4c6b.gif" width="100">
-<img src="https://user-images.githubusercontent.com/74038190/212257472-08f6a927-c1a0-4f1c-8d30-c3182a3b1c43.gif" width="100">
-<img src="https://user-images.githubusercontent.com/74038190/212257468-1e9a91f1-b626-4baa-b15d-5c385dfa7ed2.gif" width="100">
-<img src="https://user-images.githubusercontent.com/74038190/212257465-7ce8d493-cac5-494e-982a-5a9deb852c4b.gif" width="100">
 
 <div align="center">
 
@@ -44,7 +39,6 @@ A blazing-fast ⚡ flight booking SPA built with the latest frontend tech stack.
 
 </div>
 
-</div>
 
 ## 👨‍💻 Kelompok 12
 
@@ -63,20 +57,6 @@ A blazing-fast ⚡ flight booking SPA built with the latest frontend tech stack.
 
 
 </div>
-
-
-
-
-## 🔥 Features
-
-- 🎫 *Smart Flight Search* - Advanced filtering and sorting
-- 💳 *Secure Payments* - Integrated with trusted payment gateways
-- 📱 *Responsive Design* - Seamless experience across all devices
-- 🔐 *OTP Verification* - Enhanced security for users
-- 📄 *E-Tickets* - Easy download and print options
-- 📊 *Booking History* - Comprehensive order tracking
-- 🔔 *Real-time Notifications* - Stay updated with your bookings
-- 👤 *Profile Management* - Easy account management
 
 ## 🛠 Quick Setup
 
@@ -102,6 +82,17 @@ A blazing-fast ⚡ flight booking SPA built with the latest frontend tech stack.
    bash
    npm run dev
    
+## 🔥 Features
+
+- 🎫 *Smart Flight Search* - Advanced filtering and sorting
+- 💳 *Secure Payments* - Integrated with trusted payment gateways
+- 📱 *Responsive Design* - Seamless experience across all devices
+- 🔐 *OTP Verification* - Enhanced security for users
+- 📄 *E-Tickets* - Easy download and print options
+- 📊 *Booking History* - Comprehensive order tracking
+- 🔔 *Real-time Notifications* - Stay updated with your bookings
+- 👤 *Profile Management* - Easy account management
+
 
 ## 📁 Project Architecture
 
