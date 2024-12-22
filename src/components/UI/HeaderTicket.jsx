@@ -371,52 +371,6 @@ const HeaderTicket = () => {
               </button>
             )}
           </div>
-
-          {/* <div className="relative flex px-8">
-            {canShowPrevious && (
-              <button
-                onClick={handlePrevDates}
-                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white shadow-md hover:bg-gray-50 mx-2"
-              >
-                <ChevronLeft className="w-5 h-5 text-purple-600" />
-              </button>
-            )}
-
-            <div className="flex flex-1 overflow-hidden mx-4">
-              <div className="grid grid-cols-7 w-full gap-1">
-                {dates.map((dateInfo, index) => (
-                  <div key={index} className="flex justify-center items-center">
-                    <div
-                      onClick={() => handleDateClick(index)}
-                      className={`flex flex-col items-center cursor-pointer transition-all duration-200 px-4 py-2 rounded-lg w-full mx-1 ${
-                        activeIndex === index
-                          ? 'text-white bg-[#7126B5]'
-                          : dateInfo.active && activeIndex === null
-                            ? 'text-white bg-[#A06ECE]'
-                            : 'text-gray-600 hover:text-[#7126B5] hover:bg-purple-50'
-                      }`}
-                    >
-                      <span className="text-sm font-semibold whitespace-nowrap">
-                        {dateInfo.day}
-                      </span>
-                      <span className="text-xs mt-1 whitespace-nowrap">
-                        {dateInfo.date}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {canShowNext && (
-              <button
-                onClick={handleNextDates}
-                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white shadow-md hover:bg-gray-50 mx-2"
-              >
-                <ChevronRight className="w-5 h-5 text-purple-600" />
-              </button>
-            )}
-          </div> */}
         </div>
       </div>
     </div>
