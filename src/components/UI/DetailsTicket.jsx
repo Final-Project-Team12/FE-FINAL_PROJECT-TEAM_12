@@ -10,6 +10,7 @@ import {
 import { updateFlightSearch } from '../../store/slices/flightSearchSlice';
 import LoadingTicket from './LoadingTicket';
 import SearchResultEmpty from './SearchResultEmpety';
+import iconBaggage from '../../../public/icons/icon-baggage.svg';
 
 const DetailsTicket = () => {
   const navigate = useNavigate();
@@ -302,7 +303,7 @@ const DetailsTicket = () => {
   }
 
   return (
-    <div className="w-full px-4 pb-4 space-y-4">
+    <div className="w-full pb-4 space-y-4">
       {currentFlights.map((flight, index) => (
         <div
           key={flight.plane_id}
@@ -347,7 +348,7 @@ const DetailsTicket = () => {
             </div>
 
             <div className="mt-2 flex items-center justify-between">
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-4 pl-10">
                 <div className="text-left">
                   <div className="text-[14px] font-bold">
                     {formatTime(flight.departure_time)}
@@ -373,6 +374,8 @@ const DetailsTicket = () => {
                     {flight.destination_airport.airport_code}
                   </div>
                 </div>
+
+                <img src={iconBaggage} alt="" />
               </div>
 
               <div className="text-right">

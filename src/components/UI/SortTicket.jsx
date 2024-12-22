@@ -137,7 +137,7 @@ const SortTicket = () => {
   const displayText = selectedLabel?.split(' - ')[1] || 'Termurah';
 
   return (
-    <div className="ml-[260px] mr-[212px] my-8 relative">
+    <div className="ml-[260px] my-8 relative flex justify-center">
       <button
         className="flex absolute right-0 items-center gap-0.5 text-purple-600 py-1 px-3 rounded-3xl border border-purple-600 hover:bg-purple-600 hover:text-white transition-colors text-xs group"
         onClick={toggleModal}
