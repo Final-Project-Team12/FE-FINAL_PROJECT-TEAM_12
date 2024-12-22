@@ -36,7 +36,6 @@ const PaymentLastPage = () => {
     }
     document.body.style.overflow = 'auto';
 
-    // Cleanup function to remove any duplicate snap elements
     return () => {
       document.body.style.overflow = 'auto';
       const snapEmbed = document.querySelector('.snap-embed');

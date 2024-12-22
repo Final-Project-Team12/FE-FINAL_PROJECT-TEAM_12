@@ -18,9 +18,24 @@ import Swal from 'sweetalert2';
 const NATIONALITIES = [
   { value: 'ID', label: 'Indonesia' },
   { value: 'MY', label: 'Malaysia' },
-  { value: 'SG', label: 'Singapore' },
-  { value: 'US', label: 'United States' },
-  { value: 'GB', label: 'United Kingdom' },
+  { value: 'SG', label: 'Singapura' },
+  { value: 'US', label: 'Amerika Serikat' },
+  { value: 'GB', label: 'Inggris' },
+  { value: 'AU', label: 'Australia' },
+  { value: 'JP', label: 'Jepang' },
+  { value: 'KR', label: 'Korea Selatan' },
+  { value: 'CN', label: 'China' },
+  { value: 'TH', label: 'Thailand' },
+  { value: 'VN', label: 'Vietnam' },
+  { value: 'PH', label: 'Filipina' },
+  { value: 'DE', label: 'Jerman' },
+  { value: 'FR', label: 'Perancis' },
+  { value: 'NL', label: 'Belanda' },
+  { value: 'IT', label: 'Italia' },
+  { value: 'ES', label: 'Spanyol' },
+  { value: 'RU', label: 'Rusia' },
+  { value: 'CA', label: 'Kanada' },
+  { value: 'BR', label: 'Brasil' },
 ];
 
 const OrderForm = () => {
@@ -96,8 +111,8 @@ const OrderForm = () => {
     ) {
       Swal.fire({
         icon: 'error',
-        title: 'Incomplete Data',
-        text: 'Please fill in all order information',
+        title: 'Data Tidak Lengkap',
+        text: 'Mohon lengkapi semua informasi pemesanan',
       });
       return false;
     }
@@ -106,8 +121,8 @@ const OrderForm = () => {
     if (!emailRegex.test(orderData.email)) {
       Swal.fire({
         icon: 'error',
-        title: 'Invalid Email',
-        text: 'Please enter a valid email address',
+        title: 'Email Tidak Valid',
+        text: 'Mohon masukkan alamat email yang valid',
       });
       return false;
     }
@@ -116,8 +131,8 @@ const OrderForm = () => {
     if (!phoneRegex.test(orderData.phone)) {
       Swal.fire({
         icon: 'error',
-        title: 'Invalid Phone',
-        text: 'Please enter a valid phone number',
+        title: 'Nomor Telepon Tidak Valid',
+        text: 'Mohon masukkan nomor telepon yang valid',
       });
       return false;
     }
@@ -133,8 +148,8 @@ const OrderForm = () => {
       ) {
         Swal.fire({
           icon: 'error',
-          title: 'Incomplete Passenger Data',
-          text: `Please complete all required fields for passenger ${index + 1}`,
+          title: 'Data Penumpang Tidak Lengkap',
+          text: `Mohon lengkapi semua data untuk penumpang ${index + 1}`,
         });
         return false;
       }
@@ -142,8 +157,8 @@ const OrderForm = () => {
       if (passenger.hasFamily && !passenger.familyName?.trim()) {
         Swal.fire({
           icon: 'error',
-          title: 'Missing Family Name',
-          text: `Please enter family name for passenger ${index + 1}`,
+          title: 'Nama Keluarga Kosong',
+          text: `Mohon masukkan nama keluarga untuk penumpang ${index + 1}`,
         });
         return false;
       }
@@ -155,8 +170,8 @@ const OrderForm = () => {
     ) {
       Swal.fire({
         icon: 'error',
-        title: 'Departure Seat Selection Required',
-        text: 'Please select departure seats for all passengers',
+        title: 'Kursi Keberangkatan Belum Dipilih',
+        text: 'Mohon pilih kursi keberangkatan untuk semua penumpang',
       });
       return false;
     }
@@ -168,8 +183,8 @@ const OrderForm = () => {
     ) {
       Swal.fire({
         icon: 'error',
-        title: 'Return Seat Selection Required',
-        text: 'Please select return seats for all passengers',
+        title: 'Kursi Kepulangan Belum Dipilih',
+        text: 'Mohon pilih kursi kepulangan untuk semua penumpang',
       });
       return false;
     }
@@ -215,16 +230,14 @@ const OrderForm = () => {
         transactionData.returnSeatSelections = returnSeatSelections;
       }
 
-      console.log('Submitting transaction:', transactionData);
-
       const success = await createTransaction(transactionData);
 
       if (success) {
         dispatch(setIsSubmitted(true));
         Swal.fire({
           icon: 'success',
-          title: 'Success!',
-          text: 'Order data has been saved',
+          title: 'Berhasil!',
+          text: 'Data pesanan telah tersimpan',
         });
       }
     } catch (error) {
@@ -232,7 +245,7 @@ const OrderForm = () => {
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: error.message || 'Failed to save order data',
+        text: error.message || 'Gagal menyimpan data pesanan',
       });
     }
   };
@@ -247,15 +260,18 @@ const OrderForm = () => {
   };
 
   return (
-    <div className="mt-4 space-y-6 w-full">
-      {/* Order Information Section */}
-      <div className="w-full border border-gray-300 rounded-lg p-6">
-        <h2 className="text-xl font-bold mb-6">Isi Data Pemesan</h2>
-        <div className="bg-gray-800 text-white p-4 rounded-t-lg mb-8">
-          <h3 className="text-xl font-semibold">Data Diri Pemesan</h3>
+    <div className="space-y-6 w-full px-4 sm:px-0">
+      <div className="w-full border border-gray-300 rounded-lg p-4 sm:p-6">
+        <h2 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6">
+          Isi Data Pemesan
+        </h2>
+        <div className="bg-gray-800 text-white p-3 sm:p-4 rounded-t-lg mb-6 sm:mb-8">
+          <h3 className="text-base sm:text-xl font-semibold">
+            Data Diri Pemesan
+          </h3>
         </div>
 
-        <form className="space-y-6">
+        <form className="space-y-4 sm:space-y-6">
           <div className="flex flex-col">
             <label className="text-[#7126B5] font-semibold mb-2">
               Nama Lengkap
@@ -266,8 +282,8 @@ const OrderForm = () => {
               onChange={(e) =>
                 dispatch(updateOrderData({ orderName: e.target.value }))
               }
-              placeholder="Enter full name"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7126B5]"
+              placeholder="Masukkan nama lengkap"
+              className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7126B5]"
             />
           </div>
 
@@ -279,8 +295,8 @@ const OrderForm = () => {
               onChange={(e) =>
                 dispatch(updateOrderData({ email: e.target.value }))
               }
-              placeholder="Enter email"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7126B5]"
+              placeholder="Masukkan email"
+              className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7126B5]"
             />
           </div>
 
@@ -294,8 +310,8 @@ const OrderForm = () => {
               onChange={(e) =>
                 dispatch(updateOrderData({ phone: e.target.value }))
               }
-              placeholder="Enter phone number"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7126B5]"
+              placeholder="Masukkan nomor telepon"
+              className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7126B5]"
             />
           </div>
 
@@ -306,22 +322,21 @@ const OrderForm = () => {
               onChange={(e) =>
                 dispatch(updateOrderData({ address: e.target.value }))
               }
-              placeholder="Enter full address"
+              placeholder="Masukkan alamat lengkap"
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7126B5] resize-none"
+              className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7126B5] resize-none"
             />
           </div>
         </form>
       </div>
 
-      {/* Passenger Information Section */}
       {orderData.passengers?.map((passenger, index) => (
         <div
           key={index}
-          className="w-full border border-gray-300 rounded-lg p-6"
+          className="w-full border border-gray-300 rounded-lg p-4 sm:p-6"
         >
-          <div className="bg-gray-800 text-white p-4 rounded-t-lg mb-6">
-            <h3 className="text-xl font-semibold">
+          <div className="bg-gray-800 text-white p-3 sm:p-4 rounded-t-lg mb-4 sm:mb-6">
+            <h3 className="text-base sm:text-xl font-semibold">
               Data Penumpang {index + 1} - {passenger.type}
             </h3>
           </div>
@@ -330,7 +345,7 @@ const OrderForm = () => {
             <div className="flex flex-col">
               <label className="text-[#7126B5] font-semibold mb-2">Title</label>
               <select
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7126B5]"
+                className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7126B5]"
                 value={passenger.title}
                 onChange={(e) =>
                   handlePassengerUpdate(index, 'title', e.target.value)
@@ -348,12 +363,12 @@ const OrderForm = () => {
               </label>
               <input
                 type="text"
-                placeholder="Enter full name"
+                placeholder="Masukkan nama lengkap"
                 value={passenger.fullName}
                 onChange={(e) =>
                   handlePassengerUpdate(index, 'fullName', e.target.value)
                 }
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7126B5]"
+                className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7126B5]"
               />
             </div>
 
@@ -375,12 +390,12 @@ const OrderForm = () => {
                 </label>
                 <input
                   type="text"
-                  placeholder="Enter family name"
+                  placeholder="Masukkan nama keluarga"
                   value={passenger.familyName}
                   onChange={(e) =>
                     handlePassengerUpdate(index, 'familyName', e.target.value)
                   }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7126B5]"
+                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7126B5]"
                 />
               </div>
             )}
@@ -398,7 +413,7 @@ const OrderForm = () => {
                 Kewarganegaraan
               </label>
               <select
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7126B5]"
+                className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7126B5]"
                 value={passenger.nationality}
                 onChange={(e) =>
                   handlePassengerUpdate(index, 'nationality', e.target.value)
@@ -419,12 +434,12 @@ const OrderForm = () => {
               </label>
               <input
                 type="text"
-                placeholder="Enter ID/Passport number"
+                placeholder="Masukkan nomor KTP/Paspor"
                 value={passenger.idNumber}
                 onChange={(e) =>
                   handlePassengerUpdate(index, 'idNumber', e.target.value)
                 }
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7126B5]"
+                className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7126B5]"
               />
             </div>
 
@@ -433,7 +448,7 @@ const OrderForm = () => {
                 Negara Penerbit
               </label>
               <select
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7126B5]"
+                className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7126B5]"
                 value={passenger.issuingCountry}
                 onChange={(e) =>
                   handlePassengerUpdate(index, 'issuingCountry', e.target.value)
@@ -459,9 +474,10 @@ const OrderForm = () => {
         </div>
       ))}
 
-      {/* Departure Seat Selection Section */}
-      <div className="w-full border border-gray-300 rounded-lg p-6">
-        <h2 className="text-xl font-bold mb-6">Choose Departure Seats</h2>
+      <div className="w-full border border-gray-300 rounded-lg p-4 sm:p-6">
+        <h2 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6">
+          Pilih Kursi Keberangkatan
+        </h2>
         <SeatSelection
           selectedSeats={selectedDepartureSeats}
           maxSeats={orderData.passengers?.length || 0}
@@ -470,10 +486,11 @@ const OrderForm = () => {
         />
       </div>
 
-      {/* Return Seat Selection Section - Only shown for round trips */}
       {isRoundTrip && (
-        <div className="w-full border border-gray-300 rounded-lg p-6">
-          <h2 className="text-xl font-bold mb-6">Choose Return Seats</h2>
+        <div className="w-full border border-gray-300 rounded-lg p-4 sm:p-6">
+          <h2 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6">
+            Pilih Kursi Kepulangan
+          </h2>
           <SeatSelection
             selectedSeats={selectedReturnSeats}
             maxSeats={orderData.passengers?.length || 0}
@@ -483,18 +500,17 @@ const OrderForm = () => {
         </div>
       )}
 
-      {/* Submit Button */}
-      <div className="mx-auto w-[95%]">
+      <div className="mx-auto w-full sm:w-[95%] px-4 sm:px-0">
         <button
           onClick={handleSubmit}
           disabled={isSubmitted || loading}
-          className={`w-full max-w-2xl ${
+          className={`w-full ${
             isSubmitted || loading
               ? 'bg-gray-400 cursor-not-allowed'
               : 'bg-[#7126B5] hover:opacity-90'
-          } text-white py-4 rounded-lg text-xl font-semibold transition-all`}
+          } text-white py-3 sm:py-4 rounded-lg text-base sm:text-xl font-semibold transition-all`}
         >
-          {loading ? 'Processing...' : 'Save'}
+          {loading ? 'Memproses...' : 'Simpan'}
         </button>
       </div>
     </div>
