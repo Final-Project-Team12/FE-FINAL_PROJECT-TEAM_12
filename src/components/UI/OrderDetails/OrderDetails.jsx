@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { getStatusColor, formatCurrency } from '../../../utils/orderUtils';
 import { usePaymentHandler } from '../../../hooks/usePaymentHandler';
 import usePrintTicket from '../../../hooks/usePrintTIcket';
-import FlightInfo from '../flightInfo';
+import FlightInfo from '../FlightInfo';
 import PassengerInfo from '../PassengerInfo';
 import PrintTicketModal from '../PrintTicketModal';
 import Divider from '../Divider';
