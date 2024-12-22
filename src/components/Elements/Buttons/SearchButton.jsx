@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { X } from 'lucide-react';
 import iconSearch from '../../../../public/icons/search.svg';
 
-const SearchButton = () => {
+const SearchButton = ({ onSearch }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchHistory, setSearchHistory] = useState([]);
@@ -14,11 +14,14 @@ const SearchButton = () => {
     }
   }, [isSearchOpen]);
 
+  useEffect(() => {
+    onSearch(searchQuery);
+  }, [searchQuery, onSearch]);
+
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       setSearchHistory([searchQuery, ...searchHistory]);
-      setSearchQuery('');
     }
   };
 
@@ -31,11 +34,16 @@ const SearchButton = () => {
     setSearchHistory(newHistory);
   };
 
+  const handleSearchItemClick = (searchTerm) => {
+    setSearchQuery(searchTerm);
+    onSearch(searchTerm);
+  };
+
   return (
-    <div className=" relative">
+    <div className="relative">
       <button
         onClick={() => setIsSearchOpen(true)}
-        className=" h-[50px] rounded-[12px] flex items-center justify-center hover:opacity-80"
+        className="h-[50px] rounded-[12px] flex items-center justify-center hover:opacity-80"
       >
         <img src={iconSearch} alt="Search" className="w-6 h-6" />
       </button>
@@ -54,7 +62,11 @@ const SearchButton = () => {
               />
             </form>
             <button
-              onClick={() => setIsSearchOpen(false)}
+              onClick={() => {
+                setIsSearchOpen(false);
+                setSearchQuery('');
+                onSearch('');
+              }}
               className="p-1 hover:bg-gray-100 rounded-full"
             >
               <X className="w-5 h-5 text-gray-500" />
@@ -79,7 +91,12 @@ const SearchButton = () => {
                   key={index}
                   className="flex items-center justify-between py-1"
                 >
-                  <span className="text-sm">{search}</span>
+                  <span
+                    className="text-sm cursor-pointer hover:text-[#A06ECE]"
+                    onClick={() => handleSearchItemClick(search)}
+                  >
+                    {search}
+                  </span>
                   <button
                     onClick={() => deleteSearchItem(index)}
                     className="p-1 hover:bg-gray-100 rounded-full"

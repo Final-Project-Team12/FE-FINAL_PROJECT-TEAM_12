@@ -3,7 +3,7 @@ import CalendarFilter from '../Elements/Filter/CalendarFilter';
 import SearchButton from '../Elements/Buttons/SearchButton';
 import { ArrowLeft } from 'lucide-react';
 
-const HeaderHistory = ({ onDateRangeChange }) => {
+const HeaderHistory = ({ onDateRangeChange, onSearchChange }) => {
   const navigate = useNavigate();
   const handleDateRangeChange = (startDate, endDate) => {
     onDateRangeChange(startDate, endDate);
@@ -25,7 +25,7 @@ const HeaderHistory = ({ onDateRangeChange }) => {
               <CalendarFilter onDateRangeChange={handleDateRangeChange} />
             </div>
             <div className="w-10 ml-1">
-              <SearchButton />
+              <SearchButton onSearch={onSearchChange} />
             </div>
           </div>
         </div>
