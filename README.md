@@ -2,6 +2,12 @@
 
 ---
 
+### **Website**
+
+[QuickFly Website](https://www.web-quickfly.my.id/)
+
+---
+
 ## **FRONTEND TEAM**
 
 | **Name**                 |
@@ -153,3 +159,47 @@ The following features are available or planned for the application:
 9. **Print Ticket**: Generates a printable ticket for booked flights.
 
 ---
+
+## **Tech Stack**
+
+The application leverages the following technologies:
+
+### **Frontend Framework**
+
+- React 18.3.1
+
+### **Development Tools**
+
+- Vite 5.4.10
+- Prettier 3.3.3
+- ESLint 9.13.0
+- Tailwind CSS 3.4.15
+
+### **State Management**
+
+- Redux Toolkit 2.4.0
+
+### **API Communication**
+
+- Axios 1.7.7
+
+### **Utilities**
+
+- Date-fns 4.1.0
+- JS-Cookie 3.0.5
+- JWT-Decode 4.0.0
+- React Toastify 10.0.6
+- SweetAlert2 11.14.5
+
+### **UI Components**
+
+- Flowbite 2.5.2
+- Headless UI 2.2.0
+- React Icons 5.3.0
+
+### **Others**
+
+- React Router Dom 7.0.2
+- React Hook Form 7.53.2
+- React Loading Skeleton 3.5.0
+- Lottie Files 0.10.0
