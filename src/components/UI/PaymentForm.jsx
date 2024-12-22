@@ -1,12 +1,14 @@
 import React, { useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { paymentService } from '../../services/payment.service';
+import { resetPaymentState } from '../../store/slices/paymentSlice';
 import Swal from 'sweetalert2';
 
 const PaymentForm = ({ onPaymentSuccess }) => {
   const { paymentData } = useSelector((state) => state.payment);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     let snapScript;
@@ -40,11 +42,9 @@ const PaymentForm = ({ onPaymentSuccess }) => {
             onError: function (result) {
               console.log('error', result);
               document.body.style.overflow = 'auto';
+              handlePaymentError();
             },
             onClose: function () {
-              console.log(
-                'customer closed the popup without finishing the payment'
-              );
               document.body.style.overflow = 'auto';
             },
           });
@@ -68,11 +68,9 @@ const PaymentForm = ({ onPaymentSuccess }) => {
           onError: function (result) {
             console.log('error', result);
             document.body.style.overflow = 'auto';
+            handlePaymentError();
           },
           onClose: function () {
-            console.log(
-              'customer closed the popup without finishing the payment'
-            );
             document.body.style.overflow = 'auto';
           },
         });
@@ -93,6 +91,19 @@ const PaymentForm = ({ onPaymentSuccess }) => {
     };
   }, [paymentData?.token, onPaymentSuccess]);
 
+  const handlePaymentError = () => {
+    Swal.fire({
+      icon: 'error',
+      title: 'Pembayaran Gagal',
+      text: 'Terjadi kesalahan dalam proses pembayaran',
+      showConfirmButton: true,
+      confirmButtonText: 'Kembali ke Beranda',
+    }).then(() => {
+      dispatch(resetPaymentState());
+      navigate('/', { replace: true });
+    });
+  };
+
   const handleCancelPayment = async () => {
     try {
       if (paymentData.orderId) {
@@ -111,6 +122,7 @@ const PaymentForm = ({ onPaymentSuccess }) => {
               paymentData.orderId
             );
             if (cancelResult.isSuccess) {
+              dispatch(resetPaymentState());
               Swal.fire({
                 icon: 'success',
                 title: 'Pembayaran Dibatalkan',
@@ -144,7 +156,7 @@ const PaymentForm = ({ onPaymentSuccess }) => {
       </div>
       <button
         onClick={handleCancelPayment}
-        className="w-full mt-4 bg-[#FF1700] text-black py-2 rounded-full hover:bg-red-600 transition-colors"
+        className="w-full mt-4 bg-[#FF1700] text-white py-2 rounded-full hover:bg-red-600 transition-colors"
       >
         Batalkan Pembayaran
       </button>
