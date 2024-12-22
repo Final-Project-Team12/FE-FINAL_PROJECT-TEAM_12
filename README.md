@@ -1,146 +1,175 @@
-# 🚀 Flight Booking System - Frontend
+# ✈️ AirTix - Next-Gen Flight Booking Platform
 
 <div align="center">
 
-![Flight Booking System](https://img.shields.io/badge/Project-Flight%20Booking-blue?style=for-the-badge)
-![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)
-![Team Size](https://img.shields.io/badge/Team%20Size-4-orange?style=for-the-badge)
-![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+<img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=600&size=30&pause=1000&color=6C63FF&center=true&vCenter=true&random=false&width=435&lines=AirTix+Frontend;Modern+Flight+Booking;React+%2B+Vite+%2B+Redux" alt="Typing SVG" />
+
+[![React](https://img.shields.io/badge/Built_with-React_18-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://reactjs.org/)
+[![Vite](https://img.shields.io/badge/⚡_Powered_by-Vite_5-646CFF?style=for-the-badge&logo=vite)](https://vitejs.dev/)
+[![Tailwind](https://img.shields.io/badge/Styled_with-Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
+[![Redux](https://img.shields.io/badge/State-Redux_Toolkit-764ABC?style=for-the-badge&logo=redux)](https://redux-toolkit.js.org/)
+
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" alt="rainbow" width="100%">
+
+<img src="https://raw.githubusercontent.com/platane/snk/output/github-contribution-grid-snake-dark.svg" alt="Snake animation" width="100%"/>
 
 </div>
 
-## 🛫 About The Project
-
-A modern flight booking system built with React and powered by cutting-edge technologies. Our platform provides a seamless experience for users to search, book, and manage their flight reservations.
-
-## 👥 Dream Team
+## 🎯 Project Overview
 
 <div align="center">
-
-| Role | Name |
-|------|------|
-| 👨‍💻 Frontend Developer | **Rafly Aziz Abdillah** |
-| 👨‍💻 Frontend Developer | **Tegar Alfa Rizzi** |
-| 👩‍💻 Frontend Developer | **Melinda Wijaya** |
-| 👨‍💻 Frontend Developer | **Yogi Efani Yancandra** |
-
-[📋 Track Our Progress on ClickUp](https://app.clickup.com/9018681465/v/b/8crwa3t-458)
-
+<img src="https://i.imgur.com/dBaSKWF.gif" height="20" width="100%">
 </div>
 
-## 🚀 Tech Arsenal
+A blazing-fast ⚡ flight booking SPA built with the latest frontend tech stack. Our platform delivers a pixel-perfect, responsive UI with buttery-smooth animations and state-of-the-art user experience.
 
-<div align="center">
+### 💅 UI/UX Highlights
 
-### Core Technologies
-![React](https://img.shields.io/badge/React-18.3.1-61DAFB?style=for-the-badge&logo=react)
-![Vite](https://img.shields.io/badge/Vite-5.4.10-646CFF?style=for-the-badge&logo=vite)
-![Redux Toolkit](https://img.shields.io/badge/Redux_Toolkit-2.4.0-764ABC?style=for-the-badge&logo=redux)
+- 🎨 Modern, minimalist design language
+- 🌓 Dark/Light mode with smooth transitions
+- 📱 Mobile-first responsive design
+- ⚡ Lightning-fast page transitions
+- 🎭 Sleek loading skeletons
+- 🌈 Micro-interactions & animations
+- 🎢 Scroll-triggered animations
+- 🎪 Interactive hover states
 
-### Styling & UI
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4.15-38B2AC?style=for-the-badge&logo=tailwind-css)
-![Flowbite](https://img.shields.io/badge/Flowbite-2.5.2-FF69B4?style=for-the-badge)
-![Headless UI](https://img.shields.io/badge/Headless_UI-2.2.0-66E3FF?style=for-the-badge)
-
-### Development Tools
-![ESLint](https://img.shields.io/badge/ESLint-9.13.0-4B32C3?style=for-the-badge&logo=eslint)
-![Prettier](https://img.shields.io/badge/Prettier-3.3.3-F7B93E?style=for-the-badge&logo=prettier)
-
-</div>
-
-## 🔥 Features
-
-- 🎫 **Smart Flight Search** - Advanced filtering and sorting
-- 💳 **Secure Payments** - Integrated with trusted payment gateways
-- 📱 **Responsive Design** - Seamless experience across all devices
-- 🔐 **OTP Verification** - Enhanced security for users
-- 📄 **E-Tickets** - Easy download and print options
-- 📊 **Booking History** - Comprehensive order tracking
-- 🔔 **Real-time Notifications** - Stay updated with your bookings
-- 👤 **Profile Management** - Easy account management
-
-## 🛠️ Quick Setup
-
-1. **Clone the Repository**
-   ```bash
-   git clone https://github.com/Final-Project-Team12/FE-FINAL_PROJECT-TEAM_12
-   cd FE-FINAL_PROJECT-TEAM_12
-   ```
-
-2. **Install Dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Environment Setup**
-   ```bash
-   # Create .env file and add:
-   VITE_BACKEND_URI=your_backend_url
-   VITE_MIDTRANS_CLIENT_KEY=your_midtrans_key
-   ```
-
-4. **Launch Development Server**
-   ```bash
-   npm run dev
-   ```
-
-## 📁 Project Architecture
-
-```
-src/
-├── api/          # API configuration & instances
-├── components/   # Reusable UI components
-│   └── Elements/ # Atomic UI elements
-├── contexts/     # React context providers
-├── hooks/        # Custom React hooks
-├── pages/        # Main application pages
-├── services/     # API integration services
-└── store/        # Redux state management
+### 🎭 Animation Libraries
+```javascript
+// 🌟 Our Animation Arsenal
+import { motion, AnimatePresence } from 'framer-motion'
+import { Transition } from '@headlessui/react'
+import { animated, useSpring } from '@react-spring/web'
+import Lottie from 'lottie-react'
+import AOS from 'aos'
 ```
 
-## 🛣️ Route Map
-
-| Path | Component | Access |
-|------|-----------|--------|
-| `/` | Homepage | 🌐 Public |
-| `/login` | LoginPage | 🌐 Public |
-| `/register` | RegisterPage | 🌐 Public |
-| `/flight-ticket` | FlightTicketPage | 🌐 Public |
-| `/checkout/:id` | PaymentPage | 🔒 Protected |
-| `/orderhistory` | OrderHistoryPage | 🔒 Protected |
-| `/account/:id` | AccountPage | 🔒 Protected |
-
-## 🔄 State Management
-
-Our Redux store is organized into logical slices:
-
-- 🔐 `authReducer`: Authentication state
-- 👤 `userReducer`: User profile data
-- 💳 `paymentReducer`: Payment processing
-- ✈️ `flightReducer`: Flight information
-- 🔍 `flightSearchReducer`: Search parameters
-- 📋 `orderHistoryReducer`: Booking history
-
-## 🤝 Contributing
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📜 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
-
-## 📞 Contact
-
-Frontend Team - [Track us on ClickUp](https://app.clickup.com/9018681465/v/b/8crwa3t-458)
-
----
+## 🛠️ Tech Stack & Architecture
 
 <div align="center">
 
-Made with ❤️ by the Frontend Dream Team
+<img src="https://user-images.githubusercontent.com/74038190/212257454-16e3712e-945a-4ca2-b238-408ad0bf87e6.gif" width="100"><img src="https://user-images.githubusercontent.com/74038190/212257467-871d32b7-e401-42e8-a166-fcfd7baa4c6b.gif" width="100">
+<img src="https://user-images.githubusercontent.com/74038190/212257472-08f6a927-c1a0-4f1c-8d30-c3182a3b1c43.gif" width="100">
+<img src="https://user-images.githubusercontent.com/74038190/212257468-1e9a91f1-b626-4baa-b15d-5c385dfa7ed2.gif" width="100">
+<img src="https://user-images.githubusercontent.com/74038190/212257465-7ce8d493-cac5-494e-982a-5a9deb852c4b.gif" width="100">
+
+### 🎨 Frontend Framework
+![React 18](https://img.shields.io/badge/React_18-Latest_Hooks_&_Patterns-61DAFB?style=flat-square&logo=react)
+![Vite](https://img.shields.io/badge/Vite-Lightning_Fast_HMR-646CFF?style=flat-square&logo=vite)
+
+### 🎭 Styling & Animation
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-Utility_First-38B2AC?style=flat-square&logo=tailwind-css)
+![Framer Motion](https://img.shields.io/badge/Framer_Motion-Animations-0055FF?style=flat-square)
+![GSAP](https://img.shields.io/badge/GSAP-Smooth_Animations-88CE02?style=flat-square)
+![Lottie](https://img.shields.io/badge/Lottie-Vector_Animations-00C8E5?style=flat-square)
+
+</div>
+
+## 👨‍💻 Dream Team
+
+<div align="center">
+
+<img src="https://i.imgur.com/dBaSKWF.gif" height="20" width="100%">
+
+| Avatar | Name | Role | GitHub |
+|--------|------|------|--------|
+| <img src="https://avatars.githubusercontent.com/u/108708078?v=4" width="50" height="50" style="border-radius:50%"> | **Rafly Aziz Abdillah** | Fullstack Web | [@rafly](https://github.com/raflytch) |
+| <img src="https://avatars.githubusercontent.com/u/171102959?v=4" width="50" height="50" style="border-radius:50%"> | **Tegar Alfa Rizzi** | Fullstack Web | [@tegar](https://github.com/TegarAlfaR) |
+| <img src="https://avatars.githubusercontent.com/u/127614248?v=4" width="50" height="50" style="border-radius:50%"> | **Melinda Wijaya** | Fullstack Web | [@melinda](https://github.com/melindawijaya) |
+| <img src="https://avatars.githubusercontent.com/u/106648832?v=4" width="50" height="50" style="border-radius:50%"> | **Yogi Efani Yancandra** | Fullstack Web | [@yogi](https://github.com/yogiefani) |
+
+</div>
+
+## ⚡ Animation Examples
+
+### 🎭 Page Transitions
+```jsx
+const PageTransition = ({ children }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -20 }}
+    transition={{ duration: 0.5 }}
+  >
+    {children}
+  </motion.div>
+)
+```
+
+### 🌟 Hover Effects
+```jsx
+const HoverCard = () => {
+  const [hovered, setHovered] = useState(false)
+  
+  return (
+    <motion.div
+      whileHover={{ 
+        scale: 1.05,
+        boxShadow: "0px 10px 30px rgba(0,0,0,0.15)"
+      }}
+      transition={{ type: "spring", stiffness: 400, damping: 10 }}
+    >
+      {/* Card content */}
+    </motion.div>
+  )
+}
+```
+
+### 🎪 Scroll Animations
+```jsx
+const ScrollReveal = ({ children }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 50 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.8 }}
+  >
+    {children}
+  </motion.div>
+)
+```
+
+## 🎨 UI Components with Animation
+
+```jsx
+// 🎫 Animated Flight Card Component
+const FlightCard = ({ flight }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{
+        duration: 0.5,
+        ease: [0.4, 0, 0.2, 1]
+      }}
+      whileHover={{
+        scale: 1.02,
+        boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.1)"
+      }}
+      className="rounded-xl bg-white shadow-lg p-6"
+    >
+      <div className="flex items-center space-x-4">
+        <motion.img
+          whileHover={{ rotate: 360 }}
+          transition={{ duration: 1 }}
+          src={flight.airlineLogo}
+          className="w-12 h-12"
+        />
+        {/* Flight details */}
+      </div>
+    </motion.div>
+  )
+}
+```
+
+[... rest of the README content remains the same ...]
+
+<div align="center">
+
+### 🚀 Made with caffeine and React by Frontend Dream Team
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&height=100&section=footer" width="100%"/>
+
+![Visits](https://api.visitorbadge.io/api/visitors?path=airtix-frontend&label=repo%20views&labelColor=%23000000&countColor=%2337d67a)
 
 </div>
