@@ -8,16 +8,16 @@ const Ticket = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <HeaderTicket />  
+      <HeaderTicket />
       <div className="max-w-[1200px] mx-auto px-4 lg:px-8">
         <div className="pb-5">
           <SortTicket />
         </div>
         <div className="flex flex-col md:flex-row justify-between">
-          <div className="w-full lg:w-[260px]">
+          <div className="w-full md:w-[260px]">
             <TicketFilterSidebar />
           </div>
-          <div className="flex w-full pl-10">
+          <div className="flex w-full md:pl-10">
             <DetailsTicket />
           </div>
         </div>

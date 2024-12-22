@@ -334,7 +334,7 @@ const HeaderTicket = () => {
               </button>
             )}
 
-            <div className="flex flex-1 overflow-hidden mx-2 md:mx-4">
+            <div className="flex flex-1 overflow-hidden mx-5 md:mx-4">
               <div className="grid grid-cols-1 md:grid-cols-7 w-full gap-2 md:gap-1">
                 {dates.map((dateInfo, index) => (
                   <div key={index} className="flex justify-center items-center">
