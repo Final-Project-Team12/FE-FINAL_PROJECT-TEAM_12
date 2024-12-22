@@ -86,6 +86,7 @@ const DestinationFilter = () => {
 
   const getVisiblePages = useCallback(() => {
     const maxVisible = windowWidth < 640 ? 3 : 5;
+    const halfVisible = Math.floor(maxVisible / 2);
     const pages = [];
 
     if (totalPages <= maxVisible) {
@@ -93,28 +94,24 @@ const DestinationFilter = () => {
         pages.push(i);
       }
     } else {
-      pages.push(1);
+      let startPage = Math.max(1, currentPage - halfVisible);
+      let endPage = Math.min(totalPages, startPage + maxVisible - 1);
 
-      let startPage = Math.max(2, currentPage - 1);
-      let endPage = Math.min(totalPages - 1, startPage + maxVisible - 3);
-
-      if (endPage === totalPages - 1) {
-        startPage = Math.max(2, endPage - (maxVisible - 3));
+      if (endPage === totalPages) {
+        startPage = Math.max(1, endPage - maxVisible + 1);
       }
 
-      if (startPage > 2) {
-        pages.push('...');
+      if (startPage > 1) {
+        pages.push(1);
+        if (startPage > 2) pages.push('...');
       }
 
       for (let i = startPage; i <= endPage; i++) {
         pages.push(i);
       }
 
-      if (endPage < totalPages - 1) {
-        pages.push('...');
-      }
-
-      if (totalPages > 1) {
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) pages.push('...');
         pages.push(totalPages);
       }
     }
