@@ -31,6 +31,7 @@ const OrderDetails = ({ selectedCard }) => {
 
   const firstTicket = tickets?.[0] || {};
   const flightDetails = firstTicket?.plane || {};
+  const airline = firstTicket?.plane?.airline || '-';
 
   const handleProceedToPayment = () => {
     handlePayment(flightDetails, total_payment, user);
@@ -83,7 +84,7 @@ const OrderDetails = ({ selectedCard }) => {
         tickets={tickets}
         plane={firstTicket.plane}
         seat={firstTicket.seat}
-        airline={firstTicket.plane.airline}
+        airline={airline}
       />
 
       <Divider />
