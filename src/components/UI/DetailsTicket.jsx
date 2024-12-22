@@ -299,7 +299,11 @@ const DetailsTicket = () => {
   }
 
   if (!isLoading && (!currentFlights || currentFlights.length === 0)) {
-    return <SearchResultEmpty />;
+    return (
+      <div className="lg:w-2/3 lg:ml-[20%]">
+        <SearchResultEmpty />
+      </div>
+    );
   }
 
   return (
