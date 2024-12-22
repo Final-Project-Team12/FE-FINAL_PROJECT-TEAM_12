@@ -256,7 +256,28 @@ const OrderForm = () => {
       ...updatedPassengers[index],
       [field]: value,
     };
-    dispatch(updateOrderData({ passengers: updatedPassengers }));
+    dispatch(
+      updateOrderData({
+        ...orderData,
+        passengers: updatedPassengers,
+      })
+    );
+  };
+
+  const handleFamilyToggle = (index, event) => {
+    const isChecked = event.target.checked;
+    const updatedPassengers = [...orderData.passengers];
+    updatedPassengers[index] = {
+      ...updatedPassengers[index],
+      hasFamily: isChecked,
+      familyName: isChecked ? updatedPassengers[index].familyName : '',
+    };
+    dispatch(
+      updateOrderData({
+        ...orderData,
+        passengers: updatedPassengers,
+      })
+    );
   };
 
   return (
@@ -374,17 +395,12 @@ const OrderForm = () => {
 
             <ToggleSwitch
               isChecked={passenger.hasFamily}
-              onChange={(e) => {
-                handlePassengerUpdate(index, 'hasFamily', e.target.checked);
-                if (!e.target.checked) {
-                  handlePassengerUpdate(index, 'familyName', '');
-                }
-              }}
+              onChange={(e) => handleFamilyToggle(index, e)}
               label="Punya Nama Keluarga?"
             />
 
             {passenger.hasFamily && (
-              <div className="flex flex-col">
+              <div className="flex flex-col mt-4">
                 <label className="text-[#7126B5] font-semibold mb-2">
                   Nama Keluarga
                 </label>
