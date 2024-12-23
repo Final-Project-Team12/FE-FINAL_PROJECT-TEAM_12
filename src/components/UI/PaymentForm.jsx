@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { paymentService } from '../../services/payment.service';
 import { resetPaymentState } from '../../store/slices/paymentSlice';
+import { resetFlightSearch } from '../../store/slices/flightSearchSlice';
 import Swal from 'sweetalert2';
 
 const PaymentForm = ({ onPaymentSuccess }) => {
@@ -100,6 +101,7 @@ const PaymentForm = ({ onPaymentSuccess }) => {
       confirmButtonText: 'Kembali ke Beranda',
     }).then(() => {
       dispatch(resetPaymentState());
+      dispatch(resetFlightSearch());
       navigate('/', { replace: true });
     });
   };
@@ -123,6 +125,7 @@ const PaymentForm = ({ onPaymentSuccess }) => {
             );
             if (cancelResult.isSuccess) {
               dispatch(resetPaymentState());
+              dispatch(resetFlightSearch());
               Swal.fire({
                 icon: 'success',
                 title: 'Pembayaran Dibatalkan',
