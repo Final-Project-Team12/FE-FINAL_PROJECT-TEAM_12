@@ -7,6 +7,7 @@ import Stepper from '../components/UI/Stepper';
 import FlightDetails from '../components/UI/FlightDetail';
 import PaymentSuccessImage from '../../public/images/Payment_Success.png';
 import { resetPaymentState } from '../store/slices/paymentSlice';
+import { resetFlightSearch } from '../store/slices/flightSearchSlice';
 import Swal from 'sweetalert2';
 
 const PaymentLastPage = () => {
@@ -65,12 +66,14 @@ const PaymentLastPage = () => {
   const handleOrderHistory = () => {
     document.body.style.overflow = 'auto';
     dispatch(resetPaymentState());
+    dispatch(resetFlightSearch());
     navigate('/orderhistory', { replace: true });
   };
 
   const handleNewSearch = () => {
     document.body.style.overflow = 'auto';
     dispatch(resetPaymentState());
+    dispatch(resetFlightSearch());
     navigate('/', { replace: true });
   };
 
