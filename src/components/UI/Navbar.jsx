@@ -5,6 +5,7 @@ import { CgProfile } from 'react-icons/cg';
 import ProductLogo from '../../../public/images/quickfly-horizontal.png';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { useNotification } from '../../hooks/useNotification';
 import { resetFlightSearch } from '../../store/slices/flightSearchSlice';
 
 const Navbar = () => {
@@ -12,6 +13,11 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, user } = useAuth();
+  const { notifications } = useNotification();
+
+  // Calculate unread notifications
+  const unreadCount = notifications.filter((notif) => !notif.is_read).length;
+  const displayCount = unreadCount > 99 ? '99+' : unreadCount;
 
   const isOtpRoute =
     location.pathname === '/otp' || location.pathname === '/otp-password';
@@ -43,10 +49,9 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="sticky top-0 left-0 right-0 bg-white shadow-[0px_2px_10px_rgba(0,0,0,0.1)] overflow-x-hidden z-[40]">
+    <nav className="sticky top-0 left-0 right-0 bg-white shadow-[0px_2px_10px_rgba(0,0,0,0.1)] overflow-x-hidden z-[40] py-2">
       <div className="container mx-auto px-4 lg:px-6">
         <div className="flex items-center justify-between h-16">
-          {/* Left side - Logo and Search */}
           <div className="flex items-center space-x-4 md:space-x-8">
             <div className="text-[#7126B5] font-bold text-xl flex items-center pl-2 sm:pl-4 md:pl-8">
               <img
@@ -57,7 +62,6 @@ const Navbar = () => {
               />
             </div>
 
-            {/* Show search only when not on OTP routes and not on orderhistory */}
             {!isOtpRoute && !isOrderHistoryRoute && (
               <div className="hidden md:block relative w-[300px] lg:w-[450px]">
                 <input
@@ -73,7 +77,6 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Right side - Auth buttons or User menu */}
           <div className="pr-2 sm:pr-4 md:pr-8 flex items-center space-x-4">
             {isAuthenticated ? (
               <>
@@ -83,12 +86,19 @@ const Navbar = () => {
                   onClick={handleOrderHistoryClick}
                   title="Order History"
                 />
-                <Bell
-                  className="text-gray-600 cursor-pointer hover:text-[#7126B5] transition-colors"
-                  size={24}
-                  onClick={handleNotificationClick}
-                  title="Notifications"
-                />
+                <div className="relative">
+                  <Bell
+                    className="text-gray-600 cursor-pointer hover:text-[#7126B5] transition-colors"
+                    size={24}
+                    onClick={handleNotificationClick}
+                    title="Notifications"
+                  />
+                  {unreadCount > 0 && (
+                    <div className="absolute -top-2 -right-2 bg-[#7126B5] text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                      {displayCount}
+                    </div>
+                  )}
+                </div>
                 <CgProfile
                   className="text-gray-600 cursor-pointer hover:text-[#7126B5] transition-colors"
                   size={24}
