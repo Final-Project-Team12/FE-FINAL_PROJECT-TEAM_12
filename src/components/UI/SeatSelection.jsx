@@ -1,4 +1,5 @@
-import { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import Swal from 'sweetalert2';
 
 const SeatSelection = ({
@@ -7,6 +8,10 @@ const SeatSelection = ({
   onSeatSelect,
   flightData,
 }) => {
+  const selectedSeatClass = useSelector(
+    (state) => state.flightSearch.selectedSeatClass
+  );
+
   const seatLabelToId = useMemo(() => {
     const mapping = {};
     let id = 1;
@@ -96,7 +101,7 @@ const SeatSelection = ({
       <div className="p-2 sm:p-3 md:p-4">
         <div className="bg-[#73CA5C] text-white p-2 sm:p-3 rounded-t-lg mb-3 sm:mb-4 text-center">
           <h3 className="text-base sm:text-lg md:text-xl font-semibold">
-            Economy - Seats Available
+            {selectedSeatClass} - Seats Available
           </h3>
         </div>
 
