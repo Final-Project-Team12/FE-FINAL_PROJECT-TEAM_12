@@ -1,11 +1,14 @@
 import { Search, Bell, List } from 'lucide-react';
 import { FaArrowRightToBracket } from 'react-icons/fa6';
+import { useDispatch } from 'react-redux';
 import { CgProfile } from 'react-icons/cg';
 import ProductLogo from '../../../public/images/quickfly-horizontal.png';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { resetFlightSearch } from '../../store/slices/flightSearchSlice';
 
 const Navbar = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, user } = useAuth();
@@ -15,6 +18,7 @@ const Navbar = () => {
   const isOrderHistoryRoute = location.pathname === '/orderhistory';
 
   const handleLogoClick = () => {
+    dispatch(resetFlightSearch());
     navigate('/');
   };
 
