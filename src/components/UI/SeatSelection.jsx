@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import Swal from 'sweetalert2';
 
@@ -33,17 +33,16 @@ const SeatSelection = ({
 
   const calculateSeatId = (col, row) => {
     const label = `${col}${row}`;
-    const seatId = seatLabelToId[label];
-    return seatId;
+    return seatLabelToId[label];
   };
 
   const getSeatLabel = (seatId) => {
-    const label = seatIdToLabel[seatId];
-    return label || '';
+    return seatIdToLabel[seatId] || '';
   };
 
   const handleSeatSelect = (col, row) => {
     const seatId = calculateSeatId(col, row);
+
     const isSelected = selectedSeats.includes(seatId);
     let newSelectedSeats;
 
@@ -66,10 +65,18 @@ const SeatSelection = ({
         });
         return;
       }
+
       newSelectedSeats = [...selectedSeats, seatId];
     }
 
-    onSeatSelect(newSelectedSeats);
+    if (
+      Array.isArray(newSelectedSeats) &&
+      newSelectedSeats.every((id) => !isNaN(Number(id)))
+    ) {
+      onSeatSelect(newSelectedSeats);
+    } else {
+      console.error('Invalid seat selection:', newSelectedSeats);
+    }
   };
 
   const getSeatColor = (seatId) => {
@@ -87,10 +94,11 @@ const SeatSelection = ({
   };
 
   const isSeatDisabled = (seatId) => {
-    const isDisabled = flightData?.seats_detail?.some(
-      (seat) => seat.seat_id === seatId && !seat.is_available
+    return (
+      flightData?.seats_detail?.some(
+        (seat) => seat.seat_id === seatId && !seat.is_available
+      ) || false
     );
-    return isDisabled || false;
   };
 
   const rows = Array.from({ length: 12 }, (_, i) => i + 1);
@@ -107,6 +115,7 @@ const SeatSelection = ({
 
         <div className="flex justify-center mb-3 sm:mb-4 w-full">
           <div className="w-full sm:w-[95%] md:w-[90%] select-none px-1">
+            {/* Seat column headers */}
             <div className="grid grid-cols-8 mb-1 sm:mb-2">
               <div className="col-span-3 grid grid-cols-3">
                 {columns.slice(0, 3).map((col) => (
@@ -131,6 +140,7 @@ const SeatSelection = ({
               </div>
             </div>
 
+            {/* Seat grid */}
             {rows.map((row) => (
               <div
                 key={row}
@@ -180,6 +190,7 @@ const SeatSelection = ({
           </div>
         </div>
 
+        {/* Legend */}
         <div className="grid grid-cols-3 sm:flex sm:flex-wrap justify-center gap-2 sm:gap-4 text-[10px] sm:text-sm md:text-base">
           <div className="flex items-center justify-center gap-1 sm:gap-2">
             <div className="w-3 h-3 sm:w-5 sm:h-5 md:w-6 md:h-6 bg-[#73CA5C] rounded sm:rounded-lg" />
