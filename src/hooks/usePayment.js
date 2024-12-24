@@ -1,4 +1,3 @@
-// usePayment.js
 import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -24,7 +23,6 @@ export const usePayment = () => {
   const calculateTotalWithTax = useCallback(
     (formData) => {
       try {
-        // Get seat prices based on selected class
         const departureSeat =
           flightState.selectedDepartureFlight.seats_detail.find(
             (seat) => seat.class === flightState.selectedSeatClass
@@ -37,30 +35,12 @@ export const usePayment = () => {
 
         const departureSeatPrice = departureSeat?.price || 0;
         const returnSeatPrice = returnSeat?.price || 0;
-
-        // Calculate base amount per passenger
         const totalBasePrice =
           departureSeatPrice + (flightState.isRoundTrip ? returnSeatPrice : 0);
-
-        // Calculate total for all passengers
         const totalPassengerPrice =
           totalBasePrice * formData.passengerData.length;
-
-        // Calculate tax (10%)
         const tax = Math.round(totalPassengerPrice * 0.1);
-
-        // Calculate final total
         const totalPayment = totalPassengerPrice + tax;
-
-        console.log('Payment calculation:', {
-          departureSeatPrice,
-          returnSeatPrice,
-          totalBasePrice,
-          passengerCount: formData.passengerData.length,
-          totalPassengerPrice,
-          tax,
-          totalPayment,
-        });
 
         return totalPayment;
       } catch (error) {
@@ -71,83 +51,102 @@ export const usePayment = () => {
     [flightState]
   );
 
-  const validateSeatSelections = useCallback(
-    (seatSelections, passengerCount) => {
-      if (
-        !Array.isArray(seatSelections) ||
-        seatSelections.length !== passengerCount
-      ) {
-        throw new Error('Invalid seat selection count');
-      }
+  const validateSeatSelections = useCallback((seats, passengerCount) => {
+    if (!Array.isArray(seats) || seats.length !== passengerCount) {
+      return false;
+    }
 
-      return seatSelections.every((seatId) => {
-        const numericSeatId = Number(seatId);
-        return !isNaN(numericSeatId) && numericSeatId > 0;
-      });
-    },
-    []
-  );
+    return seats.every((seatId) => {
+      const numericSeatId = Number(seatId);
+      return !isNaN(numericSeatId) && numericSeatId > 0;
+    });
+  }, []);
 
   const createTransaction = useCallback(
     async (formData) => {
       dispatch(setLoading(true));
       try {
-        // Validate seat selections
         const passengerCount = formData.passengerData.length;
-
-        if (!validateSeatSelections(formData.seatSelections, passengerCount)) {
-          throw new Error('Invalid seat selections');
-        }
+        const departureSeatSelections = formData.seatSelections;
+        let returnSeatSelections = [];
 
         if (
-          flightState.isRoundTrip &&
-          !validateSeatSelections(formData.returnSeatSelections, passengerCount)
+          !validateSeatSelections(
+            departureSeatSelections.map((s) => s.seat_id),
+            passengerCount
+          )
         ) {
-          throw new Error('Invalid return seat selections');
+          throw new Error('Invalid departure seat selections');
         }
 
-        const totalPayment = calculateTotalWithTax(formData);
-
-        // Format seat selections ensuring numeric seat_id values
-        const seatSelections = formData.seatSelections.map((seatId) => ({
-          seat_id: Number(seatId),
-          version: 0,
-        }));
+        if (flightState.isRoundTrip) {
+          returnSeatSelections = formData.returnSeatSelections;
+          if (
+            !validateSeatSelections(
+              returnSeatSelections.map((s) => s.seat_id),
+              passengerCount
+            )
+          ) {
+            throw new Error('Invalid return seat selections');
+          }
+        }
 
         const transactionData = {
           userData: {
             user_id: user.id,
           },
-          passengerData: formData.passengerData,
-          seatSelections,
+          passengerData: formData.passengerData.map((passenger) => ({
+            title: passenger.title,
+            full_name: passenger.fullName.trim(),
+            family_name: passenger.hasFamily
+              ? passenger.familyName.trim()
+              : null,
+            birth_date: passenger.birthDate,
+            nationality: passenger.nationality,
+            id_number: passenger.idNumber.trim(),
+            id_issuer: passenger.issuingCountry,
+            id_expiry: passenger.expiryDate,
+          })),
+          seatSelections: departureSeatSelections,
           planeId: flightState.selectedDepartureFlight.plane_id,
-          is_round_trip: flightState.isRoundTrip,
-          total_payment: totalPayment,
+          isRoundTrip: flightState.isRoundTrip,
         };
 
         if (flightState.isRoundTrip) {
           transactionData.returnPlaneId =
             flightState.selectedReturnFlight.plane_id;
-          transactionData.returnSeatSelections =
-            formData.returnSeatSelections.map((seatId) => ({
-              seat_id: Number(seatId),
-              version: 0,
-            }));
+          transactionData.returnSeatSelections = returnSeatSelections;
         }
-
-        console.log('Sending transaction data:', transactionData);
 
         const result = await paymentService.createTransaction(transactionData);
 
         if (result.isSuccess) {
-          dispatch(setTransactionId(result.data.id));
-          dispatch(setTransactionData(transactionData));
-          dispatch(
-            setPaymentData({
-              amount: totalPayment,
-              orderId: result.data.transaction_id,
-            })
-          );
+          if (result.data.type === 'round') {
+            dispatch(setTransactionId(result.data.outbound.transaction_id));
+            dispatch(
+              setTransactionData({
+                outbound: result.data.outbound,
+                return: result.data.return,
+              })
+            );
+            dispatch(
+              setPaymentData({
+                amount: result.data.total_payment,
+                orderId: result.data.outbound.transaction_id,
+              })
+            );
+          } else if (result.data.data) {
+            dispatch(setTransactionId(result.data.data.transaction_id));
+            dispatch(setTransactionData(result.data.data));
+            dispatch(
+              setPaymentData({
+                amount: result.data.data.total_payment,
+                orderId: result.data.data.transaction_id,
+              })
+            );
+          } else {
+            throw new Error('Invalid response format');
+          }
 
           Swal.fire({
             icon: 'success',
@@ -174,7 +173,7 @@ export const usePayment = () => {
         dispatch(setLoading(false));
       }
     },
-    [dispatch, user, flightState, calculateTotalWithTax, validateSeatSelections]
+    [dispatch, user, flightState, validateSeatSelections, calculateTotalWithTax]
   );
 
   const initiatePayment = useCallback(

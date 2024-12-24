@@ -6,9 +6,9 @@ import {
   updateOrderData,
   updatePassengerData,
   setIsSubmitted,
-  setHasFamily,
   setSelectedDepartureSeats,
   setSelectedReturnSeats,
+  setHasFamily,
 } from '../../store/slices/paymentSlice';
 import SeatSelection from './SeatSelection';
 import DatePicker from '../Elements/DatePicker/DatePicker';
@@ -45,7 +45,6 @@ const OrderForm = () => {
 
   const {
     orderData,
-    hasFamily,
     selectedDepartureSeats,
     selectedReturnSeats,
     isSubmitted,
@@ -103,6 +102,7 @@ const OrderForm = () => {
   };
 
   const validateForm = () => {
+    // Validate order information
     if (
       !orderData.orderName?.trim() ||
       !orderData.phone?.trim() ||
@@ -117,6 +117,7 @@ const OrderForm = () => {
       return false;
     }
 
+    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(orderData.email)) {
       Swal.fire({
@@ -127,6 +128,7 @@ const OrderForm = () => {
       return false;
     }
 
+    // Validate phone number format
     const phoneRegex = /^\+?[\d\s-]{10,}$/;
     if (!phoneRegex.test(orderData.phone)) {
       Swal.fire({
@@ -137,6 +139,7 @@ const OrderForm = () => {
       return false;
     }
 
+    // Validate passenger information
     for (const [index, passenger] of orderData.passengers.entries()) {
       if (
         !passenger.fullName?.trim() ||
@@ -164,6 +167,7 @@ const OrderForm = () => {
       }
     }
 
+    // Validate seat selections
     if (
       !Array.isArray(selectedDepartureSeats) ||
       selectedDepartureSeats.length !== orderData.passengers.length
@@ -198,34 +202,37 @@ const OrderForm = () => {
     try {
       const formattedPassengers = orderData.passengers.map((passenger) => ({
         title: passenger.title,
-        full_name: passenger.fullName.trim(),
-        family_name: passenger.hasFamily ? passenger.familyName.trim() : null,
-        birth_date: passenger.birthDate,
+        fullName: passenger.fullName.trim(),
+        familyName: passenger.hasFamily ? passenger.familyName.trim() : null,
+        birthDate: passenger.birthDate,
         nationality: passenger.nationality,
-        id_number: passenger.idNumber.trim(),
-        id_issuer: passenger.issuingCountry,
-        id_expiry: passenger.expiryDate,
+        idNumber: passenger.idNumber.trim(),
+        issuingCountry: passenger.issuingCountry,
+        expiryDate: passenger.expiryDate,
       }));
 
-      const departureSeatSelections = selectedDepartureSeats.map((seatId) =>
-        Number(seatId)
-      );
+      const seatSelections = selectedDepartureSeats.map((seatId) => ({
+        seat_id: Number(seatId),
+      }));
+
+      let returnSeatSelections = [];
+      if (isRoundTrip) {
+        returnSeatSelections = selectedReturnSeats.map((seatId) => ({
+          seat_id: Number(seatId),
+        }));
+      }
 
       const transactionData = {
         userData: {
           user_id: user.id,
         },
         passengerData: formattedPassengers,
-        seatSelections: departureSeatSelections,
+        seatSelections,
         planeId: selectedDepartureFlight.plane_id,
-        is_round_trip: isRoundTrip,
-        total_payment: 0,
+        isRoundTrip,
       };
 
       if (isRoundTrip) {
-        const returnSeatSelections = selectedReturnSeats.map((seatId) =>
-          Number(seatId)
-        );
         transactionData.returnPlaneId = selectedReturnFlight.plane_id;
         transactionData.returnSeatSelections = returnSeatSelections;
       }
