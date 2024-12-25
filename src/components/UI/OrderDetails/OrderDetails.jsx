@@ -22,9 +22,6 @@ const OrderDetails = ({ selectedCard }) => {
 
   const {
     tickets = [],
-    outboundTickets = [],
-    returnTickets = [],
-    isRoundTrip = false,
     status = '',
     token = '',
     total_payment = 0,
@@ -35,9 +32,6 @@ const OrderDetails = ({ selectedCard }) => {
   const firstTicket = tickets?.[0] || {};
   const flightDetails = firstTicket?.plane || {};
   const airline = firstTicket?.plane?.airline || '-';
-
-  const firstOutboundTicket = outboundTickets[0] || tickets[0];
-  const firstReturnTicket = returnTickets[0];
 
   const handleProceedToPayment = () => {
     handlePayment(flightDetails, total_payment, user);
@@ -69,27 +63,6 @@ const OrderDetails = ({ selectedCard }) => {
           </span>
         </div>
       </div>
-
-      <h3 className="font-semibold text-purple-800 mb-2">Outbound Flight</h3>
-      <FlightInfo
-        type="departure"
-        time={firstOutboundTicket?.plane?.departure_time}
-        terminal={firstOutboundTicket?.plane?.departure_terminal}
-        airport={firstOutboundTicket?.plane?.origin_airport}
-      />
-
-      {isRoundTrip && firstReturnTicket && (
-        <>
-          <Divider />
-          <h3 className="font-semibold text-purple-800 mb-2">Return Flight</h3>
-          <FlightInfo
-            type="departure"
-            time={firstReturnTicket?.plane?.departure_time}
-            terminal={firstReturnTicket?.plane?.departure_terminal}
-            airport={firstReturnTicket?.plane?.origin_airport}
-          />
-        </>
-      )}
 
       <div className="mb-2">
         <h2 className="font-regular">

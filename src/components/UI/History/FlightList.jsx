@@ -17,7 +17,6 @@ const FlightList = ({
       </div>
     );
   }
-
   const safeIncludes = (value, searchTerm) => {
     if (value === null || value === undefined) return false;
     return String(value).toLowerCase().includes(searchTerm);
@@ -57,7 +56,7 @@ const FlightList = ({
     <div className="lg:w-3/5 sm:w-full space-y-4">
       {filteredFlights.map((flight) => (
         <FlightTicketCard
-          key={`${flight.transaction_id}-${flight.token}`} // Using a combination of transaction_id and token for uniqueness
+          key={flight.transaction_id}
           flight={flight}
           onCardClick={onCardClick}
           isSelected={flight.transaction_id === selectedCardId}
