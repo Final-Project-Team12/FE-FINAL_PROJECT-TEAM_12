@@ -24,31 +24,24 @@ const useOrderHistory = () => {
 
         const transformedData = response.map((transaction) => {
           if (transaction.type === 'round') {
-            const outbound = {
+            const roundTripTotal =
+              transaction.outbound.total_payment +
+              transaction.return.total_payment;
+            return {
               ...transaction.outbound,
-              trip_type: 'outbound',
-              related_transaction: transaction.return,
+              trip_type: 'round',
+              return_flight: transaction.return,
+              total_round_payment: roundTripTotal,
             };
-            const return_flight = {
-              ...transaction.return,
-              trip_type: 'return',
-              related_transaction: transaction.outbound,
-            };
-            return [outbound, return_flight];
           } else {
-            return [
-              {
-                ...transaction.transaction,
-                trip_type: 'single',
-                related_transaction: null,
-              },
-            ];
+            return {
+              ...transaction.transaction,
+              trip_type: 'single',
+            };
           }
         });
 
-        const flattenedData = transformedData.flat();
-
-        dispatch(setOrderHistory(flattenedData));
+        dispatch(setOrderHistory(transformedData));
       } catch (error) {
         dispatch(setError(error.message || 'Failed to fetch order history'));
       } finally {

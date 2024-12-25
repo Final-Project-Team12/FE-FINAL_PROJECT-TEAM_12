@@ -15,7 +15,10 @@ const FlightTicketCard = ({
     status = '',
     transaction_date,
     total_payment = 0,
+    total_round_payment = 0,
     tickets = [],
+    trip_type,
+    return_flight,
   } = flight;
 
   const firstTicket = tickets[0];
@@ -59,6 +62,12 @@ const FlightTicketCard = ({
       minute: '2-digit',
     });
   };
+  const calculateTotalPrice = () => {
+    if (trip_type === 'round') {
+      return total_round_payment;
+    }
+    return total_payment;
+  };
 
   return (
     <div>
@@ -72,11 +81,16 @@ const FlightTicketCard = ({
         onClick={handleCardClick}
       >
         <div className="p-4">
-          <span
-            className={`text-white text-xs font-light rounded-full px-3 py-1 ${getStatusColor(status)}`}
-          >
-            {status}
-          </span>
+          <div className="flex justify-between">
+            <span
+              className={`text-white text-xs font-light rounded-full px-3 py-1 ${getStatusColor(status)}`}
+            >
+              {status}
+            </span>
+            <div className="text-sm text-purple-600">
+              {trip_type === 'round' ? 'Round Trip' : 'Single Trip'}
+            </div>
+          </div>
           <div className="flex justify-between py-3 gap-3">
             <div className="gap-2">
               <div className="hidden md:flex">
@@ -125,7 +139,7 @@ const FlightTicketCard = ({
             </div>
             <div className="mt-6">
               <p className="font-bold text-purple-900">
-                IDR {total_payment.toLocaleString('id-ID')}
+                IDR {calculateTotalPrice().toLocaleString('id-ID')}
               </p>
             </div>
           </div>
