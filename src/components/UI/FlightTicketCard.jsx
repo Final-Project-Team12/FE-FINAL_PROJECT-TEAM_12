@@ -18,8 +18,10 @@ const FlightTicketCard = ({
     tickets = [],
   } = flight;
 
-  const firstTicket = tickets[0];
+  const firstTicket = flight.outboundTickets?.[0] || flight.tickets?.[0];
+  const returnTicket = flight.returnTickets?.[0];
   const flightDetails = firstTicket?.plane || {};
+  const returnFlightDetails = returnTicket?.plane || {};
 
   const getStatusColor = (status) => {
     switch (status.toUpperCase()) {
@@ -111,6 +113,41 @@ const FlightTicketCard = ({
               </div>
             </div>
           </div>
+          {flight.isRoundTrip && returnTicket && (
+            <>
+              <div className="w-full pt-1">
+                <hr className="h-px bg-gray-200 border-1 dark:bg-gray-500" />
+              </div>
+              <div className="flex justify-between py-3 gap-3">
+                <div className="gap-2">
+                  <div>
+                    <p className="font-regular">
+                      {formatDate(returnFlightDetails.departure_time)}
+                    </p>
+                    <p className="font-regular">
+                      {formatTime(returnFlightDetails.departure_time)}
+                    </p>
+                  </div>
+                </div>
+                <div className="hidden md:flex md:flex-col md:items-center md:justify-center">
+                  <div>{returnFlightDetails.duration} mins</div>
+                  <div>
+                    <img src={Arrow} alt="arrow icon" />
+                  </div>
+                </div>
+                <div>
+                  <div>
+                    <p className="font-regular">
+                      {formatDate(returnFlightDetails.arrival_time)}
+                    </p>
+                    <p className="font-regular">
+                      {formatTime(returnFlightDetails.arrival_time)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
           <div className="w-full pt-1">
             <hr className="h-px bg-gray-200 border-1 dark:bg-gray-500" />
           </div>
