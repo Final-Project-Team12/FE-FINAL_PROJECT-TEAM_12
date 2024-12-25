@@ -27,11 +27,17 @@ const OrderDetails = ({ selectedCard }) => {
     total_payment = 0,
     user = {},
     transaction_id,
+    trip_type,
+    return_flight,
   } = selectedCard;
 
   const firstTicket = tickets?.[0] || {};
   const flightDetails = firstTicket?.plane || {};
   const airline = firstTicket?.plane?.airline || '-';
+
+  const returnTicket = return_flight?.tickets?.[0] || {};
+  const returnFlightDetails = returnTicket?.plane || {};
+  const returnAirline = returnTicket?.plane?.airline || '-';
 
   const handleProceedToPayment = () => {
     handlePayment(flightDetails, total_payment, user);
@@ -70,48 +76,93 @@ const OrderDetails = ({ selectedCard }) => {
           <span className="text-purple-800 font-bold">{token}</span>
         </h2>
       </div>
+      <div className="mb-4">
+        {trip_type === 'round' && (
+          <p className="text-purple-500 font-bold mb-2">Outbound Flight</p>
+        )}
+        <FlightInfo
+          type="departure"
+          time={flightDetails.departure_time}
+          terminal={flightDetails.departure_terminal}
+          airport={flightDetails.origin_airport}
+        />
 
-      <FlightInfo
-        type="departure"
-        time={flightDetails.departure_time}
-        terminal={flightDetails.departure_terminal}
-        airport={flightDetails.origin_airport}
-      />
+        <Divider />
+
+        <PassengerInfo
+          tickets={tickets}
+          plane={firstTicket.plane}
+          seat={firstTicket.seat}
+          airline={airline}
+        />
+
+        <Divider />
+
+        <FlightInfo
+          type="arrival"
+          time={flightDetails.arrival_time}
+          terminal={flightDetails.departure_terminal}
+          airport={flightDetails.destination_airport}
+        />
+      </div>
+
+      {trip_type === 'round' && return_flight && (
+        <>
+          <Divider />
+          <div className="mb-4">
+            <p className="text-purple-500 font-bold mb-2">Return Flight</p>
+            <FlightInfo
+              type="departure"
+              time={returnFlightDetails.departure_time}
+              terminal={returnFlightDetails.departure_terminal}
+              airport={returnFlightDetails.origin_airport}
+            />
+
+            <Divider />
+
+            <PassengerInfo
+              tickets={return_flight.tickets}
+              plane={returnTicket.plane}
+              seat={returnTicket.seat}
+              airline={returnAirline}
+            />
+
+            <Divider />
+
+            <FlightInfo
+              type="arrival"
+              time={returnFlightDetails.arrival_time}
+              terminal={returnFlightDetails.departure_terminal}
+              airport={returnFlightDetails.destination_airport}
+            />
+          </div>
+        </>
+      )}
 
       <Divider />
-
-      <PassengerInfo
-        tickets={tickets}
-        plane={firstTicket.plane}
-        seat={firstTicket.seat}
-        airline={airline}
-      />
-
-      <Divider />
-
-      <FlightInfo
-        type="arrival"
-        time={flightDetails.arrival_time}
-        terminal={flightDetails.departure_terminal}
-        airport={flightDetails.destination_airport}
-      />
-
-      <Divider />
-
       <div className="flex flex-col gap-2 px-5">
         <p className="font-bold text-sm">Rincian Harga</p>
         <div className="flex justify-between text-sm font-regular">
           <p>{tickets.length} Penumpang</p>
           <p>{formatCurrency(total_payment)}</p>
         </div>
+        {trip_type === 'round' && (
+          <div className="flex justify-between text-sm font-regular">
+            <p>{return_flight?.tickets?.length} Penumpang (Return)</p>
+            <p>{formatCurrency(return_flight?.total_payment || 0)}</p>
+          </div>
+        )}
       </div>
-
       <Divider />
 
       <div className="w-11/12 flex justify-between ml-5">
         <p className="font-bold">Total</p>
         <p className="font-bold text-purple-800">
-          {formatCurrency(total_payment)}
+          {formatCurrency(
+            trip_type === 'round'
+              ? total_payment + (return_flight?.total_payment || 0)
+              : total_payment
+          )}
         </p>
       </div>
 
