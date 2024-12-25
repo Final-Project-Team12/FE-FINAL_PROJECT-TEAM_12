@@ -15,20 +15,27 @@ const Notification = () => {
   const [selectedNotif, setSelectedNotif] = useState(null);
 
   useEffect(() => {
-    const filtered = notifications.filter((item) => {
-      const searchLower = searchQuery.toLowerCase().trim();
-      const matchesSearch =
-        item.title.toLowerCase().includes(searchLower) ||
-        item.description.toLowerCase().includes(searchLower);
+    const filtered = notifications
+      .filter((item) => {
+        const searchLower = searchQuery.toLowerCase().trim();
+        const matchesSearch =
+          item.title.toLowerCase().includes(searchLower) ||
+          item.description.toLowerCase().includes(searchLower);
 
-      const matchesDateRange =
-        dateRange.startDate && dateRange.endDate
-          ? new Date(item.notification_date) >= new Date(dateRange.startDate) &&
-            new Date(item.notification_date) <= new Date(dateRange.endDate)
-          : true;
+        const matchesDateRange =
+          dateRange.startDate && dateRange.endDate
+            ? new Date(item.notification_date) >=
+                new Date(dateRange.startDate) &&
+              new Date(item.notification_date) <= new Date(dateRange.endDate)
+            : true;
 
-      return matchesSearch && matchesDateRange;
-    });
+        return matchesSearch && matchesDateRange;
+      })
+      .sort(
+        (a, b) =>
+          new Date(b.notification_date).getTime() -
+          new Date(a.notification_date).getTime()
+      );
 
     setFilteredNotifications(filtered);
   }, [searchQuery, dateRange, notifications]);
