@@ -1,9 +1,13 @@
 import axiosInstance from '../api/axiosInstance';
 
 const generateRandomId = () => {
-  const timestamp = new Date().getTime();
-  const randomStr = Math.random().toString(36).substring(2, 10);
-  return `${timestamp}_${randomStr}`;
+  let result = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  const charactersLength = characters.length;
+  for (let i = 0; i < 12; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
 };
 
 export const paymentService = {

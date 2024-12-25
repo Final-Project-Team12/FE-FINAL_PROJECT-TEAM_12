@@ -67,7 +67,7 @@ const PaymentLastPage = () => {
     document.body.style.overflow = 'auto';
     dispatch(resetPaymentState());
     dispatch(resetFlightSearch());
-    navigate('/orderhistory', { replace: true });
+    window.location.href = '/order-history';
   };
 
   const handleNewSearch = () => {
