@@ -9,10 +9,18 @@ const DatePickerModal = ({
   title,
   minDate,
 }) => {
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [nextMonthDate, setNextMonthDate] = useState(
-    new Date(new Date().setMonth(currentDate.getMonth() + 1))
-  );
+  const [currentDate, setCurrentDate] = useState(() => {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    return now;
+  });
+
+  const [nextMonthDate, setNextMonthDate] = useState(() => {
+    const next = new Date();
+    next.setMonth(next.getMonth() + 1);
+    next.setHours(0, 0, 0, 0);
+    return next;
+  });
 
   const months = [
     'Januari',
@@ -63,11 +71,6 @@ const DatePickerModal = ({
     );
   };
 
-  const formatDate = (date) => {
-    if (!date) return '';
-    return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
-  };
-
   const isCurrentMonth = (date) => {
     return date && date.getMonth() === currentDate.getMonth();
   };
@@ -84,11 +87,11 @@ const DatePickerModal = ({
 
   const handleDateSelection = (date) => {
     const selectedDate = new Date(date);
+    selectedDate.setHours(0, 0, 0, 0);
 
     if (minDate) {
       const minDateTime = new Date(minDate);
       minDateTime.setHours(0, 0, 0, 0);
-      selectedDate.setHours(0, 0, 0, 0);
 
       if (selectedDate >= minDateTime) {
         onSelect(selectedDate);

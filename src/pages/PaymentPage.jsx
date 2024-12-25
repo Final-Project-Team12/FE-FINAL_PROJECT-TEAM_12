@@ -133,7 +133,7 @@ const PaymentPage = () => {
             <button
               onClick={handleProceedToPayment}
               disabled={loading}
-              className="w-full max-w-2xl bg-red-600 text-white py-4 rounded-lg text-xl font-semibold hover:opacity-90 transition-opacity mt-4 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="w-full bg-red-600 text-white py-4 rounded-lg text-xl font-semibold hover:opacity-90 transition-opacity mt-4 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               {loading ? 'Processing...' : 'Lanjut Bayar'}
             </button>
