@@ -55,6 +55,12 @@ const FlightTicketCard = ({
     });
   };
 
+  const formatDuration = (durationInMinutes) => {
+    const hours = Math.floor(durationInMinutes / 60);
+    const minutes = durationInMinutes % 60;
+    return `${hours}h ${minutes}m`;
+  };
+
   const formatTime = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleTimeString('id-ID', {
@@ -106,7 +112,7 @@ const FlightTicketCard = ({
               </div>
             </div>
             <div className="hidden md:flex md:flex-col md:items-center md:justify-center">
-              <div>{flightDetails.duration} mins</div>
+              <div>{formatDuration(flightDetails.duration)}</div>
               <div>
                 <img src={Arrow} alt="arrow icon" />
               </div>
@@ -133,7 +139,7 @@ const FlightTicketCard = ({
               <p className="font-bold">Booking Code:</p>
               <p>{flight.token}</p>
             </div>
-            <div className="hidden md:flex md:mt-2">
+            <div className="hidden sm:block md:mt-2">
               <p className="font-bold">Class:</p>
               <p>{firstTicket?.seat?.class}</p>
             </div>
