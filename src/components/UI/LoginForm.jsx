@@ -78,7 +78,7 @@ const LoginForm = () => {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <div>
             <InputField
-              label="Email/No Telepon"
+              label="Email"
               type="email"
               placeholder="Contoh: johndoe@gmail.com"
               error={errors.email}
