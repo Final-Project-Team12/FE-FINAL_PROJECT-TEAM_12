@@ -144,7 +144,6 @@ const FlightSearch = () => {
                 <span className="text-[#7126B5]">QuickFly!</span>
               </h2>
 
-              {/* Form content */}
               <div className="space-y-3 sm:space-y-4 md:space-y-6">
                 {/* From-To Section */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-8 items-start md:items-center relative">

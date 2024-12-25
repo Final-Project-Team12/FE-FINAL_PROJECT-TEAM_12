@@ -64,7 +64,11 @@ const DetailsTicket = () => {
         'Desember',
       ];
 
-      return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+      const year = date.getFullYear();
+      const month = months[date.getMonth()];
+      const day = date.getDate();
+
+      return `${day} ${month} ${year}`;
     } catch (error) {
       console.error('Error formatting date:', error);
       return '';
@@ -76,10 +80,10 @@ const DetailsTicket = () => {
     try {
       const date = new Date(dateString);
       if (isNaN(date.getTime())) return '';
-
       return date.toLocaleTimeString('id-ID', {
         hour: '2-digit',
         minute: '2-digit',
+        hour12: false,
       });
     } catch (error) {
       console.error('Error formatting time:', error);
@@ -93,7 +97,10 @@ const DetailsTicket = () => {
       const dateObj = new Date(date);
       if (isNaN(dateObj.getTime())) return '';
 
-      return dateObj.toISOString().split('T')[0];
+      const year = dateObj.getFullYear();
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const day = String(dateObj.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
     } catch (error) {
       console.error('Error formatting date for API:', error);
       return '';
@@ -132,6 +139,9 @@ const DetailsTicket = () => {
           fromCityDisplay: `${flight.destination_airport.name} (${flight.destination_airport.airport_code})`,
           toCityDisplay: `${flight.origin_airport.name} (${flight.origin_airport.airport_code})`,
         };
+
+        const returnDate = new Date(departureDate);
+        returnDate.setHours(0, 0, 0, 0);
 
         dispatch(
           setSearchParams({
@@ -183,9 +193,7 @@ const DetailsTicket = () => {
   const lastFlightElementRef = useCallback(
     (node) => {
       if (isLoading || !hasMoreFlights || isRequestInProgress.current) return;
-
       if (observer.current) observer.current.disconnect();
-
       observer.current = new IntersectionObserver(
         (entries) => {
           if (entries[0].isIntersecting) {
@@ -194,7 +202,6 @@ const DetailsTicket = () => {
         },
         { rootMargin: '20px', threshold: 0.1 }
       );
-
       if (node) observer.current.observe(node);
     },
     [isLoading, hasMoreFlights, dispatch]
@@ -209,7 +216,6 @@ const DetailsTicket = () => {
   useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
-
       if (!fromCity || !toCity || !departureDate) {
         navigate('/');
         return;
@@ -238,9 +244,9 @@ const DetailsTicket = () => {
       try {
         const currentDate =
           isRoundTrip && selectedDepartureFlight ? returnDate : departureDate;
-        const formattedDate = formatDateForAPI(currentDate);
+        const formattedCurrentDate = formatDateForAPI(currentDate);
 
-        if (!formattedDate) {
+        if (!formattedCurrentDate) {
           console.error('Invalid date format');
           return;
         }
@@ -248,18 +254,17 @@ const DetailsTicket = () => {
         const searchPayload = {
           from: fromCity,
           to: toCity,
-          departureDate: formattedDate,
+          departureDate: formattedCurrentDate,
           seatClass: selectedSeatClass,
           passengerAdult: passengerCounts.adult || 0,
           passengerChild: passengerCounts.child || 0,
           passengerInfant: passengerCounts.infant || 0,
           isRoundTrip,
-          ...(selectedDepartureFlight &&
-            returnDate &&
-            isRoundTrip && {
-              returnDate: formatDateForAPI(returnDate),
-            }),
         };
+
+        if (selectedDepartureFlight && returnDate && isRoundTrip) {
+          searchPayload.returnDate = formatDateForAPI(returnDate);
+        }
 
         await dispatch(
           fetchFilteredFlights({
@@ -398,15 +403,15 @@ const DetailsTicket = () => {
                   </div>
                   <button
                     className={`
-                      mt-1 px-6 py-1 rounded-md text-sm transition-colors duration-200
-                      ${
-                        flight.seats_detail.find(
-                          (seat) => seat.class === selectedSeatClass
-                        )?.available_seats > 0
-                          ? 'bg-purple-600 text-white hover:bg-purple-700'
-                          : 'bg-gray-400 text-white cursor-not-allowed'
-                      }
-                    `}
+                    mt-1 px-6 py-1 rounded-md text-sm transition-colors duration-200
+                    ${
+                      flight.seats_detail.find(
+                        (seat) => seat.class === selectedSeatClass
+                      )?.available_seats > 0
+                        ? 'bg-purple-600 text-white hover:bg-purple-700'
+                        : 'bg-gray-400 text-white cursor-not-allowed'
+                    }
+                  `}
                     onClick={() => handleSelectFlight(flight)}
                     disabled={
                       flight.seats_detail.find(
