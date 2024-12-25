@@ -115,7 +115,7 @@ const OrderDetailsModal = ({ selectedCard, onClose }) => {
 
   return (
     <>
-      <div className="fixed inset-0 z-[999] isolate">
+      <div className="fixed inset-0 z-[999] isolate lg:hidden">
         {/* Backdrop */}
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-[2px]"
