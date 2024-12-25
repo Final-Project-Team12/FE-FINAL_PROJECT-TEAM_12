@@ -1,5 +1,7 @@
 import { useSelector } from 'react-redux';
-import { X } from 'lucide-react'; // Impor ikon X dari Lucide React
+import { X } from 'lucide-react';
+import { pdf } from '@react-pdf/renderer';
+import TicketPDF from './TicketPDF';
 import LogoQuickFly from '../../../public/images/quickfly-vertical.png';
 
 const PrintTicketModal = ({ isOpen, onClose }) => {
@@ -52,6 +54,26 @@ const PrintTicketModal = ({ isOpen, onClose }) => {
       </div>
     );
   }
+
+  const handlerDownloadTicket = async (ticket) => {
+    if (!ticket || !ticket.ticket_details) {
+      console.error('Invalid ticket data');
+      return;
+    }
+    try {
+      const blob = await pdf(<TicketPDF ticket={ticket} />).toBlob();
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Boarding_Pass_${ticket.ticket_details.flight_number}.pdf`;
+      link.click();
+
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error generating ticket:', error);
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -123,6 +145,14 @@ const PrintTicketModal = ({ isOpen, onClose }) => {
                     className="w-[120px] h-[120px] object-contain"
                   />
                 </div>
+              </div>
+              <div className="flex justify-center my-4">
+                <button
+                  className="bg-[#7126B5] hover:bg-[#4B1979] text-white rounded-lg w-1/3 h-9"
+                  onClick={() => handlerDownloadTicket(ticket)}
+                >
+                  Download Tiket
+                </button>
               </div>
             </div>
           ))}
