@@ -287,11 +287,6 @@ const OrderForm = () => {
         passengers: updatedPassengers,
       })
     );
-
-    console.log(`Toggled family for passenger ${index}:`, {
-      hasFamily: isChecked,
-      familyName: updatedPassengers[index].familyName,
-    });
   };
 
   return (
