@@ -6,7 +6,11 @@ const AuthBanner = () => {
     <div className="w-full ">
       <div className="grid h-full bg-gradient-to-t from-[#FFE9CA00] via-[#FFE9CA00] to-[#DEC9FF] bg-[length:100%_300%] grid-rows-2">
         <div className="flex ml-[10%] mt-auto">
-          <img src={ProductLogo} alt="Banner Logo" className="w-[264px]" />
+          <img
+            src={ProductLogo}
+            alt="Banner Logo"
+            className="md:w-[200px] lg:w-[264px]"
+          />
         </div>
         <div>
           <img
