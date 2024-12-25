@@ -42,6 +42,16 @@ export const usePayment = () => {
         const tax = Math.round(totalPassengerPrice * 0.1);
         const totalPayment = totalPassengerPrice + tax;
 
+        console.log('Payment calculation:', {
+          departureSeatPrice,
+          returnSeatPrice,
+          totalBasePrice,
+          passengerCount: formData.passengerData.length,
+          totalPassengerPrice,
+          tax,
+          totalPayment,
+        });
+
         return totalPayment;
       } catch (error) {
         console.error('Error calculating total:', error);
@@ -52,13 +62,26 @@ export const usePayment = () => {
   );
 
   const validateSeatSelections = useCallback((seats, passengerCount) => {
-    if (!Array.isArray(seats) || seats.length !== passengerCount) {
+    if (!Array.isArray(seats)) {
+      console.error('Seats is not an array:', seats);
+      return false;
+    }
+
+    if (seats.length !== passengerCount) {
+      console.error('Wrong number of seats:', {
+        seatsLength: seats.length,
+        passengerCount,
+      });
       return false;
     }
 
     return seats.every((seatId) => {
       const numericSeatId = Number(seatId);
-      return !isNaN(numericSeatId) && numericSeatId > 0;
+      const isValid = !isNaN(numericSeatId) && numericSeatId > 0;
+      if (!isValid) {
+        console.error('Invalid seat ID:', seatId);
+      }
+      return isValid;
     });
   }, []);
 
@@ -98,9 +121,10 @@ export const usePayment = () => {
           passengerData: formData.passengerData.map((passenger) => ({
             title: passenger.title,
             full_name: passenger.fullName.trim(),
-            family_name: passenger.hasFamily
-              ? passenger.familyName.trim()
-              : null,
+            family_name:
+              passenger.hasFamily && passenger.familyName
+                ? passenger.familyName.trim()
+                : undefined,
             birth_date: passenger.birthDate,
             nationality: passenger.nationality,
             id_number: passenger.idNumber.trim(),
@@ -117,6 +141,8 @@ export const usePayment = () => {
             flightState.selectedReturnFlight.plane_id;
           transactionData.returnSeatSelections = returnSeatSelections;
         }
+
+        console.log('Sending transaction data:', transactionData);
 
         const result = await paymentService.createTransaction(transactionData);
 

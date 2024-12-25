@@ -9,23 +9,12 @@ const generateRandomId = () => {
 export const paymentService = {
   createTransaction: async (transactionData) => {
     try {
-      if (!transactionData.userData?.user_id) {
-        throw new Error('User ID is required');
-      }
-
-      if (
-        !Array.isArray(transactionData.passengerData) ||
-        transactionData.passengerData.length === 0
-      ) {
-        throw new Error('Passenger data is required');
-      }
-
       const cleanedData = {
         userData: transactionData.userData,
         passengerData: transactionData.passengerData.map((passenger) => ({
           title: passenger.title,
           full_name: passenger.full_name,
-          family_name: passenger.family_name,
+          family_name: passenger.family_name || undefined,
           birth_date: passenger.birth_date,
           nationality: passenger.nationality,
           id_number: passenger.id_number,
@@ -42,34 +31,19 @@ export const paymentService = {
         cleanedData.returnSeatSelections = transactionData.returnSeatSelections;
       }
 
-      console.log('Sending transaction data:', cleanedData);
+      console.log('Sending cleaned transaction data:', cleanedData);
 
       const response = await axiosInstance.post('/transaction', cleanedData);
-
       return {
         isSuccess: true,
         data: response.data,
       };
     } catch (error) {
-      console.error('Transaction creation error:', error);
-
-      if (error.code === 'ERR_NETWORK') {
-        return {
-          isSuccess: false,
-          message: 'Koneksi gagal, silakan periksa koneksi internet Anda',
-        };
-      }
-
-      if (error.response?.status === 422) {
-        return {
-          isSuccess: false,
-          message: 'Data yang diinput tidak valid, silakan periksa kembali',
-        };
-      }
-
+      console.error('Transaction creation error:', error.response || error);
       return {
         isSuccess: false,
-        message: error.message || 'Gagal membuat transaksi, silakan coba lagi',
+        message:
+          error.response?.data?.message || 'Failed to create transaction',
       };
     }
   },
@@ -86,7 +60,12 @@ export const paymentService = {
           mobile_number: paymentDetails.customerDetails.mobile_number,
           address: paymentDetails.customerDetails.address || '',
         },
-        productDetails: paymentDetails.productDetails,
+        productDetails: paymentDetails.productDetails.map((product) => ({
+          productId: product.productId,
+          productName: product.productName,
+          quantity: product.quantity,
+          price: product.price,
+        })),
       };
 
       const response = await axiosInstance.post('/payments', paymentData);
@@ -96,18 +75,10 @@ export const paymentService = {
         orderId: paymentData.orderId,
       };
     } catch (error) {
-      console.error('Payment Error:', error);
-
-      if (error.code === 'ERR_NETWORK') {
-        return {
-          isSuccess: false,
-          message: 'Koneksi gagal, silakan periksa koneksi internet Anda',
-        };
-      }
-
+      console.error('Payment Error:', error.response?.data || error);
       return {
         isSuccess: false,
-        message: error.message || 'Gagal memulai pembayaran, silakan coba lagi',
+        message: error.response?.data?.message || 'Failed to initiate payment',
       };
     }
   },

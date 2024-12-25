@@ -8,7 +8,6 @@ import {
   setIsSubmitted,
   setSelectedDepartureSeats,
   setSelectedReturnSeats,
-  setHasFamily,
 } from '../../store/slices/paymentSlice';
 import SeatSelection from './SeatSelection';
 import DatePicker from '../Elements/DatePicker/DatePicker';
@@ -102,7 +101,6 @@ const OrderForm = () => {
   };
 
   const validateForm = () => {
-    // Validate order information
     if (
       !orderData.orderName?.trim() ||
       !orderData.phone?.trim() ||
@@ -117,7 +115,6 @@ const OrderForm = () => {
       return false;
     }
 
-    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(orderData.email)) {
       Swal.fire({
@@ -128,7 +125,6 @@ const OrderForm = () => {
       return false;
     }
 
-    // Validate phone number format
     const phoneRegex = /^\+?[\d\s-]{10,}$/;
     if (!phoneRegex.test(orderData.phone)) {
       Swal.fire({
@@ -139,7 +135,6 @@ const OrderForm = () => {
       return false;
     }
 
-    // Validate passenger information
     for (const [index, passenger] of orderData.passengers.entries()) {
       if (
         !passenger.fullName?.trim() ||
@@ -167,7 +162,6 @@ const OrderForm = () => {
       }
     }
 
-    // Validate seat selections
     if (
       !Array.isArray(selectedDepartureSeats) ||
       selectedDepartureSeats.length !== orderData.passengers.length
@@ -203,7 +197,11 @@ const OrderForm = () => {
       const formattedPassengers = orderData.passengers.map((passenger) => ({
         title: passenger.title,
         fullName: passenger.fullName.trim(),
-        familyName: passenger.hasFamily ? passenger.familyName.trim() : null,
+        hasFamily: passenger.hasFamily,
+        familyName:
+          passenger.hasFamily && passenger.familyName
+            ? passenger.familyName.trim()
+            : undefined,
         birthDate: passenger.birthDate,
         nationality: passenger.nationality,
         idNumber: passenger.idNumber.trim(),
@@ -237,6 +235,8 @@ const OrderForm = () => {
         transactionData.returnSeatSelections = returnSeatSelections;
       }
 
+      console.log('Submitting transaction data:', transactionData);
+
       const success = await createTransaction(transactionData);
 
       if (success) {
@@ -269,6 +269,8 @@ const OrderForm = () => {
         passengers: updatedPassengers,
       })
     );
+
+    console.log(`Updated passenger ${index}:`, updatedPassengers[index]);
   };
 
   const handleFamilyToggle = (index, event) => {
@@ -285,6 +287,11 @@ const OrderForm = () => {
         passengers: updatedPassengers,
       })
     );
+
+    console.log(`Toggled family for passenger ${index}:`, {
+      hasFamily: isChecked,
+      familyName: updatedPassengers[index].familyName,
+    });
   };
 
   return (
