@@ -6,6 +6,7 @@ import {
   clearAllFilters,
   fetchFilteredFlights,
 } from '../../store/slices/flightFilterSlice';
+import Swal from 'sweetalert2';
 
 const TicketFilterSidebar = () => {
   const dispatch = useDispatch();
@@ -49,8 +50,8 @@ const TicketFilterSidebar = () => {
 
     if (activeFilters.minPrice && activeFilters.maxPrice) {
       setPriceRange({
-        min: activeFilters.minPrice,
-        max: activeFilters.maxPrice,
+        min: formatPrice(activeFilters.minPrice.toString()),
+        max: formatPrice(activeFilters.maxPrice.toString()),
       });
     }
   }, [activeFilters]);
@@ -118,24 +119,38 @@ const TicketFilterSidebar = () => {
 
   const handlePriceChange = (e) => {
     const { name, value } = e.target;
-    setPriceRange((prev) => ({ ...prev, [name]: value }));
+    const formattedValue = formatPrice(value);
+    setPriceRange((prev) => ({ ...prev, [name]: formattedValue }));
+  };
+
+  const formatPrice = (value) => {
+    const numericValue = value.replace(/\D/g, '');
+    const formattedValue = Number(numericValue).toLocaleString('id-ID');
+    return `IDR ${formattedValue}`;
+  };
+
+  const parsePrice = (formattedPrice) => {
+    return Number(formattedPrice.replace(/\D/g, ''));
   };
 
   const applyPriceFilter = () => {
-    if (
-      priceRange.min &&
-      priceRange.max &&
-      Number(priceRange.min) <= Number(priceRange.max)
-    ) {
+    const minPrice = parsePrice(priceRange.min);
+    const maxPrice = parsePrice(priceRange.max);
+
+    if (minPrice <= maxPrice) {
       const newFilters = {
         ...activeFilters,
-        minPrice: Number(priceRange.min),
-        maxPrice: Number(priceRange.max),
+        minPrice,
+        maxPrice,
       };
       applyFilters(newFilters);
       setModalOpen(false);
     } else {
-      alert('Masukkan rentang harga yang valid!');
+      Swal.fire({
+        icon: 'error',
+        title: 'Rentang Harga Tidak Valid',
+        text: 'Masukkan rentang harga yang valid!',
+      });
     }
   };
 
@@ -293,8 +308,8 @@ const TicketFilterSidebar = () => {
             {activeFilters.minPrice && activeFilters.maxPrice && (
               <div className="mt-2 ml-8 text-sm text-gray-700 flex items-center gap-2">
                 <p>
-                  Rp{Number(activeFilters.minPrice).toLocaleString()} - Rp
-                  {Number(activeFilters.maxPrice).toLocaleString()}
+                  {formatPrice(activeFilters.minPrice.toString())} -{' '}
+                  {formatPrice(activeFilters.maxPrice.toString())}
                 </p>
                 <button
                   onClick={handlePriceReset}
@@ -327,7 +342,7 @@ const TicketFilterSidebar = () => {
                   Harga Minimum
                 </label>
                 <input
-                  type="number"
+                  type="text"
                   id="min-price"
                   name="min"
                   value={priceRange.min}
@@ -341,7 +356,7 @@ const TicketFilterSidebar = () => {
                   Harga Maksimum
                 </label>
                 <input
-                  type="number"
+                  type="text"
                   id="max-price"
                   name="max"
                   value={priceRange.max}
