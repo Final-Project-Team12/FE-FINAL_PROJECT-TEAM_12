@@ -148,7 +148,7 @@ const PrintTicketModal = ({ isOpen, onClose }) => {
               </div>
               <div className="flex justify-center my-4">
                 <button
-                  className="bg-[#7126B5] hover:bg-[#4B1979] text-white rounded-lg w-1/3 h-9"
+                  className="bg-[#7126B5] hover:bg-[#4B1979] text-white rounded-lg w-1/2 md:w-1/3 h-9"
                   onClick={() => handlerDownloadTicket(ticket)}
                 >
                   Download Tiket
