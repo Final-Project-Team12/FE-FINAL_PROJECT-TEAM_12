@@ -15,7 +15,10 @@ const FlightTicketCard = ({
     status = '',
     transaction_date,
     total_payment = 0,
+    total_round_payment = 0,
     tickets = [],
+    trip_type,
+    return_flight,
   } = flight;
 
   const firstTicket = tickets[0];
@@ -52,12 +55,24 @@ const FlightTicketCard = ({
     });
   };
 
+  const formatDuration = (durationInMinutes) => {
+    const hours = Math.floor(durationInMinutes / 60);
+    const minutes = durationInMinutes % 60;
+    return `${hours}h ${minutes}m`;
+  };
+
   const formatTime = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleTimeString('id-ID', {
       hour: '2-digit',
       minute: '2-digit',
     });
+  };
+  const calculateTotalPrice = () => {
+    if (trip_type === 'round') {
+      return total_round_payment;
+    }
+    return total_payment;
   };
 
   return (
@@ -72,11 +87,16 @@ const FlightTicketCard = ({
         onClick={handleCardClick}
       >
         <div className="p-4">
-          <span
-            className={`text-white text-xs font-light rounded-full px-3 py-1 ${getStatusColor(status)}`}
-          >
-            {status}
-          </span>
+          <div className="flex justify-between">
+            <span
+              className={`text-white text-xs font-light rounded-full px-3 py-1 ${getStatusColor(status)}`}
+            >
+              {status}
+            </span>
+            <div className="text-sm text-purple-600">
+              {trip_type === 'round' ? 'Round Trip' : 'Single Trip'}
+            </div>
+          </div>
           <div className="flex justify-between py-3 gap-3">
             <div className="gap-2">
               <div className="hidden md:flex">
@@ -92,7 +112,7 @@ const FlightTicketCard = ({
               </div>
             </div>
             <div className="hidden md:flex md:flex-col md:items-center md:justify-center">
-              <div>{flightDetails.duration} mins</div>
+              <div>{formatDuration(flightDetails.duration)}</div>
               <div>
                 <img src={Arrow} alt="arrow icon" />
               </div>
@@ -119,13 +139,13 @@ const FlightTicketCard = ({
               <p className="font-bold">Booking Code:</p>
               <p>{flight.token}</p>
             </div>
-            <div className="hidden md:flex md:mt-2">
+            <div className="hidden sm:block md:mt-2">
               <p className="font-bold">Class:</p>
               <p>{firstTicket?.seat?.class}</p>
             </div>
             <div className="mt-6">
               <p className="font-bold text-purple-900">
-                IDR {total_payment.toLocaleString('id-ID')}
+                IDR {calculateTotalPrice().toLocaleString('id-ID')}
               </p>
             </div>
           </div>

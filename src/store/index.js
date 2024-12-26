@@ -11,8 +11,23 @@ import orderHistoryReducer from './slices/orderHistorySlice';
 import printTicketSliceReducer from './slices/printTicketSlice';
 
 const dateSerializer = {
-  serialize: (date) => (date instanceof Date ? date.toISOString() : date),
-  deserialize: (dateString) => (dateString ? new Date(dateString) : null),
+  serialize: (date) => {
+    if (date instanceof Date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+    return date;
+  },
+  deserialize: (dateString) => {
+    if (dateString && typeof dateString === 'string') {
+      const date = new Date(dateString);
+      date.setHours(0, 0, 0, 0);
+      return date;
+    }
+    return null;
+  },
 };
 
 export const store = configureStore({
@@ -35,7 +50,6 @@ export const store = configureStore({
           'auth/loginSuccess',
           'auth/loginFailure',
           'auth/logout',
-
           'user/fetchById/pending',
           'user/fetchById/fulfilled',
           'user/fetchById/rejected',
@@ -47,7 +61,6 @@ export const store = configureStore({
           'user/deleteAccount/rejected',
           'user/resetUserData',
           'user/clearUserErrors',
-
           'flightFilter/setSortCriteria',
           'flightFilter/setActiveFilters',
           'flightFilter/setSearchParams',
@@ -56,7 +69,6 @@ export const store = configureStore({
           'flightFilter/fetchFilteredFlights/rejected',
           'flightFilter/clearAllFilters',
           'flightFilter/goToNextPage',
-
           'flightSearch/updateFlightSearch',
           'flightSearch/resetFlightSearch',
           'flightSearch/clearSelectedFlights',
@@ -66,7 +78,6 @@ export const store = configureStore({
           'flightSearch/updateSelectedSeatClass',
           'flightSearch/setSearchResults',
           'flightSearch/clearSearchResults',
-
           'register/registerStart',
           'register/registerSuccess',
           'register/registerFailure',
@@ -74,7 +85,6 @@ export const store = configureStore({
           'register/otpSuccess',
           'register/otpFailure',
           'register/resetRegisterState',
-
           'resetPassword/resetPasswordStart',
           'resetPassword/resetPasswordSuccess',
           'resetPassword/resetPasswordFailure',
@@ -87,12 +97,10 @@ export const store = configureStore({
           'payload.user',
           'payload.decodedToken',
           'meta.arg.credentials',
-
           'payload.userData',
           'meta.arg.userData',
           'payload.password',
           'meta.arg.password',
-
           'payload.departureDate',
           'payload.returnDate',
           'meta.arg.departureDate',
@@ -111,12 +119,10 @@ export const store = configureStore({
           'payload.toCityDisplay',
           'payload.departureDateDisplay',
           'payload.returnDateDisplay',
-
           'payload.registerData',
           'meta.arg.registerData',
           'payload.otpCode',
           'meta.arg.otpCode',
-
           'payload.resetPasswordData',
           'meta.arg.resetPasswordData',
           'payload.resetOtpCode',
@@ -126,7 +132,6 @@ export const store = configureStore({
           'auth.user',
           'auth.loading',
           'auth.error',
-
           'user.userData',
           'user.loading',
           'user.error',
@@ -134,7 +139,6 @@ export const store = configureStore({
           'user.updateError',
           'user.deleteLoading',
           'user.deleteError',
-
           'flightSearch.departureDate',
           'flightSearch.returnDate',
           'flightSearch.departureDateDisplay',
@@ -145,7 +149,6 @@ export const store = configureStore({
           'flightSearch.toCityDisplay',
           'flightSearch.searchResults',
           'flightSearch.seatPrices',
-
           'flightFilter.departureDate',
           'flightFilter.returnDate',
           'flightFilter.sortCriteria',
@@ -157,17 +160,14 @@ export const store = configureStore({
           'flightFilter.searchParams',
           'flightFilter.searchParams.departureDate',
           'flightFilter.searchParams.returnDate',
-
           'payment.orderData',
           'payment.paymentDetails',
           'flight.selectedFlight',
           'flight.searchResults',
-
           'register.loading',
           'register.error',
           'register.isRegistered',
           'register.isOtpVerified',
-
           'resetPassword.loading',
           'resetPassword.error',
           'resetPassword.isOtpSent',
@@ -186,13 +186,8 @@ export const store = configureStore({
     }),
 });
 
-export const serializeDate = (date) => {
-  return date instanceof Date ? date.toISOString() : date;
-};
-
-export const deserializeDate = (dateString) => {
-  return dateString ? new Date(dateString) : null;
-};
+export const serializeDate = dateSerializer.serialize;
+export const deserializeDate = dateSerializer.deserialize;
 
 export const resetStore = () => {
   store.dispatch({ type: 'auth/logout' });

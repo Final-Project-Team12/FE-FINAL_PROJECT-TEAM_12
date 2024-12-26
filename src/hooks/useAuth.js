@@ -1,7 +1,12 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { loginSuccess, loginFailure, logout } from '../store/slices/authSlice';
+import {
+  loginStart,
+  loginSuccess,
+  loginFailure,
+  logout,
+} from '../store/slices/authSlice';
 import { authService } from '../services/auth.service';
 import Swal from 'sweetalert2';
 
@@ -25,12 +30,12 @@ export const useAuth = () => {
 
     syncAuthState();
     const interval = setInterval(syncAuthState, 1000);
-
     return () => clearInterval(interval);
   }, [dispatch, user]);
 
   const login = async (credentials) => {
     try {
+      dispatch(loginStart());
       const { user, decodedToken } = await authService.login(credentials);
       dispatch(loginSuccess({ user, decodedToken }));
 

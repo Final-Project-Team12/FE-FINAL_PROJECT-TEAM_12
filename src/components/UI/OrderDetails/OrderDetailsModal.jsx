@@ -6,6 +6,7 @@ import { useOrderPayment } from '../../../hooks/useOrderPayment';
 import { setPaymentData } from '../../../store/slices/paymentSlice';
 import usePrintTicket from '../../../hooks/usePrintTIcket';
 import PrintTicketModal from '../PrintTicketModal';
+import { formatDate, formatTime } from '../../../utils/orderUtils';
 
 const OrderDetailsModal = ({ selectedCard, onClose }) => {
   const navigate = useNavigate();
@@ -114,7 +115,7 @@ const OrderDetailsModal = ({ selectedCard, onClose }) => {
 
   return (
     <>
-      <div className="fixed inset-0 z-[999] isolate">
+      <div className="fixed inset-0 z-[999] isolate lg:hidden">
         {/* Backdrop */}
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-[2px]"
@@ -158,10 +159,10 @@ const OrderDetailsModal = ({ selectedCard, onClose }) => {
                 <div className="flex justify-between">
                   <div className="flex flex-col">
                     <p className="font-bold text-base md:text-lg">
-                      {flightDetails.departure_time}
+                      {formatDate(flightDetails.departure_time)}
                     </p>
                     <p className="text-sm md:text-base text-gray-600">
-                      {flightDetails.departure_time}
+                      {formatTime(flightDetails.departure_time)}
                     </p>
                   </div>
                   <p className="text-purple-500 font-bold text-sm md:text-base">
@@ -184,7 +185,7 @@ const OrderDetailsModal = ({ selectedCard, onClose }) => {
                   </div>
                   <div className="flex flex-col ml-2">
                     <p className="font-bold text-base md:text-lg">
-                      {flightDetails.airline_id}
+                      {flightDetails.airline.airline_name}
                     </p>
                     <p className="text-sm md:text-base text-gray-600">
                       Flight Number: {flightDetails.plane_code}
@@ -216,10 +217,10 @@ const OrderDetailsModal = ({ selectedCard, onClose }) => {
                 <div className="flex justify-between">
                   <div className="flex flex-col">
                     <p className="font-bold text-base md:text-lg">
-                      {flightDetails.arrival_time}
+                      {formatDate(flightDetails.arrival_time)}
                     </p>
                     <p className="text-sm md:text-base text-gray-600">
-                      {flightDetails.arrival_time}
+                      {formatTime(flightDetails.arrival_time)}
                     </p>
                   </div>
                   <p className="text-purple-500 font-bold text-sm md:text-base">

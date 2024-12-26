@@ -6,7 +6,6 @@ import {
   updateOrderData,
   updatePassengerData,
   setIsSubmitted,
-  setHasFamily,
   setSelectedDepartureSeats,
   setSelectedReturnSeats,
 } from '../../store/slices/paymentSlice';
@@ -45,7 +44,6 @@ const OrderForm = () => {
 
   const {
     orderData,
-    hasFamily,
     selectedDepartureSeats,
     selectedReturnSeats,
     isSubmitted,
@@ -198,37 +196,46 @@ const OrderForm = () => {
     try {
       const formattedPassengers = orderData.passengers.map((passenger) => ({
         title: passenger.title,
-        full_name: passenger.fullName.trim(),
-        family_name: passenger.hasFamily ? passenger.familyName.trim() : null,
-        birth_date: passenger.birthDate,
+        fullName: passenger.fullName.trim(),
+        hasFamily: passenger.hasFamily,
+        familyName:
+          passenger.hasFamily && passenger.familyName
+            ? passenger.familyName.trim()
+            : undefined,
+        birthDate: passenger.birthDate,
         nationality: passenger.nationality,
-        id_number: passenger.idNumber.trim(),
-        id_issuer: passenger.issuingCountry,
-        id_expiry: passenger.expiryDate,
+        idNumber: passenger.idNumber.trim(),
+        issuingCountry: passenger.issuingCountry,
+        expiryDate: passenger.expiryDate,
       }));
 
-      const departureSeatSelections = selectedDepartureSeats.map((seatId) =>
-        Number(seatId)
-      );
+      const seatSelections = selectedDepartureSeats.map((seatId) => ({
+        seat_id: Number(seatId),
+      }));
+
+      let returnSeatSelections = [];
+      if (isRoundTrip) {
+        returnSeatSelections = selectedReturnSeats.map((seatId) => ({
+          seat_id: Number(seatId),
+        }));
+      }
 
       const transactionData = {
         userData: {
           user_id: user.id,
         },
         passengerData: formattedPassengers,
-        seatSelections: departureSeatSelections,
+        seatSelections,
         planeId: selectedDepartureFlight.plane_id,
-        is_round_trip: isRoundTrip,
-        total_payment: 0,
+        isRoundTrip,
       };
 
       if (isRoundTrip) {
-        const returnSeatSelections = selectedReturnSeats.map((seatId) =>
-          Number(seatId)
-        );
         transactionData.returnPlaneId = selectedReturnFlight.plane_id;
         transactionData.returnSeatSelections = returnSeatSelections;
       }
+
+      console.log('Submitting transaction data:', transactionData);
 
       const success = await createTransaction(transactionData);
 
@@ -262,6 +269,8 @@ const OrderForm = () => {
         passengers: updatedPassengers,
       })
     );
+
+    console.log(`Updated passenger ${index}:`, updatedPassengers[index]);
   };
 
   const handleFamilyToggle = (index, event) => {

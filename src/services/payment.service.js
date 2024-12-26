@@ -1,23 +1,49 @@
 import axiosInstance from '../api/axiosInstance';
 
 const generateRandomId = () => {
-  const timestamp = new Date().getTime();
-  const randomStr = Math.random().toString(36).substring(2, 10);
-  return `${timestamp}_${randomStr}`;
+  let result = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  const charactersLength = characters.length;
+  for (let i = 0; i < 12; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
 };
 
 export const paymentService = {
   createTransaction: async (transactionData) => {
     try {
-      const response = await axiosInstance.post(
-        '/transaction',
-        transactionData
-      );
+      const cleanedData = {
+        userData: transactionData.userData,
+        passengerData: transactionData.passengerData.map((passenger) => ({
+          title: passenger.title,
+          full_name: passenger.full_name,
+          family_name: passenger.family_name || undefined,
+          birth_date: passenger.birth_date,
+          nationality: passenger.nationality,
+          id_number: passenger.id_number,
+          id_issuer: passenger.id_issuer,
+          id_expiry: passenger.id_expiry,
+        })),
+        seatSelections: transactionData.seatSelections,
+        planeId: transactionData.planeId,
+        isRoundTrip: transactionData.isRoundTrip,
+      };
+
+      if (transactionData.isRoundTrip) {
+        cleanedData.returnPlaneId = transactionData.returnPlaneId;
+        cleanedData.returnSeatSelections = transactionData.returnSeatSelections;
+      }
+
+      console.log('Sending cleaned transaction data:', cleanedData);
+
+      const response = await axiosInstance.post('/transaction', cleanedData);
       return {
         isSuccess: true,
         data: response.data,
       };
     } catch (error) {
+      console.error('Transaction creation error:', error.response || error);
       return {
         isSuccess: false,
         message:

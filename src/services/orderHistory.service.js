@@ -1,5 +1,4 @@
 import axiosInstance from '../api/axiosInstance';
-
 const orderHistoryService = {
   getOrderHistory: async (id) => {
     try {
@@ -10,5 +9,4 @@ const orderHistoryService = {
     }
   },
 };
-
 export default orderHistoryService;

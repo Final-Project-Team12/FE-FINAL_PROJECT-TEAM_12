@@ -2,8 +2,13 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { flightManagementAndBookingService } from '../../services/flight.service';
 
 const formatDateForComparison = (dateString) => {
+  if (!dateString) return '';
   const date = new Date(dateString);
-  return date.toISOString().split('T')[0];
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 };
 
 export const fetchFilteredFlights = createAsyncThunk(

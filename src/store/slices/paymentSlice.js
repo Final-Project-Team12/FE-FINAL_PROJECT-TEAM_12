@@ -2,29 +2,8 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   transactionData: {
-    userData: {
-      user_id: null,
-    },
-    passengerData: [
-      {
-        title: '',
-        full_name: '',
-        family_name: '',
-        birth_date: '',
-        nationality: '',
-        id_number: '',
-        id_issuer: '',
-        id_expiry: '',
-      },
-    ],
-    seatSelections: {
-      departure: [],
-      return: [],
-    },
-    planeId: null,
-    is_round_trip: false,
-    returnPlaneId: null,
-    total_payment: 0,
+    outbound: null,
+    return: null,
   },
   paymentData: {
     orderId: '',
@@ -41,9 +20,8 @@ const initialState = {
   paymentId: null,
   orderData: {
     orderName: '',
-    orderFamily: '',
-    phone: '',
     email: '',
+    phone: '',
     address: '',
     passengers: [],
   },
@@ -61,10 +39,25 @@ const paymentSlice = createSlice({
   initialState,
   reducers: {
     setTransactionData: (state, action) => {
-      state.transactionData = action.payload;
+      if (action.payload.outbound && action.payload.return) {
+        // Handle round-trip transaction
+        state.transactionData = {
+          outbound: action.payload.outbound,
+          return: action.payload.return,
+        };
+      } else {
+        // Handle single trip transaction
+        state.transactionData = {
+          outbound: action.payload,
+          return: null,
+        };
+      }
     },
     setPaymentData: (state, action) => {
-      state.paymentData = action.payload;
+      state.paymentData = {
+        ...state.paymentData,
+        ...action.payload,
+      };
     },
     setTransactionId: (state, action) => {
       state.transactionId = action.payload;
